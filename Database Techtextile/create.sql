@@ -14,13 +14,11 @@ CREATE TABLE Marketplace (
   name VARCHAR(100),
   details TEXT,
   image TEXT,
-  yarnBrand VARCHAR(100),
   price DECIMAL(10, 2),
-  yarnDanier VARCHAR(100),
-  fabricMaterial VARCHAR(100),
-  fabricPrintTech VARCHAR(100),
   category_id INT,
+  variant_id INT,
   CONSTRAINT FK_Marketplace_Category FOREIGN KEY (category_id) REFERENCES Category (category_id)
+  CONSTRAINT FK_Marketplace_ProductVariants FOREIGN KEY (variant_id) REFERENCES ProductVariants (variant_id)
 );
 
 CREATE TABLE Seller (
@@ -77,4 +75,15 @@ CREATE TABLE Category (
   categoryName VARCHAR(100),
   parentCategory_id INT,
   CONSTRAINT FK_Category_ParentCategory FOREIGN KEY (parentCategory_id) REFERENCES Category (category_id)
+);
+
+CREATE TABLE ProductVariants (
+  variant_id SERIAL PRIMARY KEY,
+  product_id INT,
+  yarnBrand VARCHAR(10),
+  yarnDanier DECIMAL(10, 2),
+  fabricMaterial VARCHAR(10),
+  fabricPrintTech VARCHAR(10),
+  color VARCHAR(10),
+  CONSTRAINT FK_ProductVariants_Product FOREIGN KEY (product_id) REFERENCES Marketplace (product_id)
 );
