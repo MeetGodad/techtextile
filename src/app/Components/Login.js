@@ -1,61 +1,41 @@
-
-
 export default function Login() {
-    return (
-      <div className="flex w-full h-full">
-        <div className=" flex w-2/4 relative bg-white h-[1024px] overflow-hidden text-left text-mini text-black font-poppins">
+  return (
+    <div className="flex h-screen">
+      <div className="relative flex-col flex items-center justify-center w-1/2 bg-white">
+        <div className="absolute top-0 right-6 text-5xl font-semibold mb-8">LOG</div>
 
-        <div className="absolute top-[150px] left-[650px]  tracking-[-0.02em] leading-[140%] font-semibold text-[3rem] inline-block ">
-          LOG
-        </div>
-        
-        
-        <button className="cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[562px] left-[240px] w-[242px] h-[75px]">
-          <div className="absolute top-[0px] left-[0px] rounded-[15px] bg-black box-border w-[242px] h-[75px] border-[1px] border-solid border-black" />
-          <div className="absolute top-[19px] left-[55px] text-2xl tracking-[-0.02em] leading-[140%] font-poppins text-white text-left inline-block w-[120px] h-[37px]">
+        <div className="w-full max-w-md">
+          <div className="mb-4">
+            <label className="block text-sm font-semibold mb-2">INTERESTED AS</label>
+            <select className="w-full p-2 border border-black rounded-md">
+              <option value="">Select an option</option>
+              <option value="buyer">As a Buyer</option>
+              <option value="seller">As a Seller</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-semibold mb-2">EMAIL</label>
+            <input type="email" className="w-full p-2 border border-black rounded-md"/>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-semibold mb-2">PASSWORD</label>
+            <input type="password" className="w-full p-2 border border-black rounded-md" />
+          </div>
+
+          <button className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
             CONTINUE
-          </div>
-        </button>
-        <div className="absolute top-[467px] left-[214px] w-[275px] h-[60px]">
-          <input
-            className="[outline:none] bg-[transparent] absolute top-[22px] left-[0px] rounded-8xs box-border w-[275px] h-[38px] border-[1px] border-solid border-black"
-            type="text"
-          />
-          <div className="absolute top-[0px] left-[0px] tracking-[-0.02em] leading-[140%] font-semibold inline-block w-[155px] h-[22px]">
-            PASSWORD
-          </div>
+          </button>
         </div>
-        <div className="absolute top-[353px] left-[214px] w-[275px] h-[60px]">
-          <input
-            className="[outline:none] bg-[transparent] absolute top-[22px] left-[0px] rounded-8xs box-border w-[275px] h-[38px] border-[1px] border-solid border-black"
-            type="text"
-          />
-          <div className="absolute top-[0px] left-[0px] tracking-[-0.02em] leading-[140%] font-semibold inline-block w-[155px] h-[22px]">
-            EMAIL
-          </div>
-        </div>
-        <div className="absolute top-[239px] left-[214px] w-[275px] h-[60px]">
-        <select
-          className="[outline:none] bg-[transparent] absolute top-[22px] left-[2px] rounded-8xs box-border w-[275px] h-[38px] border-[1px] border-solid border-black"
-        >
-          <option value="">Select an option</option>
-          <option value="buyer">As a Buyer </option>
-          <option value="Seller">As a Seller</option>
-        </select>
-          <h3 className="absolute top-[0px] left-[0px] tracking-[-0.02em] leading-[140%] font-semibold inline-block w-[155px] h-[22px]">
-            INTERESTED AS
-          </h3>
-        </div>
-        <a className="[text-decoration:none] absolute top-[702px] left-[221px] text-2xl font-inter text-[inherit] inline-block w-[295px] h-[42px]">
-          Don’t have the account?
-        </a>
+
+        <a className="mt-4 text-xl" href="#">Don’t have an account?</a>
       </div>
-      <div className=" flex w-2/4 relative bg-black h-[1024px] overflow-hidden text-left text-mini text-black font-poppins">
-      <div className="absolute top-[150px] left-[10px] text-16xl tracking-[-0.02em] leading-[140%] font-semibold text-white inline-block text-[3rem]">
-          IN
-        </div>
-        <img src="Images/LOGO.png" className="absolute m-auto self-center left-1/4  w-[500px] h-[500px]" />
+
+      <div className="flex items-center justify-center w-1/2 bg-black relative">
+        <div className="top-0 text-5xl font-semibold text-white absolute left-7">IN</div>
+        <img src="Images/LOGO.png" alt="Logo" className="w-3/4 h-auto" />
       </div>
-      </div>
-    );
-  };
+    </div>
+  );
+}
