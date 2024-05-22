@@ -7,7 +7,6 @@ async function passwordEncryption (password) {
     return hash;
 }
 
-
 export async function GET(email, password) {
 
 
@@ -22,3 +21,4 @@ export async function GET(email, password) {
     }
     return new Response(JSON.stringify(response), { status: 200 });
 }
+

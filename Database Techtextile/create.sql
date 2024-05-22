@@ -31,7 +31,7 @@ CREATE TABLE Marketplace (
   price DECIMAL(10, 2) NOT NULL,
   category_id INT REFERENCES Category (category_id),
   variantId INT REFERENCES ProductVariant (variantId),
-  userId INT REFERENCES M_User (userId)
+  userId serial REFERENCES M_User (userId)
 );
 
 CREATE TABLE Orders (
@@ -40,7 +40,7 @@ CREATE TABLE Orders (
   orderPrice DECIMAL(10, 2) NOT NULL,
   orderStatus VARCHAR(20) NOT NULL,
   orderPayment VARCHAR(10) NOT NULL,
-  userId INT REFERENCES M_User (userId)
+  userId SERIAL REFERENCES M_User (userId)
 );
 
 CREATE TABLE orderDetails (
