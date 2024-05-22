@@ -1,11 +1,13 @@
+
 import Login from "./Login/Login"
+
 
 
 export default function Page() {
 
   return (
     <div>
-      <Login />
+      <SignUp />
     </div>
   );
 }
