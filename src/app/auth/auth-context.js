@@ -1,11 +1,10 @@
-"use strict";
+"use client";
  
 import { useContext, createContext, useState, useEffect } from "react";
 import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  EmailAuthProvider,
   signOut,
   onAuthStateChanged,
   GoogleAuthProvider,
@@ -24,23 +23,20 @@ export const AuthContextProvider = ({ children }) => {
 
   async function emailSignIn(email, password) {
     try {
-      const userCredential = await signInWithEmailAndPassword(email, password);
-      // userCredential.user.uid is the user's ID
+      const userCredential = await signInWithEmailAndPassword(auth , email, password);
       return userCredential.user.uid;
     } catch (error) {
-      console.error(error);
-      // Handle errors here
+      console.error('Failed to sign in:', error);
     }
   }
 
   async function emailSignUp(email, password) {
     try {
-      const userCredential = await createUserWithEmailAndPassword(email, password);
-      // userCredential.user.uid is the user's ID
+      const userCredential = await createUserWithEmailAndPassword(auth,email, password);
       return userCredential.user.uid;
     } catch (error) {
-      console.error(error);
-      // Handle errors here
+      console.error('Failed to sign up:', error);
+      throw error;
     }
   }
  
@@ -49,11 +45,13 @@ export const AuthContextProvider = ({ children }) => {
   };
  
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      setUser(user);
     });
+
+    // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, []); // Removed 'user' from the dependency array
+  }, []);
  
   return (
     <AuthContext.Provider value={{ user, googleSignIn, emailSignIn, emailSignUp , firebaseSignOut }}>
@@ -62,7 +60,6 @@ export const AuthContextProvider = ({ children }) => {
   );
 };
  
-
 export const useUserAuth = () => {
   return useContext(AuthContext);
 };

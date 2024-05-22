@@ -73,7 +73,7 @@ export default function Login() {
           </button>
         </div>
 
-        <Link className="mt-4 text-black text-xl" href="/app/SignUp">Don’t have an account?</Link>
+        <Link className="mt-4 text-black text-xl" href="/SignUp">Don’t have an account?</Link>
       </div>
 
       <div className="flex items-center justify-center w-1/2 bg-black relative">
