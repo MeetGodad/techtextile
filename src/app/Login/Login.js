@@ -1,6 +1,7 @@
 "use client";
 import  { useState } from "react";
 import { useUserAuth } from "../auth/auth-context";
+import Link from "next/link";
 
 export default function Login() {
  
@@ -66,13 +67,13 @@ export default function Login() {
           </div>
 
           <button
-            onClick={() => }
+            onClick={() => handleOnClick()}
            className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
             CONTINUE
           </button>
         </div>
 
-        <a className="mt-4 text-black text-xl" href="">Don’t have an account?</a>
+        <Link className="mt-4 text-black text-xl" href="/app/SignUp">Don’t have an account?</Link>
       </div>
 
       <div className="flex items-center justify-center w-1/2 bg-black relative">
