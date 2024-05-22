@@ -1,11 +1,12 @@
-import Link from 'next/link';
+// Desc: Login page for the application 
+
+import { useUserAuth } from "../utils/auth-context";
+
 export default function Login() {
   return (
     <div className="flex h-screen">
       <div className="relative flex-col flex items-center justify-center w-1/2 bg-white">
-
         <div className="absolute  text-black top-0 right-6 text-5xl font-semibold mb-8">LOG</div>
-
 
         <div className="w-full max-w-md">
           <div className="mb-4 text-black">
@@ -32,11 +33,11 @@ export default function Login() {
           </button>
         </div>
 
-        <Link href="./Components/signup.js" className="mt-4 text-xl">Don’t have an account?</Link>
+        <a className="mt-4 text-black text-xl" href="">Don’t have an account?</a>
       </div>
 
       <div className="flex items-center justify-center w-1/2 bg-black relative">
-        <div className="top-0 text-5xl font-semibold text-white absolute left-3">IN</div>
+        <div className="top-0 text-5xl font-semibold text-white absolute left-7">IN</div>
         <img src="Images/LOGO.png" alt="Logo" className="w-3/4 h-auto" />
       </div>
     </div>

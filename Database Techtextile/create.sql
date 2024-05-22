@@ -1,89 +1,51 @@
-CREATE TABLE Buyer (
-  buyer_id SERIAL PRIMARY KEY,
-  buyerName VARCHAR(100),
-  buyerPassword BYTEA NOT NULL,
-  buyerEmail VARCHAR(100) UNIQUE,
-  buyerAddress VARCHAR(100),
-  buyerPhoneNum VARCHAR(10),
-  order_id INT
-   CONSTRAINT FK_Buyer_Order FOREIGN KEY  (order_id) REFERENCES Order (order_id)
+CREATE TABLE M_User (
+  userId SERIAL PRIMARY KEY ,
+  userName VARCHAR(100) NOT NULL,
+  userEmail VARCHAR(100) UNIQUE NOT NULL,
+  userPassword BYTEA NOT NULL,
+  userAddress VARCHAR(100),
+  userPhoneNum VARCHAR(10),
+  userType VARCHAR(20) NOT NULL 
 );
 
-CREATE TABLE Marketplace (
-  product_id SERIAL PRIMARY KEY,
-  name VARCHAR(100),
-  details TEXT,
-  image TEXT,
-  price DECIMAL(10, 2),
-  category_id INT,
-  variant_id INT,
-  CONSTRAINT FK_Marketplace_Category FOREIGN KEY (category_id) REFERENCES Category (category_id)
-  CONSTRAINT FK_Marketplace_ProductVariants FOREIGN KEY (variant_id) REFERENCES ProductVariants (variant_id)
-);
-
-CREATE TABLE Seller (
-  seller_id SERIAL PRIMARY KEY,
-  sellerName VARCHAR(100),
-  sellerPassword BYTEA NOT NULL,
-  sellerEmail VARCHAR(100) UNIQUE,
-  sellerProducts TEXT,
-  sellerPhoneNum VARCHAR(10)
-);
-
-CREATE TABLE Orders (
-  order_id SERIAL PRIMARY KEY,
-  orderDeliveryDate DATE,
-  orderPrice DECIMAL(10, 2),
-  orderStatus VARCHAR(10),
-  buyerAddress VARCHAR(100),
-  orderPayment VARCHAR(5),
-  orderConfirm BOOLEAN,
-  sellerProducts TEXT,
-  sellerName VARCHAR(100),
-  buyer_id INT,
-  CONSTRAINT FK_Orders_Buyer FOREIGN KEY (buyer_id) REFERENCES Buyer (buyer_id),
-  CONSTRAINT FK_Orders_SellerName FOREIGN KEY (sellerName) REFERENCES Seller (sellerName)
-  CONSTRAINT FK_Order_BuyerAddress FOREIGN KEY (buyerAddress) REFERENCES Buyer (buyerAddress)
-);
-
-CREATE TABLE ShoppingCart (
-  product_id INT,
-  buyer_id INT,
-  PRIMARY KEY (product_id, buyer_id),
-  CONSTRAINT FK_ShoppingCart_Product FOREIGN KEY (product_id) REFERENCES Marketplace (product_id),
-  CONSTRAINT FK_ShoppingCart_Buyer FOREIGN KEY (buyer_id) REFERENCES Buyer (buyer_id)
-);
-
-CREATE TABLE MarketplaceSeller (
-  seller_id INT,
-  product_id INT,
-  PRIMARY KEY (seller_id, product_id),
-  CONSTRAINT FK_MarketplaceSeller_Seller FOREIGN KEY (seller_id) REFERENCES Seller (seller_id),
-  CONSTRAINT FK_MarketplaceSeller_Product FOREIGN KEY (product_id) REFERENCES Marketplace (product_id)
-);
-
-CREATE TABLE MarketplaceBuyer (
-  buyer_id INT,
-  product_id INT,
-  PRIMARY KEY (buyer_id, product_id),
-  CONSTRAINT FK_MarketplaceBuyer_Buyer FOREIGN KEY (buyer_id) REFERENCES Buyer (buyer_id),
-  CONSTRAINT FK_MarketplaceBuyer_Product FOREIGN KEY (product_id) REFERENCES Marketplace (product_id)
+CREATE TABLE ProductVariant (
+  variantId SERIAL PRIMARY KEY,
+  yarnBrand VARCHAR(100),
+  yarnDanier VARCHAR(100),
+  fabricMaterial VARCHAR(100),
+  fabricPrintTech VARCHAR(100),
+  color VARCHAR(25)
 );
 
 CREATE TABLE Category (
   category_id SERIAL PRIMARY KEY,
-  categoryName VARCHAR(100),
-  parentCategory_id INT,
-  CONSTRAINT FK_Category_ParentCategory FOREIGN KEY (parentCategory_id) REFERENCES Category (category_id)
+  categoryName VARCHAR(100) NOT NULL,
+  parentCategory_id INT REFERENCES Category (category_id)
 );
 
-CREATE TABLE ProductVariants (
-  variant_id SERIAL PRIMARY KEY,
-  product_id INT,
-  yarnBrand VARCHAR(10),
-  yarnDanier DECIMAL(10, 2),
-  fabricMaterial VARCHAR(10),
-  fabricPrintTech VARCHAR(10),
-  color VARCHAR(10),
-  CONSTRAINT FK_ProductVariants_Product FOREIGN KEY (product_id) REFERENCES Marketplace (product_id)
+CREATE TABLE Marketplace (
+  product_id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  details VARCHAR(255), 
+  image VARCHAR(255),
+  price DECIMAL(10, 2) NOT NULL,
+  category_id INT REFERENCES Category (category_id),
+  variantId INT REFERENCES ProductVariant (variantId),
+  userId INT REFERENCES M_User (userId)
+);
+
+CREATE TABLE Orders (
+  order_id SERIAL PRIMARY KEY,
+  orderDeliveryDate DATE NOT NULL,
+  orderPrice DECIMAL(10, 2) NOT NULL,
+  orderStatus VARCHAR(20) NOT NULL,
+  orderPayment VARCHAR(10) NOT NULL,
+  userId INT REFERENCES M_User (userId)
+);
+
+CREATE TABLE orderDetails (
+  order_id INT NOT NULL REFERENCES Orders(order_id),
+  product_id INT NOT NULL REFERENCES Marketplace (product_id),
+  quantity INT NOT NULL,
+  PRIMARY KEY (order_id, product_id)
 );
