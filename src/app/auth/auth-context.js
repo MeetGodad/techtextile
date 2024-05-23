@@ -5,7 +5,6 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  EmailAuthProvider,
   signOut,
   onAuthStateChanged,
   GoogleAuthProvider,
@@ -16,49 +15,51 @@ const AuthContext = createContext();
  
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-
+ 
   const googleSignIn = () => {
     const provider = new GoogleAuthProvider();
     return signInWithPopup(auth, provider);
   };
 
-  const emailSignIn = async (email, password) =>  { 
+  async function emailSignIn(email, password) {
     try {
-      const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-      // userCredential.user.uid is the user's ID
+      const userCredential = await signInWithEmailAndPassword(auth , email, password);
       return userCredential.user.uid;
-  } catch (error) {
-    console.log("Error signing in with email and password" , error);
-  }
-};
-
-  const emailSignUp = (email, password) => { 
-    try {
-    return createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
-    console.log("Error signing up with email and password" , error);
+      console.error('Failed to sign in:', error);
     }
-  };
+  }
+
+  async function emailSignUp(email, password) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth,email, password);
+      return userCredential.user.uid;
+    } catch (error) {
+      console.error('Failed to sign up:', error);
+      throw error;
+    }
+  }
  
   const firebaseSignOut = () => {
     return signOut(auth);
   };
  
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      setUser(user);
     });
+
+    // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, [user]);
+  }, []);
  
   return (
-    <AuthContext.Provider value={{ user,googleSignIn, emailSignIn , emailSignUp , firebaseSignOut }}>
+    <AuthContext.Provider value={{ user, googleSignIn, emailSignIn, emailSignUp , firebaseSignOut }}>
       {children}
     </AuthContext.Provider>
   );
 };
  
-
 export const useUserAuth = () => {
   return useContext(AuthContext);
 };
