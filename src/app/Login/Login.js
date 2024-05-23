@@ -5,34 +5,45 @@ import Link from "next/link";
 
 export default function Login() {
  
-  const { user, emailSignIn,  firebaseSignOut } = useUserAuth();
+  const { user, emailSignIn } = useUserAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleOnClick = async () => {
-    const userId = await emailSignIn(email, password);
-    
-    // Send userId to your backend to get the user's role
-    const response = await fetch('api/Login', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId }),
-    });
+  const handleSubmit = async () => {
 
-    if (!response.ok) {
-      alert('User not found!');
-    }
-    const data = await response.json();
-    const userRole = data.role;
-  
-    
-    if (userRole === 'buyer') {
-      
-    } else if (userRole === 'seller') {
-      
-    }
+    try {
+        const userId = await emailSignIn(email, password);
+
+        console.log('User ID:', userId);
+        
+        const response = await fetch(`api/auth/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          alert('User not found!');
+        }
+
+        const data = await response.json();
+
+        if (data.user) {
+          const userRole = data.user.usertype;
+          const userName = data.user.username;
+          console.log('User role:', userRole);
+
+          if (userRole === 'buyer') {
+            alert('Welcome back! ' + userName )
+          } else if (userRole === 'seller') {
+            alert('Welcome back! Seller ' + userName )
+          }
+        }
+
+      } catch (error) {
+        console.error('Unexpected server response:', error);
+      }
   }
 
   return (
@@ -41,14 +52,6 @@ export default function Login() {
         <div className="absolute  text-black top-0 right-6 text-5xl font-semibold mb-8">LOG</div>
 
         <div className="w-full max-w-md">
-          <div className="mb-4 text-black">
-            <label className="block text-sm  text-black font-semibold mb-2">INTERESTED AS</label>
-            <select className="w-full p-2 border border-black rounded-md">
-              <option value="">Select an option</option>
-              <option value="buyer">As a Buyer</option>
-              <option value="seller">As a Seller</option>
-            </select>
-          </div>
 
           <div className="mb-4">
             <label className="block text-black text-sm font-semibold mb-2">EMAIL</label>
@@ -67,7 +70,7 @@ export default function Login() {
           </div>
 
           <button
-            onClick={() => handleOnClick()}
+            onClick={() => handleSubmit()}
            className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
             CONTINUE
           </button>
