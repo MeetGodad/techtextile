@@ -88,9 +88,10 @@ export default function SignUp() {
                         <div className="w-1/2 pr-2 mb-5">
                             <label className="block text-sm  text-black font-semibold mb-2">INTERESTED AS</label>
                             <select 
+                            required
                             onChange={(e) => setRole(e.target.value)}
                             className="w-full p-2 border text-black border-black rounded-md">
-                            <option value="">Select an option</option>
+                            <option value="" disabled selected >Select an option</option>
                             <option value="buyer"  >As a Buyer</option>
                             <option value="seller">As a Seller</option>
                             </select>
