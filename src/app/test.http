@@ -1,0 +1,14 @@
+
+
+POST http://localhost:3000/api/auth HTTP/1.1
+content-type: application/json
+
+
+{
+    "userId": "12345",
+    "role": "buyer",
+    "name": "John Doe",
+    "email": "johndoe@example.com",
+    "address": "123 Main St",
+    "phone": "555-1234"
+}

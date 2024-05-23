@@ -21,40 +21,43 @@ export default function SignUp() {
         }
         try {
             const userId = await emailSignUp(email, password);
-            console.log('User ID saved to database2:', userId);
         
-            const user = {
-                userId,
-                email,
-                name,
-                phone,
-                role,
-                address
-            };
-            console.log(user);
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId,
+                    role,
+                    name,
+                    email,
+                    phone,
+                    address
+                }
+                ),
+            });
+    
+            if (!response.ok) {
+                alert('User not found!');
+            }
+            console.log(response);
+            const data = await response.json();
+            const userRole = data[0].userType;
+    
+            if (userRole === 'buyer') {
+                alert('You are a buyer now!')
+            } else if (userRole === 'seller') {
+               alert('You are a seller now!')
+            }
 
         } catch (error) {
-            console.error('Failed to sign up:', error);
-            alert('Failed to sign up: ' + error.message);
-        }
-        const response = await fetch('/api/SignUp', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(user),
-        });
-
-        if (!response.ok) {
-            alert('User not found!');
-        }
-        const data = await response.json();
-        const userRole = data[0].userType;
-
-        if (userRole === 'buyer') {
-            alert('You are a buyer now!')
-        } else if (userRole === 'seller') {
-           alert('You are a seller now!')
+            if (error.code === "auth/email-already-in-use") {
+              alert("Email address is already in use.");
+            } else {
+              console.error("Failed to sign up:", error);
+              alert("Failed to sign up: " + error.message);
+            }
         }
     }
 
