@@ -13,9 +13,9 @@ export default function SignUp() {
     const [address, setAddress] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    const handleSubmit = async () => {
-
-
+    
+const handleSubmit = async (event) => {
+        event.preventDefault();
 
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
@@ -81,8 +81,7 @@ export default function SignUp() {
             <div className="relative flex flex-col items-center justify-center w-1/2 bg-white">
                 <div className="absolute top-0 left-3 text-5xl text-black font-semibold mb-8">UP</div>
         
-
-                
+            <form onSubmit={handleSubmit} className="w-full max-w-md text-black ">
                 <div className="w-full max-w-md text-black ">
                     <div className="flex flex-col items-center mb-4">
                         <div className="w-1/2 pr-2 mb-5">
@@ -150,14 +149,12 @@ export default function SignUp() {
                                 className="w-full p-2 border border-black rounded-md" />
                             </div>
                         </div>
-                        <button
-                            onClick={() => handleSubmit()}
-                         className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
+                        <button className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
                             CONTINUE
                         </button>
                     </div>
                 </div>
-        
+            </form>
                 <Link href="/Login" className="mt-4  text-black text-xl">Already Have An Account ? Login Then</Link>
             </div>
         </div>
