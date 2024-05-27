@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
+
 export default function SignUp() {
 
     const { user, emailSignUp, firebaseSignOut } = useUserAuth();
@@ -14,7 +15,7 @@ export default function SignUp() {
     const [confirmPassword, setConfirmPassword] = useState("");
 
     
-const handleSubmit = async (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         if (password !== confirmPassword) {
@@ -68,8 +69,6 @@ const handleSubmit = async (event) => {
             }
         }
     }
-
-
 
     
     return (
