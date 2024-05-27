@@ -1,17 +1,12 @@
 import React from 'react';
 import Header from './components/Navbar';
 import Footer from './components/Footer';
+import Login from './Login/Login';
 
-const App = () => {
-  return (
-    <div>
-      <Header/>
-      <main>
-        <h2>Welcome to Tech Textile </h2>
-      </main>
-      <Footer/>
-    </div>
-  );
-};
-
-export default App;
+export default function Page() {
+    return (
+        <div>
+            <Login />
+        </div>
+    );
+}
