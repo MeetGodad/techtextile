@@ -1,11 +1,17 @@
-import Login from "./Login/Login"
+import React from 'react';
+import Header from './components/Navbar';
+import Footer from './components/Footer';
 
-
-export default function Page() {
-
+const App = () => {
   return (
     <div>
-      <Login />
+      <Header/>
+      <main>
+        <h2>Welcome to Tech Textile </h2>
+      </main>
+      <Footer/>
     </div>
   );
-}
+};
+
+export default App;
