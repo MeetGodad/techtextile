@@ -31,8 +31,8 @@ export default function Login() {
         const data = await response.json();
 
         if (data.user) {
-          const userRole = data.user.usertype;
-          const userName = data.user.username;
+          const userRole = data.user.user_type;
+          const userName = data.user.first_name;
           console.log('User role:', userRole);
 
           if (userRole === 'buyer') {
