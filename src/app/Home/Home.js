@@ -1,9 +1,9 @@
 "use client";
 
 import {  useEffect, useState } from 'react'; // Import useClient
-import FrameComponent from "../Components/FrameComponent";
+import ProductSection from '../components/ProductSection';
 
-const Desktop = () => {
+export default function Home() {
 
   const [products, setProducts] = useState([]);
 
@@ -28,7 +28,7 @@ const Desktop = () => {
         <section className="self-stretch flex flex-row items-start justify-start py-0 px-0 box-border max-w-full">
           <div className="w-[1271px] flex flex-row flex-wrap items-start justify-start gap-[107px_98.3px] min-h-[685px] max-w-full shrink-0">
             {products.map((product, index) => (
-              <FrameComponent  key={product.product_id}
+              <ProductSection  key={product.product_id}
               name={product.product_name}
               price={product.price}
               image={product.image_url}
@@ -54,5 +54,5 @@ const Desktop = () => {
   );
 };
 
-export default Desktop;
+
 
