@@ -5,36 +5,22 @@ GET http://localhost:3000/api/auth/7XHSnvIpguhViHnpIYc6GmFN7G93 HTTP/1.1
 
 
 
-###
 
-POST http://localhost:3000/api/auth HTTP/1.1
-content-type: application/json
-
-
-{
-    "userId": "12345",
-    "role": "buyer",
-    "name": "John Doe",
-    "email": "johndoe@example.com",
-    "address": "123 Main St",
-    "phone": "555-1234"
-}
-
-
-###
 
 POST http://localhost:3000/api/auth HTTP/1.1
 content-type: application/json
 
 {
-    "userId": "6789",
-    "name": "shubh",
-    "email": "shubhapa@gmail.com",
-    "address": "41Dr, NW",
-    "phone": "4033612541",
-    "role": "buyer"
+  "userId": "1",
+  "userType": "buyer",
+  "firstName": "John",
+  "LastName": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "1234567890",
+  "address": "123 Main St"
 }
-###
+
+
 //new product
 POST http://localhost:3000/api/products HTTP/1.1
 content-type: application/json
@@ -50,4 +36,6 @@ content-type: application/json
     "yarn_denier":"45",
     "yarn_color":"blue"
 }
+
+
 
