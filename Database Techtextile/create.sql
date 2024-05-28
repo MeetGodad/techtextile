@@ -1,8 +1,7 @@
 CREATE TABLE M_User (
-  userId SERIAL PRIMARY KEY ,
+  userId VARCHAR(100) PRIMARY KEY ,
   userName VARCHAR(100) NOT NULL,
   userEmail VARCHAR(100) UNIQUE NOT NULL,
-  userPassword BYTEA NOT NULL,
   userAddress VARCHAR(100),
   userPhoneNum VARCHAR(10),
   userType VARCHAR(20) NOT NULL 
@@ -25,13 +24,13 @@ CREATE TABLE Category (
 
 CREATE TABLE Marketplace (
   product_id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  details VARCHAR(255), 
-  image VARCHAR(255),
-  price DECIMAL(10, 2) NOT NULL,
-  category_id INT REFERENCES Category (category_id),
+  product_name VARCHAR(100) NOT NULL,
+  product_details VARCHAR(255), 
+  product_image VARCHAR(255),
+  product_price DECIMAL(10, 2) NOT NULL,
+  category_id INT REFERENCES Category (category_id) NOT NULL, 
   variantId INT REFERENCES ProductVariant (variantId),
-  userId INT REFERENCES M_User (userId)
+  userId VARCHAR(100) REFERENCES M_User (userId) NOT NULL
 );
 
 CREATE TABLE Orders (
@@ -40,7 +39,7 @@ CREATE TABLE Orders (
   orderPrice DECIMAL(10, 2) NOT NULL,
   orderStatus VARCHAR(20) NOT NULL,
   orderPayment VARCHAR(10) NOT NULL,
-  userId INT REFERENCES M_User (userId)
+  userId VARCHAR(100) REFERENCES M_User (userId)
 );
 
 CREATE TABLE orderDetails (

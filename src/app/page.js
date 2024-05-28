@@ -1,11 +1,13 @@
 
-import Login from "./Login/Login"
-import Home from "./Home/Home"
-export default function Page() {
+import React from 'react';
+import Header from './components/Navbar';
+import Footer from './components/Footer';
+import Login from './Login/Login';
 
-  return (
-    <div>
-      <Home />
-    </div>
-  );
+export default function Page() {
+    return (
+        <div>
+            <Login />
+        </div>
+    );
 }

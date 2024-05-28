@@ -1,0 +1,56 @@
+
+
+
+GET http://localhost:3000/api/auth/7XHSnvIpguhViHnpIYc6GmFN7G93 HTTP/1.1
+
+
+
+###
+
+POST http://localhost:3000/api/auth HTTP/1.1
+content-type: application/json
+
+
+{
+    "userId": "12345",
+    "role": "buyer",
+    "name": "John Doe",
+    "email": "johndoe@example.com",
+    "address": "123 Main St",
+    "phone": "555-1234"
+}
+
+
+###
+
+POST http://localhost:3000/api/auth HTTP/1.1
+content-type: application/json
+
+{
+    "userId": "6789",
+    "name": "shubh",
+    "email": "shubhapa@gmail.com",
+    "address": "41Dr, NW",
+    "phone": "4033612541",
+    "role": "buyer"
+}
+###
+//new product
+POST http://localhost:3000/api/products HTTP/1.1
+content-type: application/json
+    
+    {
+    "product_name": "Product1",
+    "product_details": "Details1",
+    "product_image": "Image1",
+    "product_price": 100.00,
+    "categoryName": "Category1",
+    "parentCategory_id": null,
+    "yarnBrand": "Brand1",
+    "yarnDanier": "Danier1",
+    "fabricMaterial": "Material1",
+    "fabricPrintTech": "PrintTech1",
+    "color": "Color1",
+    "userId": "6789"
+    }
+
