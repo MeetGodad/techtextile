@@ -33,8 +33,8 @@ export async function POST(req) {
     else if (requestData.product_type === 'fabric'){const Fabric = await sql`
             INSERT INTO FabricProducts (product_id, fabric_type, fabric_print_tech, fabric_material, fabric_color)
             VALUES (${productId}, ${requestData.fabric_type}, ${requestData.fabric_print_tech}, ${requestData.fabric_material},         
-                 ${requestData.fabric_color});
-            RETURNING fabric_id`;   
+                 ${requestData.fabric_color})
+            RETURNING fabric_id;`;   
 
         const fabricId = Fabric[0].fabric_id;
         console.log("Marketplace data inserted successfully", fabricId);

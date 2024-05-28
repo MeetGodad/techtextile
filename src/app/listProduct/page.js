@@ -7,7 +7,7 @@ const [productData, setProductData] = useState({
     description: '',
     price: '',
     image_url: '',
-    seller_id: 9,
+    seller_id: 12,
     product_type: '',
     yarn_type: '',
     yarn_denier: '',
