@@ -1,16 +1,3 @@
-<<<<<<< Updated upstream
-import Login from "./Login/Login"
-
-
-export default function Page() {
-
-  return (
-    <div>
-      <Login />
-    </div>
-  );
-}
-=======
 import React from 'react';
 import Header from './components/Navbar';
 import Footer from './components/Footer';
@@ -24,4 +11,3 @@ export default function Page() {
         </div>
     );
 }
->>>>>>> Stashed changes
