@@ -12,29 +12,33 @@ export async function POST(req) {
         const sql = neon(databaseUrl);
         console.log("Executing SQL queries");
 
-        const productVariantResult = await sql`
-            INSERT INTO ProductVariant (yarnBrand, yarnDanier, fabricMaterial, fabricPrintTech, color)
-            VALUES (${requestData.yarnBrand}, ${requestData.yarnDanier}, ${requestData.fabricMaterial}, ${requestData.fabricPrintTech}, ${requestData.color})
-            RETURNING variantid;
+        const product_details = await sql`
+            INSERT INTO Products (product_name, product_description, price, image_url, seller_id,product_type)
+            VALUES (${requestData.product_name}, ${requestData.description}, ${requestData.price}, ${requestData.image_url},             
+                 ${requestData.seller_id},${requestData.product_type})
+            RETURNING product_id;
         `;
-        const variantId = productVariantResult[0].variantid;
-        console.log("ProductVariant inserted with ID:", variantId);
+        const productId = product_details[0].product_id;
+        console.log("ProductVariant inserted with ID:", productId);
 
-      
-        const categoryResult = await sql`
-            INSERT INTO Category (categoryName, parentCategory_id)
-            VALUES (${requestData.categoryName}, ${requestData.parentCategory_id})
-            RETURNING category_id;
-        `;
-        const categoryId = categoryResult[0].category_id;
-        console.log("Category inserted with ID:", categoryId);
+      if (requestData.product_type === 'yarn'){const Yarn = await sql`
+            INSERT INTO YarnProducts (product_id, yarn_type,yarn_denier,yarn_color)
+            VALUES (${productId}, 
+                 ${requestData.yarn_type},${requestData.yarn_denier},${requestData.yarn_color})
+            RETURNING yarn_id; `;
+            
+        const yarnId = Yarn[0].yarn_id;
+        console.log("Category inserted with ID:", yarnId);
+    }
+    else if (requestData.product_type === 'fabric'){const Fabric = await sql`
+            INSERT INTO FabricProducts (product_id, fabric_type, fabric_print_tech, fabric_material, fabric_color)
+            VALUES (${productId}, ${requestData.fabric_type}, ${requestData.fabric_print_tech}, ${requestData.fabric_material},         
+                 ${requestData.fabric_color});
+            RETURNING fabric_id`;   
 
-        const marketplaceResult = await sql`
-            INSERT INTO Marketplace (product_name, product_details, product_image, product_price, category_id, variantId, userId)
-            VALUES (${requestData.product_name}, ${requestData.product_details}, ${requestData.product_image}, ${requestData.product_price}, ${categoryId}, ${variantId}, ${requestData.userId})
-            RETURNING *;
-        `;
-        console.log("Marketplace data inserted successfully", marketplaceResult);
+        const fabricId = Fabric[0].fabric_id;
+        console.log("Marketplace data inserted successfully", fabricId);
+    }
 
         return new Response(JSON.stringify({ message: "Data inserted successfully" }), { status: 200 });
     } catch (error) {
