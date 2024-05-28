@@ -15,8 +15,8 @@ export default function SignUp() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [companyName, setCompanyName] = useState("");
 
-    const handleSubmit = async () => {
-
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
 
         if (password !== confirmPassword) {
@@ -93,7 +93,7 @@ export default function SignUp() {
                 <div className="absolute top-0 left-3 text-5xl text-black font-semibold mb-8">UP</div>
         
 
-                
+         <form onSubmit={handleSubmit} className="w-full max-w-md text-black ">   
                 <div className="w-full max-w-md text-black ">
                     <div className="flex flex-col items-center mb-4">
                         <div className="flex mb-4 w-full">
@@ -204,7 +204,7 @@ export default function SignUp() {
                         </button>
                     </div>
                 </div>
-        
+                </form>
                 <Link href="/Login" className="mt-4  text-black text-xl">Already Have An Account ? Login Then</Link>
             </div>
         </div>

@@ -9,7 +9,8 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     try {
         const userId = await emailSignIn(email, password);
@@ -31,7 +32,7 @@ export default function Login() {
 
         if (data.user) {
           const userRole = data.user.user_type;
-          const userName = data.user.first_name + ' ' + data.user.last_name;
+          const userName = data.user.first_name;
           console.log('User role:', userRole);
 
           if (userRole === 'buyer') {
@@ -51,30 +52,33 @@ export default function Login() {
       <div className="relative flex-col flex items-center justify-center w-1/2 bg-white">
         <div className="absolute  text-black top-0 right-6 text-5xl font-semibold mb-8">LOG</div>
 
-        <div className="w-full max-w-md">
 
-          <div className="mb-4">
-            <label className="block text-black text-sm font-semibold mb-2">EMAIL</label>
-            <input 
-            type="email" 
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border text-black border-black rounded-md"/>
+        <form  onSubmit={handleSubmit}  className="w-full max-w-md">
+         <div className="w-full max-w-md">
+
+            <div className="mb-4">
+              <label className="block text-black text-sm font-semibold mb-2">EMAIL</label>
+              <input 
+              type="email" 
+              required
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-2 border text-black border-black rounded-md"/>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-black text-sm font-semibold mb-2">PASSWORD</label>
+              <input
+              required  
+              type="password" 
+                onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border text-black border-black rounded-md" />
+            </div>
+
+            <button className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
+              CONTINUE
+            </button>
           </div>
-
-          <div className="mb-4">
-            <label className="block text-black text-sm font-semibold mb-2">PASSWORD</label>
-            <input
-             type="password" 
-              onChange={(e) => setPassword(e.target.value)}
-             className="w-full p-2 border text-black border-black rounded-md" />
-          </div>
-
-          <button
-            onClick={() => handleSubmit()}
-           className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
-            CONTINUE
-          </button>
-        </div>
+        </form>
 
         <Link className="mt-4 text-black text-xl" href="/SignUp">Don’t have an account?</Link>
       </div>
