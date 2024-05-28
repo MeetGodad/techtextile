@@ -96,18 +96,6 @@ export default function SignUp() {
                 
                 <div className="w-full max-w-md text-black ">
                     <div className="flex flex-col items-center mb-4">
-<<<<<<< Updated upstream
-                        <div className="w-1/2 pr-2 mb-5">
-                            <label className="block text-sm  text-black font-semibold mb-2">INTERESTED AS</label>
-                            <select 
-                            required
-                            onChange={(e) => setRole(e.target.value)}
-                            className="w-full p-2 border text-black border-black rounded-md">
-                            <option value="" disabled selected >Select an option</option>
-                            <option value="buyer"  >As a Buyer</option>
-                            <option value="seller">As a Seller</option>
-                            </select>
-=======
                         <div className="flex mb-4 w-full">
                             <div className="w-1/2 pr-2">
                                 <label className="block text-sm  text-black font-semibold mb-2">INTERESTED AS</label>
@@ -132,7 +120,6 @@ export default function SignUp() {
                                     
                                 </div>
                             )}
->>>>>>> Stashed changes
                         </div>
                         <div className="flex mb-4 w-full">
                             <div className="w-1/2 pr-2">
@@ -212,14 +199,7 @@ export default function SignUp() {
                                 onChange={(e) => setAddress(e.target.value)}
                                 className="w-full p-2 border border-black rounded-md" />
                             </div>
-<<<<<<< Updated upstream
-                        </div>
-                        <button
-                            onClick={() => handleSubmit()}
-                         className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
-=======
                         <button className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
->>>>>>> Stashed changes
                             CONTINUE
                         </button>
                     </div>
