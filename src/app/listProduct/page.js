@@ -3,6 +3,7 @@ import { useState } from "react";
 import { storage } from '../auth/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
+import Header from "../components/Navbar";
 
 
 export default function listproduct(){
@@ -71,72 +72,157 @@ const handleUpload = async () => {
     return urls;
 };
 
-    return (
-        <div>
-            <form onSubmit={handleSubmit} className="flex flex-col ml-8 p-4">
-                <div className="p-4">
-                    <label className="m-4">Product Name</label>
-                    <input type="text" required name="product_name" value={productData.product_name} onChange={handleChange}  />
-                </div>
-                <div>
-                    <label>Product Description</label>
-                    <input type="text" required name="description" value={productData.description} onChange={handleChange} />
-                </div>
-                <div>
-                    <label>Price</label>
-                    <input type="text" required name="price" value={productData.price} onChange={handleChange} />
-                </div>
-                <div>
-                    <label>Upload Images:</label>
-                    <input type="file" required name="image_url" multiple onChange={handleImageChange} />
-                </div>
-                <div>
-                <label>Product Type:</label>
-                <select name="product_type" value={productData.product_type} onChange={handleChange} required>
+return (
+    <div className="w-full bg-white p-8">
+        <Header></Header>
+        <h2 className="text-2xl font-bold mb-6 text-center">List Item</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+                <label className="block font-semibold">Item Name</label>
+                <input 
+                    type="text" 
+                    required 
+                    name="product_name" 
+                    value={productData.product_name} 
+                    onChange={handleChange} 
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+            </div>
+            <div className="space-y-2">
+                <label className="block font-semibold">Description</label>
+                <textarea 
+                    required 
+                    name="description" 
+                    value={productData.description} 
+                    onChange={handleChange} 
+                    className="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none"
+                ></textarea>
+            </div>
+            <div className="space-y-2">
+                <label className="block font-semibold">Price</label>
+                <input 
+                    type="text" 
+                    required 
+                    name="price" 
+                    value={productData.price} 
+                    onChange={handleChange} 
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+            </div>
+            <div className="space-y-2">
+                <label className="block font-semibold">Upload Images</label>
+                <input 
+                    type="file" 
+                    required 
+                    multiple
+                    name="image_url" 
+                    onChange={handleImageChange} 
+                    className="w-full  "
+                />
+            </div>
+            <div className="space-y-2">
+                <label className="block font-semibold">Product Type</label>
+                <select 
+                    name="product_type" 
+                    value={productData.product_type} 
+                    onChange={handleChange} 
+                    required 
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                >
                     <option value="">Select Type</option>
                     <option value="yarn">Yarn</option>
                     <option value="fabric">Fabric</option>
                 </select>
-                </div>
-
-                {
-                    productData.product_type === 'yarn' && (
-                        <div>
-                            <div><label>Yarn Type</label>
-                            <input type="text" required name="yarn_type" value={productData.yarn_type}  onChange={handleChange}/>
-                            </div>
-                            <div><label>Yarn Denier</label>
-                            <input type="text" required name="yarn_denier" value={productData.yarn_denier} onChange={handleChange} />
-                            </div>
-                            <div><label>Yarn Color</label>
-                            <input type="text" required name="yarn_color" value={productData.yarn_color}  onChange={handleChange}/>
-                            </div>
-                            
-                        </div>
-                    )
-                }
-
-                {
-                    productData.product_type === 'fabric' && (
+            </div>
+            {productData.product_type === 'yarn' && (
+                <div className="space-y-2">
                     <div>
-                        <div><label>Fabric Type</label>
-                        <input type="text" required name="fabric_type" value={productData.fabric_type}  onChange={handleChange}/>
-                        </div>
-                        <div><label>Fabric Print Tech</label>
-                        <input type="text" required name="fabric_print_tech" value={productData.fabric_print_tech} onChange={handleChange} />
-                        </div>
-                        <div><label>Fabric Material</label>
-                        <input type="text" required name="fabric_material" value={productData.fabric_material} onChange={handleChange} />
-                        </div>
-                        <div><label>Fabric Color</label>
-                        <input type="text" required name="fabric_color" value={productData.fabric_color}  onChange={handleChange}/>
-                        </div>
-                        
+                        <label className="block font-semibold">Yarn Type</label>
+                        <input 
+                            type="text" 
+                            required 
+                            name="yarn_type" 
+                            value={productData.yarn_type}  
+                            onChange={handleChange} 
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                        />
                     </div>
-                    )}
-                <button type="submit">Submit</button>
-            </form>
-        </div>
-    );
-
-}
+                    <div>
+                        <label className="block font-semibold">Yarn Denier</label>
+                        <input 
+                            type="text" 
+                            required 
+                            name="yarn_denier" 
+                            value={productData.yarn_denier} 
+                            onChange={handleChange} 
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                        />
+                    </div>
+                    <div>
+                        <label className="block font-semibold">Yarn Color</label>
+                        <input 
+                            type="text" 
+                            required 
+                            name="yarn_color" 
+                            value={productData.yarn_color}  
+                            onChange={handleChange} 
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                        />
+                    </div>
+                </div>
+            )}
+            {productData.product_type === 'fabric' && (
+                <div className="space-y-2">
+                    <div>
+                        <label className="block font-semibold">Fabric Type</label>
+                        <input 
+                            type="text" 
+                            required 
+                            name="fabric_type" 
+                            value={productData.fabric_type}  
+                            onChange={handleChange} 
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                        />
+                    </div>
+                    <div>
+                        <label className="block font-semibold">Fabric Print Tech</label>
+                        <input 
+                            type="text" 
+                            required 
+                            name="fabric_print_tech" 
+                            value={productData.fabric_print_tech} 
+                            onChange={handleChange} 
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                        />
+                    </div>
+                    <div>
+                        <label className="block font-semibold">Fabric Material</label>
+                        <input 
+                            type="text" 
+                            required 
+                            name="fabric_material" 
+                            value={productData.fabric_material} 
+                            onChange={handleChange} 
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                        />
+                    </div>
+                    <div>
+                        <label className="block font-semibold">Fabric Color</label>
+                        <input 
+                            type="text" 
+                            required 
+                            name="fabric_color" 
+                            value={productData.fabric_color}  
+                            onChange={handleChange} 
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                        />
+                    </div>
+                </div>
+            )}
+            <button type="submit" className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Submit
+            </button>
+        </form>
+    </div>
+);
+};
