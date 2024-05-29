@@ -1,15 +1,15 @@
-
-import Home from "./Home";
+import Cart from "./addToCart";
 import Header from "../components/Navbar";
 import Footer from "../components/Footer";
+
 
 
 export default function Page() {
     return (
     <div>
         <Header />
-        <Home />
+        <Cart />
         <Footer />
     </div>
     );
-    }
+}

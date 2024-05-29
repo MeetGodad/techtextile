@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import FrameComponent from "../components/ProductSection";
 import ProductSection from '../components/ProductSection';
+import { useUserAuth } from '../auth/auth-context';
 
 export default function Home() {
+  const { user } = useUserAuth(); 
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
 
@@ -22,8 +23,31 @@ export default function Home() {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    setCart(storedCart);
+  }, []);
+
   const addToCart = (product) => {
-    setCart([...cart, product]);
+    if (!user) {
+      alert('Please sign up or log in first.');
+      return;
+    }
+    const updatedCart = [...cart];
+    const existingProduct = updatedCart.find(item => item.product_id === product.product_id);
+
+    if (existingProduct) {
+      existingProduct.quantity += 1;
+    } else {
+      updatedCart.push({ ...product, quantity: 1 });
+    }
+
+    setCart(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    
+    // Dispatch an event to notify that the cart has been updated
+    const event = new Event('cartUpdated');
+    window.dispatchEvent(event);
   };
 
   return (

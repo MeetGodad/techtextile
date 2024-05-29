@@ -1,13 +1,15 @@
 "use client";
 import  { useState } from "react";
+import { redirect, useRouter } from "next/navigation";
 import { useUserAuth } from "../auth/auth-context";
 import Link from "next/link";
-
 export default function Login() {
  
   const { user, emailSignIn } = useUserAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -25,21 +27,10 @@ export default function Login() {
         });
 
         if (!response.ok) {
-          alert('User not found!');
-        }
+          alert('Invalid Credentials! Please try again.');
 
-        const data = await response.json();
-
-        if (data.user) {
-          const userRole = data.user.usertype;
-          const userName = data.user.username;
-          console.log('User role:', userRole);
-
-          if (userRole === 'buyer') {
-            alert('Welcome back! ' + userName )
-          } else if (userRole === 'seller') {
-            alert('Welcome back! Seller ' + userName )
-          }
+        }else if (response.ok) {
+          router.push('/Home');
         }
 
       } catch (error) {
