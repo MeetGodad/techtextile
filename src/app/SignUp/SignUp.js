@@ -191,8 +191,9 @@ export default function SignUp() {
                                 className="w-full p-2 border border-black rounded-md" />
                             </div>
                         <button className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
+                            <Link href= "/Home">
                             CREATE AN ACCOUNT
-                        </button>
+                            </Link> </button>
                     </div>
                 </div>
                 </form>
