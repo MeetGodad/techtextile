@@ -1,11 +1,21 @@
 "use client";
 
+<<<<<<< Updated upstream
 import {  useEffect, useState } from 'react'; // Import useClient
 import FrameComponent from "../Components/FrameComponent";
 
 const Desktop = () => {
 
+=======
+import { useEffect, useState } from 'react';
+import ProductSection from '../components/ProductSection';
+import { useUserAuth } from '../auth/auth-context';
+
+export default function Home() {
+  const { user } = useUserAuth(); 
+>>>>>>> Stashed changes
   const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -16,8 +26,32 @@ const Desktop = () => {
 
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    setCart(storedCart);
+  }, []);
+
   const addToCart = (product) => {
-    setCart([...cart, product]);
+    if (!user) {
+      alert('Please sign up or log in first.');
+      return;
+    }
+    const updatedCart = [...cart];
+    const existingProduct = updatedCart.find(item => item.product_id === product.product_id);
+
+    if (existingProduct) {
+      existingProduct.quantity += 1;
+    } else {
+      updatedCart.push({ ...product, quantity: 1 });
+    }
+
+    setCart(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    
+    // Dispatch an event to notify that the cart has been updated
+    const event = new Event('cartUpdated');
+    window.dispatchEvent(event);
   };
 
   return (
@@ -27,12 +61,23 @@ const Desktop = () => {
         </div>
         <section className="self-stretch flex flex-row items-start justify-start py-0 px-0 box-border max-w-full">
           <div className="w-[1271px] flex flex-row flex-wrap items-start justify-start gap-[107px_98.3px] min-h-[685px] max-w-full shrink-0">
+<<<<<<< Updated upstream
             {products.map((product, index) => (
               <FrameComponent  key={product.product_id}
               name={product.product_name}
               price={product.price}
               image={product.image_url}
               onAddToCart={() => addToCart(product)} />
+=======
+            {products.map((product) => (
+              <ProductSection
+                key={product.product_id}
+                name={product.product_name}
+                price={product.price}
+                image={product.image_url}
+                onAddToCart={() => addToCart(product)}
+              />
+>>>>>>> Stashed changes
             ))}
           </div>
           <div className="h-[697px] w-[1318px] flex flex-col items-start justify-start max-w-[104%] shrink-0 ml-[-976px]">
@@ -52,7 +97,11 @@ const Desktop = () => {
         src="/line-5.svg"/>
     </div>
   );
+<<<<<<< Updated upstream
 };
 
 export default Desktop;
 
+=======
+}
+>>>>>>> Stashed changes
