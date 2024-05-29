@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-const FrameComponent = ({
+export default function ProductSection({
   shoppingCart,
   addToCartBackgroundColor,
   frameDivBackgroundColor,
@@ -11,7 +11,7 @@ const FrameComponent = ({
   price,
   image,
   onAddToCart,
-}) => {
+}) {
   const frameDivStyle = useMemo(() => {
     return {
       backgroundColor: addToCartBackgroundColor,
@@ -75,7 +75,11 @@ const FrameComponent = ({
 };
 <<<<<<< Updated upstream:src/app/components/FrameComponent.js
 
-export default FrameComponent;
+
+
+
+
+
 
 =======
 >>>>>>> Stashed changes:src/app/components/ProductSection.js

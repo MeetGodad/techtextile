@@ -1,9 +1,14 @@
 import React from 'react';
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 import Link from 'next/link';
 >>>>>>> Stashed changes
 
+=======
+import Link from 'next/link';
+ 
+>>>>>>> 68bc9edd0d3e0922c7312705b4cea28df97cca24
 const Header = () => {
   return (
     <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-3 px-4 box-border top-0 z-99 sticky leading-normal tracking-normal gap-4 text-left text-xl text-black font-sans">
@@ -43,7 +48,7 @@ const Header = () => {
                             src="/shopping-cart@2x.png"
                         />
                     </button>
-                    <a href="/Login" className="ml-2 font-bold">SIGN UP/LOG IN</a>
+                    <Link href="/Login"> SignUp/Login </Link>
                 </div>
             </div>
         </div>

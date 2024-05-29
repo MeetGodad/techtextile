@@ -2,9 +2,9 @@
 
 <<<<<<< Updated upstream
 import {  useEffect, useState } from 'react'; // Import useClient
-import FrameComponent from "../Components/FrameComponent";
+import ProductSection from '../components/ProductSection';
 
-const Desktop = () => {
+export default function Home() {
 
 =======
 import { useEffect, useState } from 'react';
@@ -63,7 +63,7 @@ export default function Home() {
           <div className="w-[1271px] flex flex-row flex-wrap items-start justify-start gap-[107px_98.3px] min-h-[685px] max-w-full shrink-0">
 <<<<<<< Updated upstream
             {products.map((product, index) => (
-              <FrameComponent  key={product.product_id}
+              <ProductSection  key={product.product_id}
               name={product.product_name}
               price={product.price}
               image={product.image_url}
@@ -100,7 +100,7 @@ export default function Home() {
 <<<<<<< Updated upstream
 };
 
-export default Desktop;
+
 
 =======
 }
