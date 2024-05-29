@@ -1,7 +1,8 @@
 "use client";
 
 import {  useEffect, useState } from 'react'; // Import useClient
-import FrameComponent from "../Components/FrameComponent";
+import FrameComponent from "../components/FrameComponent";
+
 
 const Desktop = () => {
 
