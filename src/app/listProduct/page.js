@@ -1,8 +1,13 @@
 "use client";
 import { useState } from "react";
+import { storage } from '../auth/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
+
 
 export default function listproduct(){
-const [productData, setProductData] = useState({
+    const [image, setImage] = useState([]);
+    const [productData, setProductData] = useState({
     product_name: '',
     description: '',
     price: '',
@@ -19,13 +24,16 @@ const [productData, setProductData] = useState({
 })
 const handleSubmit = async (e) => {
     e.preventDefault();
+    const urls = await handleUpload();
+    const urlsString = urls.join(",")
+    const updatedProductData = { ...productData, image_url: urlsString };
     try{
         const response = await fetch('api/products', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(productData),
+            body: JSON.stringify(updatedProductData),
         });
         if (!response.ok) {
             alert('An error occurred while saving the product');
@@ -43,7 +51,25 @@ const handleSubmit = async (e) => {
 const handleChange = (e) => {
     setProductData({ ...productData, [e.target.name]: e.target.value });
   };
+const handleImageChange = (e) => {
+    setImage([...e.target.files]);   
+};
 
+const handleUpload = async () => {
+    const folderId = uuidv4(); 
+    const urls = [];
+    for (const img of image) {
+        try {
+            const storageRef = ref(storage, `images/${folderId}/${img.name}`);
+            const snapshot = await uploadBytes(storageRef, img);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            urls.push(downloadURL);
+        } catch (error) {
+            console.error('Error uploading image:', error);
+        }
+    }
+    return urls;
+};
 
     return (
         <div>
@@ -61,8 +87,8 @@ const handleChange = (e) => {
                     <input type="text" required name="price" value={productData.price} onChange={handleChange} />
                 </div>
                 <div>
-                    <label>Image URL</label>
-                    <input type="text" required name="image_url" value={productData.image_url} onChange={handleChange} />
+                    <label>Upload Images:</label>
+                    <input type="file" required name="image_url" multiple onChange={handleImageChange} />
                 </div>
                 <div>
                 <label>Product Type:</label>
