@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 
 export default function ProductSection({
-  shoppingCart,
-  addToCartBackgroundColor,
-  frameDivBackgroundColor,
-  propWidth,
-  propFlex,
+  shoppingCart = "/shopping-cart.png",
+  addToCartBackgroundColor = "black",
+  frameDivBackgroundColor  = "#fcf1f1",
+  propWidth = "100%",
+  propFlex = "1",
   product,
   name,
   price,
@@ -34,42 +34,33 @@ export default function ProductSection({
   const addToCartHandler = () => {
     onAddToCart(product);
   };
-
   return (
-    <div className="h-72 w-[243px] flex flex-col items-start justify-start gap-[12px] text-left text-base text-black font-title-16px-medium">
-      <div className="self-stretch flex-1 flex flex-col items-end justify-start">
-        <div
-          className="self-stretch flex-1 rounded-mini bg-lavenderblush-100 flex flex-row items-start justify-start pt-[22.2px] px-8 pb-[22px]"
-          style={frameDivStyle}
-        >
-          <img
-            className="h-[119.5px] flex-1 relative rounded-mini max-w-full overflow-hidden object-cover z-[1]"
-            loading="lazy"
-            alt={name}
-            src={image}
-          />
-        </div>
-        <button
-          onClick={addToCartHandler}
-          className="[border:none] cursor-pointer py-1.5 px-[45px] bg-black self-stretch rounded-t-none rounded-b-mini flex flex-row items-start justify-start gap-[9px] whitespace-nowrap z-[1] mt-[-34px] hover:bg-darkslategray"
-          style={addToCartStyle}
-        >
-          <img
-            className="h-[26px] w-[26px] relative object-cover min-h-[26px] z-[2]"
-            alt="Shopping Cart"
-            src={shoppingCart}
-          />
-          <i className="w-[108px] relative text-xl inline-block font-bold font-inria-sans text-white text-center shrink-0 min-w-[108px] z-[2]">
-            Add to cart
-          </i>
-        </button>
+    <div className=" mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white">
+      <div className="flex  flex-col w-full h-48  items-center justify-center bg-lavenderblush-100" style={rectangleDivStyle}>
+        <img
+          className="max-w-full max-h-full object-cover"
+          loading="lazy"
+          alt={name}
+          src={image}
+        />
       </div>
-      <div className="flex-1 min-w-[calc(25%-32px)] max-w-[calc(25%-32px)] p-4 box-border" style={{ backgroundColor: '#fcf1f1' }}>
-        <h2 className="mt-2 text-lg font-semibold">{name}</h2>
-        <div className="mt-2 p-2" style={{ backgroundColor: '#fcf1f1' }}>
-          ${price.toFixed(2)}
-        </div>
-      </div>
+      <button
+        onClick={addToCartHandler}
+        className="flex items-center justify-center py-2 px-4 w-full  bg-black text-white rounded-md hover:bg-darkslategray transition"
+        style={addToCartStyle}
+      >
+        <img
+          className="w-6 h-6 mr-2"
+          alt="cart"
+          src="/Images/white_cart.png"
+        />
+        <span className="text-base font-bold">Add to cart</span>
+      </button>
+      <h2 className="text-lg font-semibold text-center">{name}</h2>
+      <div className="text-center text-lg font-medium text-gray-800">${price.toFixed(2)}</div>
     </div>
   );
 };
+
+
+
