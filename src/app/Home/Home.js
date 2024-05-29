@@ -53,7 +53,6 @@ export default function Home() {
   return (
     <div className="w-full min-h-screen bg-white p-8">
       <main className="max-w-screen-xl mx-auto">
-        <h1 className="text-center text-4xl font-bold mb-8">FABRIC PRODUCTS</h1>
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {products.map((product) => (
             <ProductSection

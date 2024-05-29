@@ -26,6 +26,7 @@ const Header = () => {
             src="/search.svg"
           />
         </div>
+        <Link className="font-light" href="/listProduct">Products</Link>
         <div className="flex items-center gap-6">
                     <a href="#" className="font-light">Home</a>
                     <a href="#" className="font-light">Category</a>
