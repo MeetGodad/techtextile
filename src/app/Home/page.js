@@ -7,9 +7,13 @@ import Footer from "../components/Footer";
 export default function Page() {
     return (
     <div>
-        <Header />
-        <Home />
-        <Footer />
+        <div className="flex flex-col min-h-screen">
+            <Header />
+            <div className="flex-grow">
+                <Home />
+            </div>
+            <Footer />
+        </div>
     </div>
     );
     }
