@@ -34,3 +34,30 @@ body {
     text-wrap: balance;
   }
 }
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background-color: black;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+.nav-link:hover {
+  color: black; /* Optional: Change the text color on hover */
+}
