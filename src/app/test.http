@@ -1,5 +1,5 @@
 
-
+GET http://localhost:3000/api/Profile/8M7B8WDchFWdXkXM73MwyoeJx3y1 HTTP/1.1
 
 GET http://localhost:3000/api/auth/7XHSnvIpguhViHnpIYc6GmFN7G93 HTTP/1.1
 
@@ -36,6 +36,7 @@ content-type: application/json
     "yarn_denier":"45",
     "yarn_color":"blue"
 }
+
 
 
 
