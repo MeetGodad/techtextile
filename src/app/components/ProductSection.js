@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useRef } from "react";
 
 export default function ProductSection({
   shoppingCart = "/shopping-cart.png",
@@ -12,6 +12,12 @@ export default function ProductSection({
   image,
   onAddToCart,
 }) {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [flyStyle, setFlyStyle] = useState({});
+  const productRef = useRef(null);
+  const imageUrls = image.split(',');
+  const firstImageUrl = imageUrls[0];
+
   const frameDivStyle = useMemo(() => {
     return {
       backgroundColor: addToCartBackgroundColor,
@@ -32,21 +38,44 @@ export default function ProductSection({
   }, [propWidth, propFlex]);
 
   const addToCartHandler = () => {
-    onAddToCart(product);
+    const cartIcon = document.querySelector('#cart-icon');
+    const productImage = productRef.current;
+
+    if (productImage && cartIcon) {
+      const productRect = productImage.getBoundingClientRect();
+      const cartRect = cartIcon.getBoundingClientRect();
+      const flyX = cartRect.left - productRect.left + "px";
+      const flyY = cartRect.top - productRect.top + "px";
+
+      setFlyStyle({
+        '--fly-x': flyX,
+        '--fly-y': flyY,
+      });
+
+      setIsAnimating(true);
+
+      setTimeout(() => {
+        setIsAnimating(false);
+        onAddToCart(product);
+      }, 600);
+    }
   };
   return (
-    <div className=" mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white">
-      <div className="flex  flex-col w-full h-48  items-center justify-center bg-lavenderblush-100" style={rectangleDivStyle}>
+
+    <div className="relative mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white">
+      <div className="flex flex-col w-full h-48 items-center justify-center bg-lavenderblush-100" style={rectangleDivStyle}>
         <img
-          className="max-w-full max-h-full object-cover"
+          ref={productRef}
+          className={`max-w-full max-h-full object-cover ${isAnimating ? 'animate-fly' : ''}`}
+          style={flyStyle}
           loading="lazy"
           alt={name}
-          src={image}
+          src={firstImageUrl}
         />
       </div>
       <button
         onClick={addToCartHandler}
-        className="flex items-center justify-center py-2 px-4 w-full  bg-black text-white rounded-md hover:bg-darkslategray transition"
+        className="flex items-center justify-center py-2 px-4 w-full bg-black text-white rounded-md hover:bg-darkslategray transition"
         style={addToCartStyle}
       >
         <img
@@ -57,10 +86,7 @@ export default function ProductSection({
         <span className="text-base font-bold">Add to cart</span>
       </button>
       <h2 className="text-lg font-semibold text-center">{name}</h2>
-      <div className="text-center text-lg font-medium text-gray-800">${price.toFixed(2)}</div>
+      <div className="text-center text-lg font-medium text-gray-800">${price}</div>
     </div>
   );
-};
-
-
-
+}

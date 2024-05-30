@@ -32,7 +32,7 @@ const Cart = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container  mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
       <div className="overflow-x-auto">
         <div className="w-full bg-white shadow-md rounded-lg overflow-hidden">
@@ -46,13 +46,13 @@ const Cart = () => {
             </div>
           </div>
           {cart.map(item => (
-            <div key={item.product_id} className="w-full p-4 border-t border-gray-200">
+            <div key={item.product_id} className="w-full p-4 border-t text-black border-gray-200">
               <div className="grid grid-cols-5 gap-4">
                 <div className="flex items-center space-x-4">
                   <img src={item.image_url} alt={item.product_name} className="w-16 h-16 object-cover" />
                   <div>{item.product_name}</div>
                 </div>
-                <div>${item.price.toFixed(2)}</div>
+                <div>${Number(item.price).toFixed(2)}</div>
                 <div>
                   <input
                     type="number"
@@ -61,7 +61,7 @@ const Cart = () => {
                     onChange={(e) => updateQuantity(item.product_id, e.target.value)}
                   />
                 </div>
-                <div>${(item.price * item.quantity).toFixed(2)}</div>
+                <div>${Number((item.price * item.quantity)).toFixed(2)}</div>
                 <div>
                   <button onClick={() => removeItem(item.product_id)} className="text-red-500">Remove</button>
                 </div>
@@ -72,9 +72,9 @@ const Cart = () => {
       </div>
       <div className="mt-8 flex justify-end">
         <div className="text-right">
-          <div className="text-lg font-semibold">Subtotal: ${calculateSubtotal().toFixed(2)}</div>
-          <div className="text-sm text-gray-600">Shipping: Free</div>
-          <div className="text-lg font-bold mt-2">Total: ${calculateSubtotal().toFixed(2)}</div>
+          <div className="text-lg font-semibold">Subtotal: ${Number(calculateSubtotal()).toFixed(2)}</div>
+          <div className="text-sm text-gray-400">Shipping: Free</div>
+          <div className="text-lg font-bold mt-2">Total: ${Number(calculateSubtotal()).toFixed(2)}</div>
           <button
             className="mt-4 px-6 py-2 bg-black text-white font-bold rounded"
             onClick={handleCheckout}

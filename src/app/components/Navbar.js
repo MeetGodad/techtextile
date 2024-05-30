@@ -1,67 +1,98 @@
 "use client";
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUserAuth } from '../auth/auth-context';
-import { useEffect } from 'react';
 
 const Header = () => {
 
   const { user } = useUserAuth();
+  const [searchText, setSearchText] = useState('');
+  const [cartCount, setCartCount] = useState(0);
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
   useEffect(() => {
-    console.log(user);
-  }, [user]);
-  
+    const handleCartUpdate = () => {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+      setCartCount(count);
+    };
+
+    const handleUserUpdate = () => {
+      const loggedUser = JSON.parse(localStorage.getItem('user'));
+      setLoggedInUser(loggedUser);
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    window.addEventListener('userUpdated', handleUserUpdate);
+
+    // Initial count and user state
+    handleCartUpdate();
+    handleUserUpdate();
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+      window.removeEventListener('userUpdated', handleUserUpdate);
+    };
+  }, []);
 
   return (
-    <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-3 px-4 box-border top-0 z-99 sticky leading-normal tracking-normal gap-4 text-left text-xl text-black font-sans">
+    <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-0 px-3 box-border top-0 z-99 sticky leading-normal tracking-normal gap-3 text-left text-xl text-black font-sans" style={{ borderBottom: '2px solid black' }}>
       <div className="flex items-center">
-        <div className="relative flex items-center justify-center w-20 h-20">
-          <div className="absolute top-1/3 left-1/4 text-3xl transform rotate-[-5.6deg]">T</div>
-          <div className="absolute bottom-1/4 right-1/4 text-3xl transform rotate-[5.6deg]">T</div>
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -rotate-30 border-2 border-black w-14 h-14"></div>
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 rotate-30 border-2 border-black w-14 h-14"></div>
-        </div>
-        <h3 className="ml-4 text-2xl font-bold">TECH TEXTILE</h3>
+        <div className="relative flex items-center justify-center w-20 h-20"></div>
+        <h3 className="text-4xl font-bold">TECH TEXTILE</h3>
       </div>
-      <div className="flex items-center gap-8">
-        <div className="flex items-center bg-gray-200 rounded-md px-3 py-1">
+      <div className="flex items-center gap-4">
+        <div className="flex place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[200px] h-10" style={{ minWidth: '200px', height: '40px' }}>
           <input
             type="text"
-            placeholder="What are you looking for ?"
-            className="bg-transparent outline-none"
+            placeholder="What are you looking ?"
+            className="text-left bg-transparent outline-none text-sm"
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: 'calc(100% - 24px)' }}
           />
+          {searchText === '' && (
           <img
             className="ml-2 w-6 h-6"
             alt="Search"
-            src="/search.svg"
+            src="/Images/Search.png"
           />
+          )}
         </div>
-        <Link className="font-light" href="/listProduct">Products</Link>
         <div className="flex items-center gap-6">
-                    <a href="#" className="font-light">Home</a>
-                    <a href="#" className="font-light">Category</a>
-                    <a href="#" className="font-light">About</a>
-                </div>
+          <a className="nav-link  font-semibold" href="/Home" passHref>Home</a>
+          <a className="nav-link  font-semibold" href="#">Category</a>
+          <a className="nav-link  font-semibold" href="#">About</a>
+        </div>
         <Link href="/Cart" passHref>
-          <div className="flex items-center">
+          <div className="flex items-center nav-link">
+          <div id="cart-icon" className="relative flex items-center">
             <img
-              className="w-6 h-6"
-              alt="Cart"
-              src="/cart.svg"
+              className="w-10 h-8"
+              alt="cart"
+              src="/Images/black_cart.png"
             />
-            <span className="ml-2">Cart</span>
+            <span className="ml-2 font-semibold">Cart</span>
+              {cartCount > 0 && (
+                <div className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </div>
+              )}
+          </div>
           </div>
         </Link>
         {user ? (
           <Link href="/Profile" passHref>
-            <div className="flex items-center">
+
+            <div className="flex items-center nav-link">
+
               <span className="ml-2">Visit Profile</span>
             </div>
           </Link>
         ) : (
           <Link href="/Login" passHref>
-            <div className="flex items-center"> 
-              <span className="ml-2">SignUp/Login</span>
+            <div className="flex items-center nav-link">
+              <span className=" font-semibold">SignUp/Login</span>
             </div>
           </Link>
         )}

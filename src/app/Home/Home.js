@@ -10,18 +10,20 @@ export default function Home() {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
+
+
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/products.json');
+        const response = await fetch('/api/products');
         const data = await response.json();
         setProducts(data);
+        
       } catch (error) {
         console.error('Error fetching the products:', error);
       }
     };
-
     fetchProducts();
-  }, []);
+  }, [setInterval]);
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -44,13 +46,14 @@ export default function Home() {
 
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
-    
+
     // Dispatch an event to notify that the cart has been updated
     const event = new Event('cartUpdated');
     window.dispatchEvent(event);
   };
 
   return (
+    (products && products.length > 0) && (
     <div className="w-full min-h-screen bg-white p-8">
       <main className="max-w-screen-xl mx-auto">
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -67,5 +70,6 @@ export default function Home() {
         </section>
       </main>
     </div>
+    )
   );
 };
