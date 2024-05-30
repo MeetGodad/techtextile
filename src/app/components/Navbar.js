@@ -1,7 +1,17 @@
-import React from 'react';
+"use client";
 import Link from 'next/link';
+import { useUserAuth } from '../auth/auth-context';
+import { useEffect } from 'react';
 
 const Header = () => {
+
+  const { user } = useUserAuth();
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+  
+
   return (
     <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-3 px-4 box-border top-0 z-99 sticky leading-normal tracking-normal gap-4 text-left text-xl text-black font-sans">
       <div className="flex items-center">
@@ -42,7 +52,19 @@ const Header = () => {
             <span className="ml-2">Cart</span>
           </div>
         </Link>
-        <Link href="/Login"> SignUp/Login </Link>
+        {user ? (
+          <Link href="/Profile" passHref>
+            <div className="flex items-center">
+              <span className="ml-2">Visit Profile</span>
+            </div>
+          </Link>
+        ) : (
+          <Link href="/Login" passHref>
+            <div className="flex items-center"> 
+              <span className="ml-2">SignUp/Login</span>
+            </div>
+          </Link>
+        )}
       </div>
     </div>
   );
