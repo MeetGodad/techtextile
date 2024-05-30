@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 const Header = () => {
   const [cartCount, setCartCount] = useState(0);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const handleCartUpdate = () => {
@@ -12,13 +13,21 @@ const Header = () => {
       setCartCount(count);
     };
 
-    window.addEventListener('cartUpdated', handleCartUpdate);
+    const handleUserUpdate = () => {
+      const loggedInUser = JSON.parse(localStorage.getItem('user'));
+      setUser(loggedInUser);
+    };
 
-    // Initial count
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    window.addEventListener('userUpdated', handleUserUpdate);
+
+    // Initial count and user state
     handleCartUpdate();
+    handleUserUpdate();
 
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate);
+      window.removeEventListener('userUpdated', handleUserUpdate);
     };
   }, []);
 
