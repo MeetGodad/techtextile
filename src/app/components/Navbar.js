@@ -1,4 +1,4 @@
-"Use client";
+"use client";
 import React from 'react';
 import Link from 'next/link';
 import { useUserAuth } from '../auth/auth-context';
