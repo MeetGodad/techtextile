@@ -44,7 +44,7 @@ export default function Home() {
 
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
-    
+
     // Dispatch an event to notify that the cart has been updated
     const event = new Event('cartUpdated');
     window.dispatchEvent(event);

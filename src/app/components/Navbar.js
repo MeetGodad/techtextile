@@ -1,16 +1,26 @@
 "use client";
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useUserAuth } from '../auth/auth-context';
-import { useEffect } from 'react';
 
 const Header = () => {
-
-  const { user } = useUserAuth();
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    console.log(user);
-  }, [user]);
-  
+    const handleCartUpdate = () => {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+      setCartCount(count);
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+
+    // Initial count
+    handleCartUpdate();
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, []);
 
   return (
     <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-3 px-4 box-border top-0 z-99 sticky leading-normal tracking-normal gap-4 text-left text-xl text-black font-sans">
@@ -38,18 +48,23 @@ const Header = () => {
         </div>
         <Link className="font-light" href="/listProduct">Products</Link>
         <div className="flex items-center gap-6">
-                    <a href="#" className="font-light">Home</a>
-                    <a href="#" className="font-light">Category</a>
-                    <a href="#" className="font-light">About</a>
-                </div>
+          <a href="#" className="font-light">Home</a>
+          <a href="#" className="font-light">Category</a>
+          <a href="#" className="font-light">About</a>
+        </div>
         <Link href="/Cart" passHref>
-          <div className="flex items-center">
+          <div id="cart-icon" className="relative flex items-center">
             <img
               className="w-6 h-6"
               alt="Cart"
               src="/cart.svg"
             />
             <span className="ml-2">Cart</span>
+            {cartCount > 0 && (
+              <div className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                {cartCount}
+              </div>
+            )}
           </div>
         </Link>
         {user ? (
