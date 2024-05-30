@@ -15,6 +15,8 @@ export default function ProductSection({
   const [isAnimating, setIsAnimating] = useState(false);
   const [flyStyle, setFlyStyle] = useState({});
   const productRef = useRef(null);
+  const imageUrls = image.split(',');
+  const firstImageUrl = imageUrls[0];
 
   const frameDivStyle = useMemo(() => {
     return {
@@ -68,7 +70,7 @@ export default function ProductSection({
           style={flyStyle}
           loading="lazy"
           alt={name}
-          src={image}
+          src={firstImageUrl}
         />
       </div>
       <button
@@ -84,7 +86,7 @@ export default function ProductSection({
         <span className="text-base font-bold">Add to cart</span>
       </button>
       <h2 className="text-lg font-semibold text-center">{name}</h2>
-      <div className="text-center text-lg font-medium text-gray-800">${price.toFixed(2)}</div>
+      <div className="text-center text-lg font-medium text-gray-800">${price}</div>
     </div>
   );
 }
