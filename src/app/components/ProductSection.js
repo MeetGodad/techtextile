@@ -1,11 +1,11 @@
 import { useMemo, useState, useRef } from "react";
 
 export default function ProductSection({
-  shoppingCart,
-  addToCartBackgroundColor,
-  frameDivBackgroundColor,
-  propWidth,
-  propFlex,
+  shoppingCart = "/shopping-cart.png",
+  addToCartBackgroundColor = "black",
+  frameDivBackgroundColor  = "#fcf1f1",
+  propWidth = "100%",
+  propFlex = "1",
   product,
   name,
   price,
