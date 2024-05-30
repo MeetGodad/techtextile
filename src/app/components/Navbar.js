@@ -1,9 +1,6 @@
+"Use client";
 import React from 'react';
 import Link from 'next/link';
-<<<<<<< Updated upstream
-
-const Header = () => {
-=======
 import { useUserAuth } from '../auth/auth-context';
 import { useEffect , useState} from 'react';
 
@@ -16,7 +13,6 @@ const Header = () => {
     console.log(user);
   }, [user]);
 
->>>>>>> Stashed changes
   return (
     <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-0 px-3 box-border top-0 z-99 sticky leading-normal tracking-normal gap-3 text-left text-xl text-black font-sans" style={{ borderBottom: '2px solid black' }}>
       <div className="flex items-center">
@@ -40,10 +36,7 @@ const Header = () => {
           />
           )}
         </div>
-<<<<<<< Updated upstream
-=======
         <Link className="nav-link font-light font-semibold" href="/listProduct">Products</Link>
->>>>>>> Stashed changes
         <div className="flex items-center gap-6">
           <a className="nav-link font-light font-semibold" href="/Home" passHref>Home</a>
           <a className="nav-link font-light font-semibold" href="#">Category</a>
@@ -59,9 +52,6 @@ const Header = () => {
             <span className="ml-2 font-semibold">Cart</span>
           </div>
         </Link>
-<<<<<<< Updated upstream
-        <Link href="/Login"> SignUp/Login </Link>
-=======
         {user ? (
           <Link href="/Profile" passHref>
             <div className="flex items-center nav-link">
@@ -75,7 +65,6 @@ const Header = () => {
             </div>
           </Link>
         )}
->>>>>>> Stashed changes
       </div>
     </div>
   );
