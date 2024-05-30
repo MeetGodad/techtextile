@@ -15,6 +15,8 @@ const AuthContext = createContext();
  
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); 
+  
  
   const googleSignIn = () => {
     const provider = new GoogleAuthProvider();
@@ -45,14 +47,17 @@ export const AuthContextProvider = ({ children }) => {
   };
  
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
     });
-
-    // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, []);
- 
+  }, [user]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  } 
+
   return (
     <AuthContext.Provider value={{ user, googleSignIn, emailSignIn, emailSignUp , firebaseSignOut }}>
       {children}

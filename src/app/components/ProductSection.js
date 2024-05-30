@@ -58,8 +58,8 @@ export default function ProductSection({
       }, 600);
     }
   };
-
   return (
+
     <div className="relative mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white">
       <div className="flex flex-col w-full h-48 items-center justify-center bg-lavenderblush-100" style={rectangleDivStyle}>
         <img

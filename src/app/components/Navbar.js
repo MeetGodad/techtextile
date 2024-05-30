@@ -67,7 +67,19 @@ const Header = () => {
             )}
           </div>
         </Link>
-        <Link href="/Login"> SignUp/Login </Link>
+        {user ? (
+          <Link href="/Profile" passHref>
+            <div className="flex items-center">
+              <span className="ml-2">Visit Profile</span>
+            </div>
+          </Link>
+        ) : (
+          <Link href="/Login" passHref>
+            <div className="flex items-center"> 
+              <span className="ml-2">SignUp/Login</span>
+            </div>
+          </Link>
+        )}
       </div>
     </div>
   );
