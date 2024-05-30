@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUserAuth } from '../auth/auth-context';
-import { useEffect , useState} from 'react';
 
 const Header = () => {
 
   const { user } = useUserAuth();
   const [searchText, setSearchText] = useState('');
   const [cartCount, setCartCount] = useState(0);
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
   useEffect(() => {
     const handleCartUpdate = () => {
@@ -19,8 +19,8 @@ const Header = () => {
     };
 
     const handleUserUpdate = () => {
-      const loggedInUser = JSON.parse(localStorage.getItem('user'));
-      setUser(loggedInUser);
+      const loggedUser = JSON.parse(localStorage.getItem('user'));
+      setLoggedInUser(loggedUser);
     };
 
     window.addEventListener('cartUpdated', handleCartUpdate);
@@ -59,11 +59,10 @@ const Header = () => {
           />
           )}
         </div>
-        <Link className="nav-link font-light font-semibold" href="/listProduct">Products</Link>
         <div className="flex items-center gap-6">
-          <a className="nav-link font-light font-semibold" href="/Home" passHref>Home</a>
-          <a className="nav-link font-light font-semibold" href="#">Category</a>
-          <a className="nav-link font-light font-semibold" href="#">About</a>
+          <a className="nav-link  font-semibold" href="/Home" passHref>Home</a>
+          <a className="nav-link  font-semibold" href="#">Category</a>
+          <a className="nav-link  font-semibold" href="#">About</a>
         </div>
         <Link href="/Cart" passHref>
           <div className="flex items-center nav-link">
