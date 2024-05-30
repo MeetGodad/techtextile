@@ -34,7 +34,7 @@ const Header = () => {
       window.removeEventListener('cartUpdated', handleCartUpdate);
       window.removeEventListener('userUpdated', handleUserUpdate);
     };
-  }, []);
+  }, [ user ]);
 
   return (
     <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-0 px-3 box-border top-0 z-99 sticky leading-normal tracking-normal gap-3 text-left text-xl text-black font-sans" style={{ borderBottom: '2px solid black' }}>
