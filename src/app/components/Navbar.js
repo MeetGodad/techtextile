@@ -9,10 +9,7 @@ const Header = () => {
 
   const { user } = useUserAuth();
   const [searchText, setSearchText] = useState('');
-
-  
   const [cartCount, setCartCount] = useState(0);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const handleCartUpdate = () => {
@@ -77,10 +74,12 @@ const Header = () => {
               src="/Images/black_cart.png"
             />
             <span className="ml-2 font-semibold">Cart</span>
-            {cartCount > 0 && (
-              <div className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
-                {cartCount}
-              </div>
+              {cartCount > 0 && (
+                <div className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </div>
+              )}
+          </div>
           </div>
         </Link>
         {user ? (
