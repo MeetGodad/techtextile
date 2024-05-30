@@ -71,6 +71,45 @@
 
 // export default SellerViewItem;
 
+// "use client"
+// import React, { useState, useEffect } from 'react';
+
+// const SellerViewItem = () => {
+//   const [items, setItems] = useState([]);
+
+//   useEffect(() => {
+//     const fetchItems = async () => {
+//       try {
+//         const response = await fetch(`/api/DisplayData_Api`);
+//         const data = await response.json();
+//         console.log('Fetched data:', data);
+//         setItems(data.items || []);
+//       } catch (error) {
+//         console.error('Error fetching items:', error);
+//       }
+//     };
+//     fetchItems();
+//   }, []);
+
+//   return (
+//     <div>
+//       <h1>Listed Items</h1>
+//       {items.length === 0 ? (
+//         <div>No items found</div>
+//       ) : (
+//         <ul>
+//           {items.map((item, index) => (
+//             <li key={index}>{item.product_name}</li>
+//           ))}
+//         </ul>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default SellerViewItem;
+
+// this code is genrated by chat gpt 
 "use client"
 import React, { useState, useEffect } from 'react';
 
@@ -80,7 +119,10 @@ const SellerViewItem = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await fetch(`/api/DisplayData_Api`);
+        const response = await fetch('/api/display_data/route');  // Ensure this matches the actual API endpoint path
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
         const data = await response.json();
         console.log('Fetched data:', data);
         setItems(data.items || []);
