@@ -1,5 +1,5 @@
 
-
+GET http://localhost:3000/api/Profile/8M7B8WDchFWdXkXM73MwyoeJx3y1 HTTP/1.1
 
 GET http://localhost:3000/api/auth/7XHSnvIpguhViHnpIYc6GmFN7G93 HTTP/1.1
 
@@ -21,13 +21,22 @@ content-type: application/json
 }
 
 
-<<<<<<< Updated upstream
-=======
+//new product
+POST http://localhost:3000/api/products HTTP/1.1
+content-type: application/json
+
+{
+    "product_name": "samlpe1",
+    "description": "desc1",
+    "price": 65,
+    "image_url": "Danier1",
+    "seller_id": 9,
+    "product_type": "yarn",
+    "yarn_type": "Color1",
+    "yarn_denier":"45",
+    "yarn_color":"blue"
+}
 
 
-
-
-###
->>>>>>> Stashed changes
 
 

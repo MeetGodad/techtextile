@@ -1,3 +1,4 @@
+
 [
     {
       "product_id": 1,
@@ -88,6 +89,96 @@
       "image_url": "/images/chiffon-fabric.jpg",
       "seller_id": 110,
       "product_type": "fabric"
+    },
+    {
+        "product_id": 11,
+        "product_name": "Cashmere Yarn",
+        "description": "Luxuriously soft cashmere yarn for high-end knitting projects.",
+        "price": 55.00,
+        "image_url": "/images/cashmere-yarn.jpg",
+        "seller_id": 111,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 12,
+        "product_name": "Satin Fabric",
+        "description": "Smooth and glossy satin fabric ideal for elegant evening wear.",
+        "price": 45.00,
+        "image_url": "/images/satin-fabric.jpg",
+        "seller_id": 112,
+        "product_type": "fabric"
+    },
+    {
+        "product_id": 13,
+        "product_name": "Alpaca Yarn",
+        "description": "Warm and hypoallergenic alpaca yarn, perfect for cozy winter items.",
+        "price": 35.99,
+        "image_url": "/images/alpaca-yarn.jpg",
+        "seller_id": 113,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 14,
+        "product_name": "Tweed Fabric",
+        "description": "Durable and stylish tweed fabric, ideal for outerwear and suits.",
+        "price": 38.50,
+        "image_url": "/images/tweed-fabric.jpg",
+        "seller_id": 114,
+        "product_type": "fabric"
+    },
+    {
+        "product_id": 15,
+        "product_name": "Merino Wool Yarn",
+        "description": "Fine and soft merino wool yarn for luxurious knitting projects.",
+        "price": 29.99,
+        "image_url": "/images/merino-wool-yarn.jpg",
+        "seller_id": 115,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 16,
+        "product_name": "Organza Fabric",
+        "description": "Sheer and lightweight organza fabric, perfect for elegant overlays.",
+        "price": 32.00,
+        "image_url": "/images/organza-fabric.jpg",
+        "seller_id": 116,
+        "product_type": "fabric"
+    },
+    {
+        "product_id": 17,
+        "product_name": "Mohair Yarn",
+        "description": "Luxuriously soft and fluffy mohair yarn, ideal for light and warm garments.",
+        "price": 42.50,
+        "image_url": "/images/mohair-yarn.jpg",
+        "seller_id": 117,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 18,
+        "product_name": "Corduroy Fabric",
+        "description": "Durable and soft corduroy fabric, perfect for pants and jackets.",
+        "price": 27.00,
+        "image_url": "/images/corduroy-fabric.jpg",
+        "seller_id": 118,
+        "product_type": "fabric"
+    },
+    {
+        "product_id": 19,
+        "product_name": "Lurex Yarn",
+        "description": "Sparkling lurex yarn, ideal for festive and glamorous projects.",
+        "price": 20.00,
+        "image_url": "/images/lurex-yarn.jpg",
+        "seller_id": 119,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 20,
+        "product_name": "Canvas Fabric",
+        "description": "Heavy-duty canvas fabric, great for bags, tents, and other outdoor uses.",
+        "price": 24.50,
+        "image_url": "/images/canvas-fabric.jpg",
+        "seller_id": 120,
+        "product_type": "fabric"
     }
-  ]
-  
+
+]

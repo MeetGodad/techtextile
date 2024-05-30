@@ -1,6 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
 export default function SignUp() {
 
@@ -14,6 +15,7 @@ export default function SignUp() {
     const [address, setAddress] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [companyName, setCompanyName] = useState("");
+    const router = useRouter();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -54,19 +56,8 @@ export default function SignUp() {
             if (!response.ok) {
                 alert('User not found!');
             }
-            const responseData = await response.json();
-            console.log('Response:', responseData);
-            
-            if (responseData.user) {
-                const userRole = responseData.user.user_type;
-            
-                if (userRole === 'buyer') {
-                    alert('You are a buyer now!')
-                } else if (userRole === 'seller') {
-                    alert('You are a seller now!') 
-                }
-            } else {
-                console.error('Unexpected server response:', responseData);
+            else if (response.ok) {
+                router.push('/Home');
             }
 
 
@@ -200,8 +191,9 @@ export default function SignUp() {
                                 className="w-full p-2 border border-black rounded-md" />
                             </div>
                         <button className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
-                            CONTINUE
-                        </button>
+                            <Link href= "/Home">
+                            CREATE AN ACCOUNT
+                            </Link> </button>
                     </div>
                 </div>
                 </form>
