@@ -6,8 +6,7 @@ export async function GET() {
         const sql = neon(databaseUrl);
         const products = await sql`
             SELECT * FROM Products;`;
-        console.log("Products:", products);
-
+            console.log("Products:", products);
         if (products.length === 0) {
             return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
         }

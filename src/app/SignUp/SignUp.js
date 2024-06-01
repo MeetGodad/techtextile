@@ -57,6 +57,7 @@ export default function SignUp() {
                 alert('User not found!');
             }
             else if (response.ok) {
+
                 router.push('/Home');
             }
 
