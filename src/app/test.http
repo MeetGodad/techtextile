@@ -27,6 +27,7 @@ content-type: application/json
   "address": "123 Main St"
 }
 
+###
 
 //new product
 POST http://localhost:3000/api/products HTTP/1.1
@@ -37,7 +38,7 @@ content-type: application/json
     "description": "desc1",
     "price": 65,
     "image_url": "Danier1",
-    "seller_id": 9,
+    "userId": "8M7B8WDchFWdXkXM73MwyoeJx3y1",
     "product_type": "yarn",
     "yarn_type": "Color1",
     "yarn_denier":"45",
@@ -45,5 +46,7 @@ content-type: application/json
 }
 
 
-
+###
+GET http://localhost:3000/api/sellerid/vcQpXA7LsSNLQrJd4LnOynvCS5B2 HTTP/1.1
+content-type: application/json
 
