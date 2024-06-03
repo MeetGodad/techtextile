@@ -10,16 +10,18 @@ export default function Home() {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
+
+
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/products.json');
+        const response = await fetch('/api/products');
         const data = await response.json();
         setProducts(data);
+        
       } catch (error) {
         console.error('Error fetching the products:', error);
       }
     };
-
     fetchProducts();
   }, []);
 
@@ -51,6 +53,7 @@ export default function Home() {
   };
 
   return (
+    (products && products.length > 0) && (
     <div className="w-full min-h-screen bg-white p-8">
       <main className="max-w-screen-xl mx-auto">
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -67,5 +70,6 @@ export default function Home() {
         </section>
       </main>
     </div>
+    )
   );
 };

@@ -57,6 +57,7 @@ export default function SignUp() {
                 alert('User not found!');
             }
             else if (response.ok) {
+                
                 router.push('/Home');
             }
 
@@ -71,9 +72,6 @@ export default function SignUp() {
         }
     }
 
-
-
-    
     return (
         <div className="flex h-screen">
             <div className="flex items-center justify-center w-1/2 bg-black relative">

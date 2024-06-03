@@ -1,5 +1,24 @@
 import { neon } from '@neondatabase/serverless';
 
+export async function GET() {
+    try {
+        const databaseUrl = process.env.DATABASE_URL || "";
+        const sql = neon(databaseUrl);
+        const products = await sql`
+            SELECT * FROM Products;`;
+
+        if (products.length === 0) {
+            return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
+        }
+
+        return new Response(JSON.stringify(products), { status: 200 });
+    } catch (error) {
+        console.error('An error occurred: Internal server error', error);
+        return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
+    }
+}
+
+
 export async function POST(req) {
     try {
         console.log("Parsing request data");
@@ -46,3 +65,6 @@ export async function POST(req) {
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
 }
+
+
+
