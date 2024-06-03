@@ -60,6 +60,8 @@ const Header = () => {
           )}
         </div>
         <div className="flex items-center gap-6">
+          <Link href="/seller">View Listing</Link>
+          <Link href="/listProduct">     add Item</Link>
           <a className="nav-link  font-semibold" href="/Home" passHref>Home</a>
           <a className="nav-link  font-semibold" href="#">Category</a>
           <a className="nav-link  font-semibold" href="#">About</a>
