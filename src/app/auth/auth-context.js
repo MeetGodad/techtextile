@@ -54,9 +54,7 @@ export const AuthContextProvider = ({ children }) => {
     return () => unsubscribe();
   }, [user]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  } 
+  
 
   return (
     <AuthContext.Provider value={{ user, googleSignIn, emailSignIn, emailSignUp , firebaseSignOut }}>

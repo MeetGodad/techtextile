@@ -57,6 +57,7 @@ export default function SignUp() {
                 alert('User not found!');
             }
             else if (response.ok) {
+                
                 router.push('/Home');
             }
 
@@ -71,9 +72,6 @@ export default function SignUp() {
         }
     }
 
-
-
-    
     return (
         <div className="flex h-screen">
             <div className="flex items-center justify-center w-1/2 bg-black relative">
@@ -197,7 +195,9 @@ export default function SignUp() {
                     </div>
                 </div>
                 </form>
-                <Link href="/Login" className="mt-4  text-black text-xl">Already Have An Account ? Login Then</Link>
+                <Link href="/Login" className="mt-4  text-black text-xl hover-box"> 
+                    <span>Already Have An Account ? Login Then</span>
+                </Link>
             </div>
         </div>
     );
