@@ -27,9 +27,9 @@ export default function Login() {
         });
 
         if (!response.ok) {
-          alert('Invalid Credentials! Please try again.');
-
-        }else if (response.ok) {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.message}`);
+        } else {
           router.push('/Home');
         }
 

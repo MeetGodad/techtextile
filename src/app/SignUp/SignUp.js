@@ -54,10 +54,9 @@ export default function SignUp() {
             });
     
             if (!response.ok) {
-                alert('User not found!');
-            }
-            else if (response.ok) {
-                
+                const errorData = await response.json();
+                alert(`Error: ${errorData.message}`);
+            } else {
                 router.push('/Home');
             }
 
