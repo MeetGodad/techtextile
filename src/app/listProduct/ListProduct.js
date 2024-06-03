@@ -14,7 +14,7 @@ export default function ListProduct(){
     description: '',
     price: '',
     image_url: '',
-    seller_id: user.uid,
+    seller_id: 12,
     product_type: '',
     yarn_type: '',
     yarn_denier: '',

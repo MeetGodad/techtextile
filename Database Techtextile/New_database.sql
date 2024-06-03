@@ -9,7 +9,7 @@ CREATE TABLE UserAccounts (
 CREATE TABLE Buyers (
     buyer_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
-    phone_num INT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
+    phone_num BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999)
     shipping_address TEXT
 );
 
@@ -18,7 +18,7 @@ CREATE TABLE Sellers (
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
     business_name VARCHAR(100),
     business_address TEXT,
-    phone_num INT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
+    phone_num BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999)
 );
 
 CREATE TABLE Products (
@@ -36,7 +36,7 @@ CREATE TABLE YarnProducts (
     product_id INT REFERENCES Products(product_id),
     yarn_type VARCHAR(50),
     yarn_denier VARCHAR(50),
-    yarn_color VARCHAR(50),
+    yarn_color VARCHAR(50)
 );
 
 CREATE TABLE FabricProducts (
@@ -45,7 +45,7 @@ CREATE TABLE FabricProducts (
     fabric_type VARCHAR(50),
     fabric_print_tech VARCHAR(50),
     fabric_material VARCHAR(50),
-    fabric_color VARCHAR(50),  
+    fabric_color VARCHAR(50)
 );
 
 
@@ -60,6 +60,17 @@ CREATE TABLE CartItems (
     cart_id INT REFERENCES ShoppingCart(cart_id),
     product_id INT REFERENCES Products(product_id),
     quantity INT NOT NULL
+);
+
+CREATE TABLE Addresses (
+    address_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
+    address_type VARCHAR(10) CHECK (address_type IN ('billing', 'shipping')),
+    street VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    postal_code VARCHAR(20),
+    country VARCHAR(100)
 );
 
 CREATE TABLE Orders (

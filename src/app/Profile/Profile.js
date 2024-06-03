@@ -2,13 +2,15 @@
 import  { useEffect, useState } from 'react';
 import {useUserAuth} from '../auth/auth-context';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 
 export default function Profile() {
-    const { user } = useUserAuth();
+    const { user , firebaseSignOut  } = useUserAuth();
   const [userDetails, setUserDetails] = useState(null);
   const [buyerInfo, setBuyerInfo] = useState(null);
   const [sellerInfo, setSellerInfo] = useState(null);
+  const router = useRouter();
   
 
   
@@ -24,7 +26,7 @@ export default function Profile() {
     console.log("User Id : " , userId);
   
     if (userId !== null) {
-      fetch(`api/Profile/${userId}`, {
+      fetch(`api/profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -54,8 +56,8 @@ export default function Profile() {
   }, [user]);
 
 
-  if (!user || !userDetails) {
-    return <div>Loading...</div>;
+  if (!user) {
+    router.push('/Home');
   }
 
   return (
@@ -70,6 +72,9 @@ export default function Profile() {
         <section className="mb-6">
           <h2 className="text-xl font-semibold border-b pb-2 mb-4">User Information</h2>
           <p><strong>Email:</strong> {userDetails.email}</p>
+          <button
+            onClick={firebaseSignOut}
+           className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Sign Out</button>
         </section>
 
         {userDetails.user_type === 'buyer' && buyerInfo && (
@@ -134,8 +139,6 @@ export default function Profile() {
       </main>
     
     </div>
-
-  )
-  );
+    ) );
 };
 
