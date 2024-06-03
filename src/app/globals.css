@@ -61,3 +61,34 @@ body {
 .nav-link:hover {
   color: black; /* Optional: Change the text color on hover */
 }
+.hover-box {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.hover-box::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000; /* Change the color as needed */
+  transition: top 0.3s ease-in-out;
+  z-index: -1;
+}
+
+.hover-box:hover::after {
+  top: 0;
+}
+
+.hover-box span {
+  position: relative;
+  color: #000; /* Change the color as needed */
+  transition: color 0.3s ease-in-out;
+}
+
+.hover-box:hover span {
+  color: #fff; /* Change the color as needed */
+}
