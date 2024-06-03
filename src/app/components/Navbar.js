@@ -10,6 +10,7 @@ const Header = () => {
   const [searchText, setSearchText] = useState('');
   const [cartCount, setCartCount] = useState(0);
   const [loggedInUser, setLoggedInUser] = useState(null);
+  console.log("User : " , user);
 
   useEffect(() => {
     const handleCartUpdate = () => {
@@ -26,7 +27,6 @@ const Header = () => {
     window.addEventListener('cartUpdated', handleCartUpdate);
     window.addEventListener('userUpdated', handleUserUpdate);
 
-    // Initial count and user state
     handleCartUpdate();
     handleUserUpdate();
 
@@ -34,16 +34,16 @@ const Header = () => {
       window.removeEventListener('cartUpdated', handleCartUpdate);
       window.removeEventListener('userUpdated', handleUserUpdate);
     };
-  }, [ user ]);
+  }, [user]);
 
   return (
-    <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-0 px-3 box-border top-0 z-99 sticky leading-normal tracking-normal gap-3 text-left text-xl text-black font-sans" style={{ borderBottom: '2px solid black' }}>
+    <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-0 px-3 box-border top-0 z-50 sticky leading-normal tracking-normal gap-3 text-left text-xl text-black font-sans" style={{ borderBottom: '2px solid black' }}>
       <div className="flex items-center">
         <div className="relative flex items-center justify-center w-20 h-20"></div>
         <h3 className="text-4xl font-bold">TECH TEXTILE</h3>
       </div>
       <div className="flex items-center gap-4">
-        <div className="flex place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[200px] h-10" style={{ minWidth: '200px', height: '40px' }}>
+        <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[200px] h-10" >
           <input
             type="text"
             placeholder="What are you looking ?"

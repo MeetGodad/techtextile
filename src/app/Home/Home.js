@@ -23,7 +23,7 @@ export default function Home() {
       }
     };
     fetchProducts();
-  }, [setInterval]);
+  }, []);
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
