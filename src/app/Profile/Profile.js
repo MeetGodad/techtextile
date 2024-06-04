@@ -3,6 +3,7 @@ import  { useEffect, useState } from 'react';
 import {useUserAuth} from '../auth/auth-context';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import SellerViewItem from '../seller/SellerViewItem';
 
 
 export default function Profile() {
@@ -26,7 +27,7 @@ export default function Profile() {
     console.log("User Id : " , userId);
   
     if (userId !== null) {
-      fetch(`api/profile/${userId}`, {
+      fetch(`api/Profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -107,6 +108,7 @@ export default function Profile() {
           <Link href="/listProduct" >
             <button className="mt-4 bg-green-500 text-white px-4 py-2 rounded">Add Product</button>
           </Link>  
+          
              {/* <h2 className="text-xl font-semibold border-b pb-2 mb-4">Listed Products</h2>
               <table className="min-w-full bg-white">
                 <thead>
