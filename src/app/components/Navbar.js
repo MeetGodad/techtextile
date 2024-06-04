@@ -61,9 +61,6 @@ const Header = () => {
           />
           )}
         </div>
-        <Link href="/seller" >Listing</Link>
-        {/* <Link href= "/edititem">Update Listing</Link> */}
-        <Link href= "/listProduct">List Product</Link>
         <div className="flex items-center gap-6">
           <a className="nav-link  font-semibold" href="/Home" passHref>Home</a>
           <a className="nav-link  font-semibold" href="#">Category</a>

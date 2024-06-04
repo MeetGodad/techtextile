@@ -154,8 +154,8 @@ export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
   const [userDetails, setUserDetails] = useState(null);
   const [sellerInfo, setSellerInfo] = useState(null);
-  const [showListedItems, setShowListedItems] = useState(false); // State for showing listed items
-  const router = useRouter(); // Ensure router is properly defined here
+  const [showListedItems, setShowListedItems] = useState(false); 
+  const router = useRouter(); 
 
   useEffect(() => {
     if (!user) {
@@ -201,12 +201,12 @@ export default function Profile() {
   }, [user, router]);
 
   const handleViewListedItems = () => {
-    setShowListedItems(!showListedItems); // Toggle showListedItems state
+    setShowListedItems(!showListedItems); 
   };
 
   return (
     user && userDetails && (
-      <div className="min-h-screen bg-gray-100 p-4 flex flex-col sm:flex-row"> 
+      <div className="min-h-flex bg-gray-100 p-4 flex flex-col sm:flex-row"> 
         <main className="w-full sm:w-1/4 bg-white text-black shadow p-6 rounded-lg mr-10"> 
           <section className="mb-6 p-2">
             <h2 className="text-2xl font-semibold border-b pb-2 mb-4">User Information</h2>

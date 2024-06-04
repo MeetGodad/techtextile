@@ -12,13 +12,9 @@ export async function GET(req, { params }) {
     if (sellerId.length === 0) {
         return new Response(JSON.stringify({ message: "Seller not found" }), { status: 404 });
     }
-
-    const products = await sql ` SELECT p.*
-            FROM Products p
-            LEFT JOIN YarnProducts y ON p.product_id = y.product_id
-            LEFT JOIN FabricProducts f ON p.product_id = f.product_id
-            WHERE p.seller_id = ${sellerId[0].seller_id}
-            `
+    //query was made by chat gpt
+    const products = await sql ` SELECT *
+            FROM Products WHERE seller_id = ${sellerId[0].seller_id};`;
 
     if (products.length === 0) {
         return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });

@@ -1,7 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { useUserAuth } from '../auth/auth-context';
-
 const SellerViewItem = () => {
   const [items, setItems] = useState([]);
   const { user } = useUserAuth();
