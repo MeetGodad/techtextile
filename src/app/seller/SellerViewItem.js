@@ -53,7 +53,9 @@ const SellerViewItem = () => {
             ))
           )}
         </div>
-        <button className="mt-8 mb-12 px-4 py-2 bg-green-500 text-white rounded-md">Add Item</button>
+        <button onClick={() => window.location.href='/listProduct'} className="mt-8 mb-12 px-4 py-2 bg-green-500 text-white rounded-md">
+          Add Item
+        </button>   
       </section>
     </div>
   );
