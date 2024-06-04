@@ -1,5 +1,20 @@
 
 
+POST  http://localhost:3000/api/cart HTTP/1.1
+content-type: application/json
+
+{
+  "userId": "KvWDopl2orVsz095hVbylbr4fXy1",
+  "productId": "1"
+}
+
+####
+
+
+
+GET http://localhost:3000/api/cart/RyNSMW3SqYc5emA6Xjx5omP0PcA3 HTTP/1.1
+
+
 
 GET http://localhost:3000/api/products HTTP/1.1
 
@@ -10,8 +25,17 @@ GET http://localhost:3000/api/Profile/8M7B8WDchFWdXkXM73MwyoeJx3y1 HTTP/1.1
 
 GET http://localhost:3000/api/auth/7XHSnvIpguhViHnpIYc6GmFN7G93 HTTP/1.1
 
+####
 
+POST http://localhost:3000/api/cart HTTP/1.1
+content-type: application/json
 
+{
+  "userId": "KvWDopl2orVsz095hVbylbr4fXy1",
+  "product_id": "1"
+}
+
+####
 
 
 POST http://localhost:3000/api/auth HTTP/1.1

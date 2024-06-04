@@ -23,33 +23,48 @@ export default function Home() {
       }
     };
     fetchProducts();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
     setCart(storedCart);
   }, []);
 
-  const addToCart = (product) => {
+  const addToCart = async (product) => {
     if (!user) {
       alert('Please sign up or log in first.');
       return;
     }
-    const updatedCart = [...cart];
-    const existingProduct = updatedCart.find(item => item.product_id === product.product_id);
+    try {
+      const response = await fetch('/api/cart', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.uid, productId: product.product_id }),
+      });
+      alert("response : " , response)
 
-    if (existingProduct) {
-      existingProduct.quantity += 1;
-    } else {
-      updatedCart.push({ ...product, quantity: 1 });
-    }
+      if (!response.ok) {
+          throw new Error('Failed to add product to cart');
+      }
 
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+      const updatedCart = await response.json();
 
-    // Dispatch an event to notify that the cart has been updated
-    const event = new Event('cartUpdated');
-    window.dispatchEvent(event);
+      const index = cart.findIndex((item) => item.product_id === updatedCart.product_id);
+      if (index !== -1) {
+          cart[index] = updatedCart;
+      } else {
+          cart.push(updatedCart);
+      }
+
+      setCart([...cart]);
+      
+      const event = new Event('cartUpdated');
+      window.dispatchEvent(event);
+  } catch (error) {
+      alert(error.message);
+  }
   };
 
   return (

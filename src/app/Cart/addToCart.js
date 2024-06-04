@@ -1,26 +1,66 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { useUserAuth } from '../auth/auth-context';
+
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
+  const { user } = useUserAuth();
 
+  
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCart(storedCart);
-  }, []);
+    if (user) {
+      const userId = user.uid;
+      fetch(`/api/cart/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data && typeof data === 'object') {
+            setCart([data]);
+          } else {
+            console.error('Server response is not an object:', data);
+          }
+        })
+        .catch(error => {
+          console.error('Unexpected server response:', error);
+        });
+    }
+  }, [user]);
 
   const updateQuantity = (productId, quantity) => {
-    const updatedCart = cart.map(item =>
-      item.product_id === productId ? { ...item, quantity: parseInt(quantity) } : item
-    );
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    fetch(`/api/cart/${productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ quantity: parseInt(quantity) }),
+    })
+      .then(response => response.json())
+      .then(updatedItem => {
+        const updatedCart = cart.map(item =>
+          item.product_id === productId ? updatedItem : item
+        );
+        setCart(updatedCart);
+      });
   };
 
   const removeItem = (productId) => {
-    const updatedCart = cart.filter(item => item.product_id !== productId);
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    fetch(`/api/cart/${productId}`, {
+      method: 'DELETE',
+    })
+      .then(() => {
+        const updatedCart = cart.filter(item => item.product_id !== productId);
+        setCart(updatedCart);
+      });
   };
 
   const calculateSubtotal = () => {
@@ -45,29 +85,33 @@ const Cart = () => {
               <div>Action</div>
             </div>
           </div>
-          {cart.map(item => (
-            <div key={item.product_id} className="w-full p-4 border-t text-black border-gray-200">
-              <div className="grid grid-cols-5 gap-4">
-                <div className="flex items-center space-x-4">
-                  <img src={item.image_url} alt={item.product_name} className="w-16 h-16 object-cover" />
-                  <div>{item.product_name}</div>
+
+              {cart.map(item => {
+                console.log(item);
+                 const images = item.image_url ? item.image_url.split(',') : [];
+                return (
+                <div key={item.product_id} className="w-full p-4 border-t text-black border-gray-200">
+                  <div className="grid grid-cols-5 gap-4">
+                    <div className="flex items-center space-x-4">
+                      <img src={images[0]} alt={item.product_name} className="w-16 h-16 object-cover" />
+                      <div>{item.product_name}</div>
+                    </div>
+                    <div>${Number(item.price).toFixed(2)}</div>
+                    <div>
+                      <input
+                        type="number"
+                        className="border border-gray-300 rounded w-16"
+                        value={item.quantity}
+                        onChange={(e) => updateQuantity(item.product_id, e.target.value)}
+                      />
+                    </div>
+                    <div>${Number((item.price * item.quantity)).toFixed(2)}</div>
+                    <div>
+                      <button onClick={() => removeItem(item.product_id)} className="text-red-500">Remove</button>
+                    </div>
+                  </div>
                 </div>
-                <div>${Number(item.price).toFixed(2)}</div>
-                <div>
-                  <input
-                    type="number"
-                    className="border border-gray-300 rounded w-16"
-                    value={item.quantity}
-                    onChange={(e) => updateQuantity(item.product_id, e.target.value)}
-                  />
-                </div>
-                <div>${Number((item.price * item.quantity)).toFixed(2)}</div>
-                <div>
-                  <button onClick={() => removeItem(item.product_id)} className="text-red-500">Remove</button>
-                </div>
-              </div>
-            </div>
-          ))}
+              )})}
         </div>
       </div>
       <div className="mt-8 flex justify-end">
