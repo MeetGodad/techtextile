@@ -1,18 +1,14 @@
 
 
-PUT http://localhost:3000/api/cart/28 HTTP/1.1
+
+GET http://localhost:3000/api/seller/0sZBgo4Vw1OciqK5QjcCJQ4spm43 HTTP/1.1
 content-type: application/json
 
-{
-  "quantity": 2
-}
 
 
-
-
-
-
-
+###
+GET http://localhost:3000/api/seller/0sZBgo4Vw1OciqK5QjcCJQ4spm43 HTTP/1.1
+###
 
 # POST  http://localhost:3000/api/cart HTTP/1.1
 # content-type: application/json
@@ -25,9 +21,12 @@ content-type: application/json
 # ####
 
 
+
 # GET http://localhost:3000/api/cart/RyNSMW3SqYc5emA6Xjx5omP0PcA3 HTTP/1.1
 
+
 # ##### 
+
 
 # DELETE  http://localhost:3000/api/cart/21 HTTP/1.1
 
@@ -92,7 +91,21 @@ content-type: application/json
 #     "yarn_denier":"45",
 #     "yarn_color":"blue"
 # }
+{
+    "product_name": "samlpe1",
+    "description": "desc1",
+    "price": 65,
+    "image_url": "Danier1",
+    "userId": "8M7B8WDchFWdXkXM73MwyoeJx3y1",
+    "product_type": "yarn",
+    "yarn_type": "Color1",
+    "yarn_denier":"45",
+    "yarn_color":"blue"
+}
 
 
 
+###
+GET http://localhost:3000/api/sellerid/vcQpXA7LsSNLQrJd4LnOynvCS5B2 HTTP/1.1
+content-type: application/json
 

@@ -1,144 +1,200 @@
-"use client";
-import  { useEffect, useState } from 'react';
-import {useUserAuth} from '../auth/auth-context';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
+
+// "use client";
+// import { useEffect, useState } from 'react';
+// import { useUserAuth } from '../auth/auth-context';
+// import { useRouter } from 'next/navigation';
+// import SellerViewItem from '../seller/SellerViewItem';
+
+// export default function Profile() {
+//   const { user, firebaseSignOut } = useUserAuth();
+//   const [userDetails, setUserDetails] = useState(null);
+//   const [buyerInfo, setBuyerInfo] = useState(null);
+//   const [sellerInfo, setSellerInfo] = useState(null);
+//   const [showListedItems, setShowListedItems] = useState(false);
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     if (!user) {
+//       console.log("User is not logged in");
+//       return;
+//     }
+
+//     const userId = user.uid;
+//     console.log("User Id : ", userId);
+
+//     if (userId !== null) {
+//       fetch(`api/Profile/${userId}`, {
+//         method: 'GET',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//       })
+//         .then(response => {
+//           console.log("Backend Response : ", response);
+//           if (!response.ok) {
+//             throw new Error('Network response was not ok');
+//           }
+//           return response.json();
+//         })
+//         .then(data => {
+//           console.log(data);
+//           setUserDetails(data.user);
+//           console.log("User Details : ", userDetails);
+//           if (data.user.user_type === 'seller') {
+//             setSellerInfo(data.user.sellerDetails);
+//           } else if (data.user.user_type === 'buyer') {
+//             setBuyerInfo(data.user.buyerDetails);
+//           }
+//         })
+//         .catch(error => {
+//           console.error('Unexpected server response:', error);
+//         });
+//     }
+//   }, [user]);
+
+//   useEffect(() => {
+//     if (!user) {
+//       router.push('/Home');
+//     }
+//   }, [user, router]);
+
+//   const handleViewListedItems = () => {
+//     setShowListedItems(!showListedItems);
+//   };
+
+//   return (
+//     user && userDetails && (
+//       <div className="min-h-screen bg-gray-100 flex items-center justify-center relative">
+//         <div className={`transition-all duration-500 ease-in-out flex ${showListedItems ? 'justify-start' : 'justify-center'} items-center w-full`}>
+//           <main className={`relative bg-white text-black shadow p-6 rounded-lg overflow-y-auto transition-all duration-500 ease-in-out transform ${showListedItems ? 'ml-10 mr-0' : 'w-2/3'}`} style={{ width: showListedItems ? '30%' : '56%', height: 'auto' }}>
+//             <section className="border p-4 rounded-lg mb-6">
+//               <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏</h1>
+//               <h2 className="text-3xl font-semibold border-b pb-2 mb-4">User Information</h2>
+//               <p className="text-xl"><strong>Email:</strong> {userDetails.email}</p>
+//               <button onClick={firebaseSignOut} className="mt-4 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-200">Sign Out</button>
+//               {userDetails.user_type === 'seller' && sellerInfo && (
+//                 <>
+//                   <p className="text-xl mt-4"><strong>Business Name:</strong> {sellerInfo.business_name}</p>
+//                   <p className="text-xl"><strong>Business Address:</strong> {sellerInfo.business_address}</p>
+//                   <p className="text-xl"><strong>Business Phone Number:</strong> {sellerInfo.phone_num}</p>
+//                   <button onClick={handleViewListedItems} className="mt-4 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors duration-200">
+//                     View Listed Items
+//                   </button>
+//                 </>
+//               )}
+//             </section>
+//           </main>
+
+//           {showListedItems && (
+//             <aside className="bg-white text-black shadow p-6 rounded-lg transition-all duration-500 ease-in-out transform flex-1 ml-6">
+//               <SellerViewItem userId={user.uid} />
+//             </aside>
+//           )}
+//         </div>
+//       </div>
+//     )
+//   );
+// };
+
+"use client";
+import { useEffect, useState } from 'react';
+import { useUserAuth } from '../auth/auth-context';
+import { useRouter } from 'next/navigation';
+import SellerViewItem from '../seller/SellerViewItem';
 
 export default function Profile() {
-    const { user , firebaseSignOut  } = useUserAuth();
+  const { user, firebaseSignOut } = useUserAuth();
   const [userDetails, setUserDetails] = useState(null);
   const [buyerInfo, setBuyerInfo] = useState(null);
   const [sellerInfo, setSellerInfo] = useState(null);
+  const [showListedItems, setShowListedItems] = useState(false);
+  const [listedItemsVisible, setListedItemsVisible] = useState(false);
   const router = useRouter();
-  
-
-  
 
   useEffect(() => {
-
-    if(!user){
+    if (!user) {
       console.log("User is not logged in");
       return;
     }
 
     const userId = user.uid;
-    console.log("User Id : " , userId);
-  
+    console.log("User Id : ", userId);
+
     if (userId !== null) {
-      fetch(`api/profile/${userId}`, {
+      fetch(`api/Profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       })
-      .then(response => {
-        console.log("Backend Response : " , response);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log(data);
-        setUserDetails(data.user);
-        console.log("User Details : " , userDetails);
-        if (data.user.user_type === 'seller') {
-          setSellerInfo(data.user.sellerDetails);
-        } else if (data.user.user_type === 'buyer') {
-          setBuyerInfo(data.user.buyerDetails);
-        }
-      })
-      .catch(error => {
-        console.error('Unexpected server response:', error);
-      });
+        .then(response => {
+          console.log("Backend Response : ", response);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log(data);
+          setUserDetails(data.user);
+          console.log("User Details : ", userDetails);
+          if (data.user.user_type === 'seller') {
+            setSellerInfo(data.user.sellerDetails);
+          } else if (data.user.user_type === 'buyer') {
+            setBuyerInfo(data.user.buyerDetails);
+          }
+        })
+        .catch(error => {
+          console.error('Unexpected server response:', error);
+        });
     }
   }, [user]);
 
+  useEffect(() => {
+    if (!user) {
+      router.push('/Home');
+    }
+  }, [user, router]);
 
-  if (!user) {
-    router.push('/Home');
-  }
+  const handleViewListedItems = () => {
+    if (!showListedItems) {
+      setListedItemsVisible(true);
+      setTimeout(() => setShowListedItems(true), 10); // small delay for transition
+    } else {
+      setShowListedItems(false);
+      setTimeout(() => setListedItemsVisible(false), 1000); // wait for transition to end
+    }
+  };
 
   return (
-
     user && userDetails && (
-    <div className="min-h-screen bg-gray-100 p-4 text-black">
-      <header className="bg-white text-black shadow p-4 flex flex-col items-center">
-      <h1 className="text-2xl font-semibold mt-4">{userDetails.first_name} {userDetails.last_name}</h1>
-      </header>
-
-      <main className="mt-6 bg-white text-black shadow p-4 rounded">
-        <section className="mb-6">
-          <h2 className="text-xl font-semibold border-b pb-2 mb-4">User Information</h2>
-          <p><strong>Email:</strong> {userDetails.email}</p>
-          <button
-            onClick={firebaseSignOut}
-           className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Sign Out</button>
-        </section>
-
-        {userDetails.user_type === 'buyer' && buyerInfo && (
-          <section className="mb-6">
-
-            <p><strong>Phone Number:</strong> {buyerInfo.phone_num}</p>
-            <p><strong>Shipping Address:</strong> {buyerInfo.shipping_address}</p>
-            /*
-              <h2 className="text-xl font-semibold border-b pb-2 mb-4 mt-6">Order History</h2>
-              <ul>
-                <li>Order 1</li>
-                <li>Order 2</li>
-              </ul>
-              <h2 className="text-xl font-semibold border-b pb-2 mb-4 mt-6">Wishlist</h2>
-              {/* Add Wishlist Data */}
-              <ul>
-                <li>Wishlist Item 1</li>
-                <li>Wishlist Item 2</li>
-              </ul>
-            */
+      <div className="min-h-screen bg-gray-100 p-4 relative flex items-start justify-center">
+        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems ? 'fixed top-15 left-0 m-2' : 'm-auto'}`} style={{ width: showListedItems ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems ? '15px' : '0' }}>
+          <section className="bg-white text-black shadow p-4 rounded-lg mb-6">
+            <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏</h1>
+            <h2 className="text-3xl font-semibold border-b pb-2 mb-4">User Information</h2>
+            <p className="text-xl"><strong>Email:</strong> {userDetails.email}</p>
+            <button onClick={firebaseSignOut} className="mt-4 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-200">Sign Out</button>
+            {userDetails.user_type === 'seller' && sellerInfo && (
+              <>
+                <p className="text-xl mt-4"><strong>Business Name:</strong> {sellerInfo.business_name}</p>
+                <p className="text-xl"><strong>Business Address:</strong> {sellerInfo.business_address}</p>
+                <p className="text-xl"><strong>Business Phone Number:</strong> {sellerInfo.phone_num}</p>
+                <button onClick={handleViewListedItems} className="mt-4 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors duration-200">
+                  View Listed Items
+                </button>
+              </>
+            )}
           </section>
+        </main>
+
+        {listedItemsVisible && (
+          <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showListedItems ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
+            <SellerViewItem userId={user.uid} />
+          </aside>
         )}
-
-        {userDetails && userDetails.user_type === 'seller' && sellerInfo && (
-          <section>
-            <p><strong>Business Name:</strong> {sellerInfo.business_name}</p>
-            <p><strong>Business Address:</strong> {sellerInfo.business_address}</p>
-            <p><strong>Business Phone Number:</strong> {sellerInfo.phone_num}</p>
-
-          <Link href="/listProduct" >
-            <button className="mt-4 bg-green-500 text-white px-4 py-2 rounded">Add Product</button>
-          </Link>  
-             {/* <h2 className="text-xl font-semibold border-b pb-2 mb-4">Listed Products</h2>
-              <table className="min-w-full bg-white">
-                <thead>
-                  <tr>
-                    <th className="py-2">Product Name</th>
-                    <th className="py-2">Category</th>
-                    <th className="py-2">Price</th>
-                    <th className="py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  
-                  {sellerInfo.products && sellerInfo.products.map((product, index) => (
-                    <tr key={index} className="text-left border-b">
-                      <td className="py-2 px-4">{product.name}</td>
-                      <td className="py-2 px-4">{product.category}</td>
-                      <td className="py-2 px-4">{product.price}</td>
-                      <td className="py-2 px-4">
-                        <button className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">Update</button>
-                        <button className="bg-red-500 text-white px-2 py-1 rounded">Remove</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                </table>
-                <button className="mt-4 bg-green-500 text-white px-4 py-2 rounded">Add New Product</button>
-                */}
-          </section>
-        )}
-      </main>
-    
-    </div>
-    ) );
-};
-
+      </div>
+    )
+  );
+}
