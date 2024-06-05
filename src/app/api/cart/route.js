@@ -51,67 +51,6 @@ export async function POST(request) {
 
 }
 
-export async function PUT(request, {params}) {
-  
-    try {
-      const productId = params.productId;
-      const requestData = await request.json();
-      const databaseUrl = process.env.DATABASE_URL || "";
-      const sql = neon(databaseUrl);
-  
-      const cartItem = await sql`
-      UPDATE CartItems SET quantity = ${requestData.quantity} WHERE product_id = ${productId} RETURNING *`;
-  
-      if (cartItem.length === 0) {
-          throw new Error('Failed to update the quantity of the product in the cart.');
-      }
-  
-      return {
-          status: 200,
-          body: {
-              cartItem: cartItem[0],
-          },
-      };
-  } catch (error) {
-      return {
-          status: 500,
-          body: {
-              error: error.message,
-          },
-      };
-  }
-  
-  }
 
-  export async function DELETE({params}) {
-
-    try {
-      const productId = params.productId;
-      const databaseUrl = process.env.DATABASE_URL || "";
-      const sql = neon(databaseUrl);
-  
-      const cartItem = await sql`
-      DELETE FROM CartItems WHERE product_id = ${productId} RETURNING *`;
-  
-      if (cartItem.length === 0) {
-          throw new Error('Failed to remove the product from the cart.');
-      }
-  
-      return {
-          status: 200,
-          body: {
-              cartItem: cartItem[0],
-          },
-      };
-  } catch (error) {
-      return {
-          status: 500,
-          body: {
-              error: error.message,
-          },
-      };
-  }
-  
-  }
 
 

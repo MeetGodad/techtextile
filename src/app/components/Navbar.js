@@ -4,35 +4,59 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUserAuth } from '../auth/auth-context';
 
+
 const Header = () => {
 
   const { user } = useUserAuth();
   const [searchText, setSearchText] = useState('');
-  const [cartCount, setCartCount] = useState(0);
   const [loggedInUser, setLoggedInUser] = useState(null);
-  console.log("User : " , user);
+  const [cart, setCart] = useState([]);
+
 
   useEffect(() => {
-    const handleCartUpdate = () => {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const count = cart.reduce((acc, item) => acc + item.quantity, 0);
-      setCartCount(count);
+
+    const fetchCart = async () => {
+      try {
+        if (user) {
+          const userId = user.uid;
+          fetch(`/api/cart/${userId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data && typeof data === 'object') {
+                setCart(data);
+              } else {
+                console.error('Server response is not an object:', data);
+              }
+            })
+            .catch(error => {
+              console.error('Unexpected server response:', error);
+            });
+        }
+      } catch (error) {
+        console.error('Error fetching the cart:', error);
+      }
     };
 
-    const handleUserUpdate = () => {
-      const loggedUser = JSON.parse(localStorage.getItem('user'));
-      setLoggedInUser(loggedUser);
-    };
+    const handleCartUpdate = () => {
+      fetchCart();
+    }
+
+    fetchCart();
 
     window.addEventListener('cartUpdated', handleCartUpdate);
-    window.addEventListener('userUpdated', handleUserUpdate);
-
-    handleCartUpdate();
-    handleUserUpdate();
 
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate);
-      window.removeEventListener('userUpdated', handleUserUpdate);
     };
   }, [user]);
 
@@ -64,7 +88,7 @@ const Header = () => {
           <a className="nav-link  font-semibold" href="#">Category</a>
           <a className="nav-link  font-semibold" href="#">About</a>
         </div>
-        <Link href="/Cart" passHref>
+        <Link href="/Cart">
           <div className="flex items-center nav-link">
           <div id="cart-icon" className="relative flex items-center">
             <img
@@ -72,12 +96,14 @@ const Header = () => {
               alt="cart"
               src="/Images/black_cart.png"
             />
-            <span className="ml-2 font-semibold">Cart</span>
-              {cartCount > 0 && (
-                <div className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
-                  {cartCount}
-                </div>
-              )}
+            <span className="ml-2 font-semibold">Cart</span>  
+            {console.log("cart", cart)}
+            {user && cart.length > 0 && (
+              console.log("cart", cart.length),
+              <div className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                {cart.length}
+              </div>
+            )}
           </div>
           </div>
         </Link>
@@ -86,7 +112,7 @@ const Header = () => {
 
             <div className="flex items-center nav-link">
 
-              <span className="ml-2">Visit Profile</span>
+              <span className="ml-2 font-semibold">Visit Profile</span>
             </div>
           </Link>
         ) : (

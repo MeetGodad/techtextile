@@ -25,6 +25,7 @@ export default function Home() {
     fetchProducts();
   }, [user]);
 
+  
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
     setCart(storedCart);
@@ -43,7 +44,6 @@ export default function Home() {
           },
           body: JSON.stringify({ userId: user.uid, productId: product.product_id }),
       });
-      alert("response : " , response)
 
       if (!response.ok) {
           throw new Error('Failed to add product to cart');
