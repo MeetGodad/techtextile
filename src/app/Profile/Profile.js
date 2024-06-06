@@ -102,6 +102,7 @@ import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import { useRouter } from 'next/navigation';
 import SellerViewItem from '../seller/SellerViewItem';
+import ListProduct from '../seller/ListProduct'
 
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
@@ -110,6 +111,7 @@ export default function Profile() {
   const [sellerInfo, setSellerInfo] = useState(null);
   const [showListedItems, setShowListedItems] = useState(false);
   const [listedItemsVisible, setListedItemsVisible] = useState(false);
+  const [showAddProduct, setShowAddProduct] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -122,7 +124,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
-      fetch(`api/Profile/${userId}`, {
+      fetch(`api/profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -157,9 +159,29 @@ export default function Profile() {
     }
   }, [user, router]);
 
+  const handleAddProduct = () => {
+
+
+    if (!showAddProduct) {
+      setListedItemsVisible(false);
+      setShowListedItems(false);
+      setShowAddProduct(true);
+      setTimeout(() => setShowAddProduct(true), 10); // small delay for transition
+    } else {
+      setShowAddProduct(false);
+      setTimeout(() => setListedItemsVisible(true), 1000); // wait for transition to end
+    }
+  }
+
   const handleViewListedItems = () => {
+
+    const event = new Event('sellerDataUpdated');
+    window.dispatchEvent(event);
+
+
     if (!showListedItems) {
       setListedItemsVisible(true);
+      setShowAddProduct(false);
       setTimeout(() => setShowListedItems(true), 10); // small delay for transition
     } else {
       setShowListedItems(false);
@@ -169,8 +191,8 @@ export default function Profile() {
 
   return (
     user && userDetails && (
-      <div className="min-h-screen bg-gray-100 p-4 relative flex items-start justify-center">
-        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems ? 'fixed top-15 left-0 m-2' : 'm-auto'}`} style={{ width: showListedItems ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems ? '15px' : '0' }}>
+      <div className="min-h-screen bg-gray-100 p-4 relative flex items-start  justify-center">
+        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems ? 'absolute top-15 left-0 m-2' : showAddProduct ? 'absolute  pt-1 top-18 left-0 m-2' : 'm-auto'}`}    style={{ width: showListedItems ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems ? '15px' : '0' }}>
           <section className="bg-white text-black shadow p-4 rounded-lg mb-6">
             <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏</h1>
             <h2 className="text-3xl font-semibold border-b pb-2 mb-4">User Information</h2>
@@ -181,19 +203,29 @@ export default function Profile() {
                 <p className="text-xl mt-4"><strong>Business Name:</strong> {sellerInfo.business_name}</p>
                 <p className="text-xl"><strong>Business Address:</strong> {sellerInfo.business_address}</p>
                 <p className="text-xl"><strong>Business Phone Number:</strong> {sellerInfo.phone_num}</p>
-                <button onClick={handleViewListedItems} className="mt-4 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors duration-200">
+                <button onClick={handleViewListedItems} className=" flex mt-4 bg-green-500 text-white px-6 py-3 w-1/2 justify-center rounded-lg hover:bg-green-600 transition-colors duration-200">
                   View Listed Items
+                </button>
+                <button onClick={handleAddProduct} className=" flex mt-4 bg-green-500 text-white px-6 py-3  w-1/2 justify-center rounded-lg hover:bg-green-600 transition-colors duration-200">
+                Add Product
                 </button>
               </>
             )}
           </section>
         </main>
 
-        {listedItemsVisible && (
+        {userDetails.user_type === 'seller' && listedItemsVisible && (
           <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showListedItems ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
             <SellerViewItem userId={user.uid} />
           </aside>
         )}
+
+        {userDetails.user_type === 'seller' && showAddProduct && (
+          <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showAddProduct ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
+            <ListProduct userId={user.uid} />
+          </aside>
+        )}
+
       </div>
     )
   );

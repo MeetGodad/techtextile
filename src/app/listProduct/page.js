@@ -1,5 +1,5 @@
 
-import ListProduct from "./ListProduct";
+import ListProduct from "../seller/ListProduct";
 import Header from "../components/Navbar";
 import Footer from "../components/Footer";
 

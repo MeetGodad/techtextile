@@ -6,25 +6,60 @@ const SellerViewItem = () => {
   const { user } = useUserAuth();
 
   useEffect(() => {
-    const fetchProducts = async () => {
-        try {
-          const response = await fetch(`/api/seller/${user.uid}`);
-          const data = await response.json();
-          console.log('response2:', data)
-          setItems(data);
-        } catch (error) {
-          console.error('Error fetching the products:', error);
-        }
-      };
       fetchProducts();
+
+    const handleFetchSellerData = () => {
+      fetchProducts();
+      console.log('Seller data updated with EventListener');
+    }
+
+    window.addEventListener('sellerDataUpdated', handleFetchSellerData);
+
+
+    return () => {
+      window.removeEventListener('sellerDataUpdated', handleFetchSellerData);
+    }
+
   }, [user]);
+
+  const fetchProducts = async () => {
+    try {
+      if (user) {
+        const userId = user.uid;
+        fetch(`/api/seller/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data && typeof data === 'object') {
+              setItems(data);
+            } else {
+              console.error('Server response is not an object:', data);
+            }
+          })
+          .catch(error => {
+            console.error('Unexpected server response:', error);
+          });
+      }
+    } catch (error) {
+      console.error('Error fetching the items:', error);
+    }
+  };
+
 
   return (
     <div className="w-full min-h-screen bg-white p-8 text-black">
       <section className="max-w-screen-xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold">Listed Items</h1>
-          <p className="mt-4 text-black">Listed Items</p>
         </div>
         <div className="grid grid-cols-1 gap-4">
           <div className="flex justify-between text-left text-sm font-medium">

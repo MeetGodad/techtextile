@@ -5,15 +5,12 @@ export async function GET(req, { params }) {
     try {
 
         const id = params.id;
-        
-
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
 
         const cartId = await sql`
         SELECT cart_id FROM ShoppingCart WHERE user_id = ${id}`;
-        console.log("cartId", cartId[0].cart_id);
-
+        
         const cartItems = await sql`
         SELECT p.* , ci.quantity FROM ShoppingCart sc
         JOIN CartItems ci ON sc.cart_id = ci.cart_id
