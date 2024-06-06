@@ -110,7 +110,7 @@ const Header = () => {
           </div>
         </Link>
         {user ? (
-          <Link href="/Profile" passHref>
+          <Link href="/Profile">
 
             <div className="flex items-center nav-link">
 
@@ -118,7 +118,7 @@ const Header = () => {
             </div>
           </Link>
         ) : (
-          <Link href="/Login" passHref>
+          <Link href="/Login" >
             <div className="flex items-center nav-link">
               <span className=" font-semibold">SignUp/Login</span>
             </div>

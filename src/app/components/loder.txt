@@ -1,0 +1,57 @@
+import React from 'react';
+
+const Loader = () => {
+  return (
+    <div className="flex justify-center items-center w-fit h-fit">
+      <div className="flex flex-col relative w-200 h-100 justify-end items-center overflow-x-hidden">
+        <div className="w-130 mb-6">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 198 93"
+            className="w-full"
+          >
+            {/* your svg code here */}
+          </svg>
+        </div>
+        <div className="flex justify-between items-center w-130 px-10 pb-10 pt-15 absolute bottom-0">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 30 30"
+            className="w-24"
+          >
+            {/* your svg code here */}
+          </svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 30 30"
+            className="w-24"
+          >
+            {/* your svg code here */}
+          </svg>
+        </div>
+        <div className="w-full h-1.5 bg-gray-900 rounded-full absolute bottom-0 flex-end">
+          <div className="absolute w-20 h-full bg-gray-900 rounded-full right-[-50%] animate-roadAnimation">
+            <div className="absolute w-10 h-full bg-gray-900 rounded-full right-[-65%] animate-roadAnimation"></div>
+          </div>
+        </div>
+        <svg
+          xml:space="preserve"
+          viewBox="0 0 453.459 453.459"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://www.w3.org/2000/svg"
+          id="Capa_1"
+          version="1.1"
+          fill="#000000"
+          className="absolute bottom-0 right-[-90%] h-90 animate-roadAnimation"
+        >
+          {/* your svg code here */}
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+export default Loader;

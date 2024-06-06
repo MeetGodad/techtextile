@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
+import Loder from '../components/Loder';
 
 export default function Home() {
   const { user } = useUserAuth(); 
@@ -25,11 +26,7 @@ export default function Home() {
     fetchProducts();
   }, [user]);
 
-  
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCart(storedCart);
-  }, []);
+
 
   const addToCart = async (product) => {
     if (!user) {
@@ -68,23 +65,30 @@ export default function Home() {
   };
 
   return (
-    (products && products.length > 0) && (
-    <div className="w-full min-h-screen bg-white p-8">
-      <main className="max-w-screen-xl mx-auto">
-        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <ProductSection
-              key={product.product_id}
-              name={product.product_name}
-              price={product.price}
-              image={product.image_url}
-              product={product}
-              onAddToCart={addToCart}
-            />
-          ))}
+  
+     (products && products.length > 0) ? (
+      
+      <div className="w-full min-h-screen bg-white p-8">
+        <main className="max-w-screen-xl mx-auto">
+          <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {products.map((product) => (
+              <ProductSection
+                key={product.product_id}
+                name={product.product_name}
+                price={product.price}
+                image={product.image_url}
+                product={product}
+                onAddToCart={addToCart}
+              />
+            ))}
         </section>
       </main>
     </div>
+
+    ) : (
+      <div className=" w-full min-h-screen h-60 self-center bg-white p-8">
+        <Loder />
+      </div>
     )
   );
 };

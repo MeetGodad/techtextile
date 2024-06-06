@@ -81,9 +81,8 @@ export default function ListProduct() {
 
 return (
     user ? (
-        <div className="flex">
-        <div className="flex">
-        <div className="w-2/3 bg-white p-8">
+
+        <div className="w-full min-h-screen bg-white p-8 text-black">
             <h2 className="text-2xl font-bold mb-6 text-center">List Item</h2>
             <form onSubmit={handleSubmit} className="space-y-6 text-black">
                 <div className="space-y-2">
@@ -232,12 +231,7 @@ return (
                     Submit
                 </button>
             </form>
-        </div>
-        <div className="w-1/3 flex items-center justify-center bg-black ">
-        <img src="Images/LOGO.png" alt="Logo" className="w-3/4 h-auto" />
-        </div>
-        </div>
-         </div>       
+        </div>     
     ) : (
   
         <div className="flex items-center justify-center h-screen">
