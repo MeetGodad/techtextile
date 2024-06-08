@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 const Footer = ({ className = "" }) => {
   return (
-    <footer className={`w-full bg-bg overflow-hidden flex flex-col items-start justify-start px-0 pb-10 ${className}`}>
+    <footer className={`w-full bg-bg overflow-hidden flex flex-col items-start justify-start px-0 ${className}`}>
       <img
         className="self-stretch relative max-w-full overflow-hidden max-h-full"
         loading="lazy"
