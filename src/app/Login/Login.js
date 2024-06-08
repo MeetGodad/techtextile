@@ -27,9 +27,9 @@ export default function Login() {
         });
 
         if (!response.ok) {
-          alert('Invalid Credentials! Please try again.');
-
-        }else if (response.ok) {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.message}`);
+        } else {
           router.push('/Home');
         }
 
@@ -66,9 +66,8 @@ export default function Login() {
             </div>
 
             <button className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
-              <Link href ="/Home">
               CONTINUE
-              </Link></button>
+            </button>
           </div>
         </form>
 

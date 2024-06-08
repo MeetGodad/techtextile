@@ -54,10 +54,9 @@ export default function SignUp() {
             });
     
             if (!response.ok) {
-                alert('User not found!');
-            }
-            else if (response.ok) {
-                
+                const errorData = await response.json();
+                alert(`Error: ${errorData.message}`);
+            } else {
                 router.push('/Home');
             }
 
@@ -190,7 +189,8 @@ export default function SignUp() {
                             </div>
                         <button className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
                             CREATE AN ACCOUNT
-                            </button>
+
+                        </button>
                     </div>
                 </div>
                 </form>

@@ -1,83 +1,88 @@
 "use client";
+import React, { useEffect } from 'react';
 import { useState } from "react";
 import { storage } from '../auth/firebase';
 import { useUserAuth } from "../auth/auth-context";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 
-export default function ListProduct(){
-
+export default function ListProduct() {
     const { user } = useUserAuth();
     const [image, setImage] = useState([]);
+    const [sellerId, setSellerId] = useState('');
     const [productData, setProductData] = useState({
-    product_name: '',
-    description: '',
-    price: '',
-    image_url: '',
-    seller_id: 12,
-    product_type: '',
-    yarn_type: '',
-    yarn_denier: '',
-    yarn_color: '',
-    fabric_type: '',
-    fabric_print_tech: '',
-    fabric_material: '',
-    fabric_color: ''
-})
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    const urls = await handleUpload();
-    const urlsString = urls.join(",")
-    const updatedProductData = { ...productData, image_url: urlsString };
-    try{
-        const response = await fetch('api/products', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedProductData),
-        });
-        if (!response.ok) {
-            alert('An error occurred while saving the product');
-        } else {
-            alert('Product saved successfully');
+        product_name: '',
+        description: '',
+        price: '',
+        image_url: '',
+        userId: '',
+        product_type: '',
+        yarn_type: '',
+        yarn_denier: '',
+        yarn_color: '',
+        fabric_type: '',
+        fabric_print_tech: '',
+        fabric_material: '',
+        fabric_color: ''
+    });
+
+    useEffect(() => {
+        if (user) {
+            setSellerId(user.uid);
         }
-    }
-    catch(error){
-        console.error('Unexpected server response:', error);
-    }
+    }, [user]);
 
-
-
-  };
-const handleChange = (e) => {
-    setProductData({ ...productData, [e.target.name]: e.target.value });
-  };
-const handleImageChange = (e) => {
-    setImage([...e.target.files]);   
-};
-
-const handleUpload = async () => {
-    const folderId = uuidv4(); 
-    const urls = [];
-    for (const img of image) {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const urls = await handleUpload();
+        const urlsString = urls.join(",");
+        const updatedProductData = { ...productData, image_url: urlsString, userId: sellerId };
         try {
-            const storageRef = ref(storage, `images/${folderId}/${img.name}`);
-            const snapshot = await uploadBytes(storageRef, img);
-            const downloadURL = await getDownloadURL(snapshot.ref);
-            urls.push(downloadURL);
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedProductData),
+            });
+            if (!response.ok) {
+                alert('An error occurred while saving the product');
+            } else {
+                alert('Product saved successfully');
+            }
         } catch (error) {
-            console.error('Error uploading image:', error);
+            console.error('Unexpected server response:', error);
         }
-    }
-    return urls;
-};
+    };
+
+    const handleChange = (e) => {
+        setProductData({ ...productData, [e.target.name]: e.target.value });
+    };
+
+    const handleImageChange = (e) => {
+        setImage([...e.target.files]);
+    };
+
+    const handleUpload = async () => {
+        const folderId = uuidv4();
+        const urls = [];
+        for (const img of image) {
+            try {
+                const storageRef = ref(storage, `images/${folderId}/${img.name}`);
+                const snapshot = await uploadBytes(storageRef, img);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                urls.push(downloadURL);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+            }
+        }
+        return urls;
+    };
 
 return (
     user ? (
-        <div className="flex">
-        <div className="flex">
-        <div className="w-2/3 bg-white p-8">
+
+        <div className="w-full min-h-screen bg-white p-8 text-black">
             <h2 className="text-2xl font-bold mb-6 text-center">List Item</h2>
             <form onSubmit={handleSubmit} className="space-y-6 text-black">
                 <div className="space-y-2">
@@ -226,12 +231,7 @@ return (
                     Submit
                 </button>
             </form>
-        </div>
-        <div className="w-1/3 flex items-center justify-center bg-black ">
-        <img src="Images/LOGO.png" alt="Logo" className="w-3/4 h-auto" />
-        </div>
-        </div>
-         </div>       
+        </div>     
     ) : (
   
         <div className="flex items-center justify-center h-screen">
