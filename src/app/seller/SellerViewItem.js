@@ -96,3 +96,4 @@ const SellerViewItem = () => {
 };
 
 export default SellerViewItem;
+
