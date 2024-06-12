@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -28,11 +30,11 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-    alert('Proceeding to checkout');
+    router.push('/Checkout');
   };
 
   return (
-    <div className="container  mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
       <div className="overflow-x-auto">
         <div className="w-full bg-white shadow-md rounded-lg overflow-hidden">

@@ -66,9 +66,8 @@ export default function Login() {
             </div>
 
             <button className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
-              <Link href ="/Home">
               CONTINUE
-              </Link></button>
+            </button>
           </div>
         </form>
 
