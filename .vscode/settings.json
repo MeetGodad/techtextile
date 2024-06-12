@@ -8,5 +8,6 @@
         "useracounts",
         "usertype",
         "uuidv"
-    ]
+    ],
+    "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }
