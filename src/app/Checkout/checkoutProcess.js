@@ -1,9 +1,11 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUserAuth } from '../auth/auth-context';
 
 const Checkout = () => {
   const router = useRouter();
+  const { user } = useUserAuth();
   const [step, setStep] = useState(1);
   const [cart, setCart] = useState([]);
   const [shippingInfo, setShippingInfo] = useState({
@@ -20,16 +22,30 @@ const Checkout = () => {
     cardNumber: '',
     expirationDate: '',
     cvv: '',
+    paypalEmail: '',
   });
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Visa');
   const [isStepValid, setIsStepValid] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-      setCart(storedCart);
+    if (user) {
+      fetchCartItems(user.uid, step);
     }
-  }, []);
+  }, [user, step]);
+
+  const fetchCartItems = async (userId) => {
+    try {
+      const response = await fetch(`/api/cart/${userId}`);
+      const data = await response.json();
+      if (response.ok) {
+        setCart(data);
+      } else {
+        console.error('Failed to fetch cart items:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+    }
+  };
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
@@ -54,8 +70,12 @@ const Checkout = () => {
   };
 
   const validateStep2 = () => {
-    const { cardName, cardNumber, expirationDate, cvv } = paymentInfo;
-    setIsStepValid(cardName && cardNumber && expirationDate && cvv);
+    if (selectedPaymentMethod === 'PayPal') {
+      setIsStepValid(paymentInfo.paypalEmail !== '');
+    } else {
+      const { cardName, cardNumber, expirationDate, cvv } = paymentInfo;
+      setIsStepValid(cardName && cardNumber && expirationDate && cvv);
+    }
   };
 
   const handleNextStep = () => {
@@ -121,6 +141,8 @@ const Checkout = () => {
               type="email"
               name="paypalEmail"
               placeholder="PayPal Email"
+              value={paymentInfo.paypalEmail}
+              onChange={handlePaymentChange}
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
@@ -230,6 +252,7 @@ const Checkout = () => {
         );
       case 3:
         const maskedCardNumber = `${paymentInfo.cardNumber.slice(0, 4)} **** **** ${paymentInfo.cardNumber.slice(-4)}`;
+        const paymentEmail = paymentInfo.paypalEmail;
         return (
           <div className="animate-fade-in">
             <h2 className="text-xl font-semibold mb-4">Review Order</h2>
@@ -243,68 +266,102 @@ const Checkout = () => {
               </div>
               <div>
                 <h3 className="font-semibold">Payment Information</h3>
-                <p>Payment Method: {selectedPaymentMethod}</p>
-                {selectedPaymentMethod !== 'PayPal' && <p>Card Number: {maskedCardNumber}</p>}
+                {selectedPaymentMethod === 'Visa' && (
+                  <p>Card Number: {maskedCardNumber}</p>
+                )}
+                {selectedPaymentMethod === 'Mastercard' && (
+                  <p>Card Number: {maskedCardNumber}</p>
+                )}
+                {selectedPaymentMethod === 'PayPal' && (
+                  <p>PayPal Email: {paymentEmail}</p>
+                )}
               </div>
               <div>
-                <h3 className="font-semibold">Order Items</h3>
-                {cart.map((item) => (
-                  <div key={item.product_id} className="flex items-center mb-4">
-                    <img src={item.image_url} alt={item.product_name} className="w-16 h-16 rounded mr-4" />
+              <h3 className="font-semibold">Cart Items</h3>
+              {cart.length > 0 ? (
+                cart.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center border-b pb-2 mb-2">
+                    <div className="flex items-center space-x-2">
+                      <img src={item.image_url} alt={item.product_name} className="w-16 h-16 object-cover" />
+                      <div>
+                        <p>{item.product_name}</p>
+                        <p>Quantity: {item.quantity}</p>
+                      </div>
+                    </div>
                     <div>
-                      <h3 className="font-semibold">{item.product_name}</h3>
-                      <p>Quantity: {item.quantity}</p>
-                      <p>Price: ${Number(item.price).toFixed(2)}</p>
-                      <p>Subtotal: ${Number(item.price * item.quantity).toFixed(2)}</p>
+                      <p>${(Number(item.price) * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
-                ))}
-                <div className="flex justify-between font-semibold mt-4">
-                  <span>Total</span>
-                  <span>${Number(cart.reduce((total, item) => total + item.price * item.quantity, 0)).toFixed(2)}</span>
-                </div>
-              </div>
+                ))
+              ) : (
+                <p>No items in cart</p>
+              )}
+            </div>
+            <div className="flex justify-between font-semibold">
+              <p>Total</p>
+              <p>${cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0).toFixed(2)}</p>
             </div>
           </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const renderButtons = () => {
-    return (
-      <div className="flex justify-between mt-4">
-        {step > 1 && (
-          <button onClick={handlePreviousStep} className="px-4 py-2 bg-gray-300 rounded">
-            Previous
-          </button>
-        )}
-        {step < 3 ? (
-          <button
-            onClick={handleNextStep}
-            disabled={!isStepValid}
-            className={`px-4 py-2 ${isStepValid ? 'bg-blue-500' : 'bg-gray-300'} text-white rounded`}
-          >
-            Next
-          </button>
-        ) : (
-          <button onClick={handleSubmit} className="px-4 py-2 bg-green-500 text-white rounded">
-            Pay ${Number(cart.reduce((total, item) => total + item.price * item.quantity, 0)).toFixed(2)}
-          </button>
-        )}
-      </div>
-    );
-  };
+        </div>
+      );
+    default:
+      return null;
+  }
+};
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded">
-      <div className="flex">
-        <div className="flex-1">
-          {renderStep()}
+    <div className="max-w-xl mx-auto p-4">
+      <div className="relative pt-1">
+        <div className="flex mb-2 items-center justify-between">
+          <div>
+            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+              Step {step}
+            </span>
+          </div>
+        </div>
+        <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+          <div
+            style={{ width: `${(step / 3) * 100}%` }}
+            className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500 transition-all duration-300"
+          ></div>
         </div>
       </div>
-      {renderButtons()}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => router.back()}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            Back
+          </button>
+          {step > 1 && (
+            <button
+              onClick={handlePreviousStep}
+              className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
+            >
+              Previous
+            </button>
+          )}
+          {step < 3 && (
+            <button
+              onClick={handleNextStep}
+              className={`bg-blue-500 text-white px-4 py-2 rounded ${isStepValid ? 'hover:bg-blue-600' : 'opacity-50 cursor-not-allowed'}`}
+              disabled={!isStepValid}
+            >
+              Next
+            </button>
+          )}
+          {step === 3 && (
+            <button
+              onClick={handleSubmit}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+              Pay ${cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0).toFixed(2)}
+            </button>
+          )}
+        </div>
+        <div className="border-t border-gray-300 pt-6">{renderStep()}</div>
+      </div>
     </div>
   );
 };

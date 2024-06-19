@@ -1,32 +1,87 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { useUserAuth } from '../auth/auth-context';
 import { useRouter } from 'next/navigation';
 
-const Cart = () => {
+export default function Cart({ children }) {
   const [cart, setCart] = useState([]);
+  const [errorMessages, setErrorMessages] = useState('');
+  const { user } = useUserAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCart(storedCart);
-  }, []);
+    fetchCart();
+  }, [user]);
 
-  const updateQuantity = (productId, quantity) => {
-    const updatedCart = cart.map(item =>
-      item.product_id === productId ? { ...item, quantity: parseInt(quantity) } : item
-    );
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  const fetchCart = async () => {
+    try {
+      if (user) {
+        const userId = user.uid;
+        const response = await fetch(`/api/cart/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch cart data');
+        }
+        const data = await response.json();
+        setCart(data);
+      }
+    } catch (error) {
+      console.error('Error fetching the cart:', error);
+    }
   };
 
-  const removeItem = (productId) => {
-    const updatedCart = cart.filter(item => item.product_id !== productId);
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  const updateQuantity = async (productId, quantity) => {
+    try {
+      const parsedQuantity = parseInt(quantity);
+      if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+        setErrorMessages('Please enter a valid quantity');
+        return;
+      }
+      setErrorMessages('');
+
+      const response = await fetch(`/api/cart/${productId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantity: parsedQuantity }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update quantity');
+      }
+      const updatedItem = await response.json();
+      const updatedCart = cart.map(item =>
+        item.product_id === productId ? { ...updatedItem, quantity: parsedQuantity } : item
+      );
+      setCart(updatedCart);
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    }
+  };
+
+  const removeItem = async (productId) => {
+    try {
+      const response = await fetch(`/api/cart/${productId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to remove item from cart');
+      }
+      const updatedCart = cart.filter(item => item.product_id !== productId);
+      setCart(updatedCart);
+    } catch (error) {
+      console.error('Error removing item:', error);
+    }
   };
 
   const calculateSubtotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cart.reduce((total, item) => {
+      const price = parseFloat(item.price);
+      const quantity = parseInt(item.quantity);
+      if (isNaN(price) || isNaN(quantity)) {
+        return total;
+      }
+      return total + price * quantity;
+    }, 0);
   };
 
   const handleCheckout = () => {
@@ -54,16 +109,18 @@ const Cart = () => {
                   <img src={item.image_url} alt={item.product_name} className="w-16 h-16 object-cover" />
                   <div>{item.product_name}</div>
                 </div>
-                <div>${Number(item.price).toFixed(2)}</div>
+                <div>${parseFloat(item.price).toFixed(2)}</div>
                 <div>
                   <input
                     type="number"
                     className="border border-gray-300 rounded w-16"
+                    min="1"
                     value={item.quantity}
                     onChange={(e) => updateQuantity(item.product_id, e.target.value)}
                   />
+                  {errorMessages && <div className="text-red-500 text-sm">{errorMessages}</div>}
                 </div>
-                <div>${Number((item.price * item.quantity)).toFixed(2)}</div>
+                <div>${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
                 <div>
                   <button onClick={() => removeItem(item.product_id)} className="text-red-500">Remove</button>
                 </div>
@@ -74,9 +131,9 @@ const Cart = () => {
       </div>
       <div className="mt-8 flex justify-end">
         <div className="text-right">
-          <div className="text-lg font-semibold">Subtotal: ${Number(calculateSubtotal()).toFixed(2)}</div>
+          <div className="text-lg font-semibold">Subtotal: ${calculateSubtotal().toFixed(2)}</div>
           <div className="text-sm text-gray-400">Shipping: Free</div>
-          <div className="text-lg font-bold mt-2">Total: ${Number(calculateSubtotal()).toFixed(2)}</div>
+          <div className="text-lg font-bold mt-2">Total: ${calculateSubtotal().toFixed(2)}</div>
           <button
             className="mt-4 px-6 py-2 bg-black text-white font-bold rounded"
             onClick={handleCheckout}
@@ -87,6 +144,4 @@ const Cart = () => {
       </div>
     </div>
   );
-};
-
-export default Cart;
+}
