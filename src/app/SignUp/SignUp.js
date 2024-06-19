@@ -275,7 +275,7 @@ export default function SignUp() {
                     </div>
                 </div>
                 </form>
-                <Link href="/Login" className="mt-4  text-black text-xl hover-box"> 
+                <Link href="/Login" className="mt-4  text-black text-xl"> 
                     <span>Already Have An Account ? Login Then</span>
                 </Link>
             </div>
