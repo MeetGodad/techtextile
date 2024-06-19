@@ -54,9 +54,9 @@ export default function SignUp() {
             });
     
             if (!response.ok) {
-                alert('User not found!');
-            }
-            else if (response.ok) {
+                const errorData = await response.json();
+                alert(`Error: ${errorData.message}`);
+            } else {
                 router.push('/Home');
             }
 
@@ -71,9 +71,6 @@ export default function SignUp() {
         }
     }
 
-
-
-    
     return (
         <div className="flex h-screen">
             <div className="flex items-center justify-center w-1/2 bg-black relative">
@@ -193,10 +190,13 @@ export default function SignUp() {
                         <button className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
                             CREATE AN ACCOUNT
                             </button>
+
                     </div>
                 </div>
                 </form>
-                <Link href="/Login" className="mt-4  text-black text-xl">Already Have An Account ? Login Then</Link>
+                <Link href="/Login" className="mt-4  text-black text-xl hover-box"> 
+                    <span>Already Have An Account ? Login Then</span>
+                </Link>
             </div>
         </div>
     );

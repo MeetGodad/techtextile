@@ -3,9 +3,11 @@
         "Danier",
         "Firestore",
         "lavenderblush",
+        "Loder",
         "useraccounts",
         "useracounts",
         "usertype",
         "uuidv"
-    ]
+    ],
+    "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }

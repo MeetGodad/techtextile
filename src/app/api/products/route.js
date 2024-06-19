@@ -6,7 +6,6 @@ export async function GET() {
         const sql = neon(databaseUrl);
         const products = await sql`
             SELECT * FROM Products;`;
-        console.log("Products:", products);
 
         if (products.length === 0) {
             return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
@@ -20,11 +19,12 @@ export async function GET() {
 }
 
 
+
 export async function POST(req) {
     try {
         console.log("Parsing request data");
         const requestData = await req.json();
-        console.log("Requested Data:", requestData);
+        console.log("Requested Data2:", requestData);
 
         const databaseUrl = process.env.DATABASE_URL || "";
         console.log("Database URL:", databaseUrl);
@@ -32,10 +32,14 @@ export async function POST(req) {
         const sql = neon(databaseUrl);
         console.log("Executing SQL queries");
 
+        const seller_id = await sql`
+        SELECT seller_id FROM sellers WHERE user_id = ${requestData.userId};`;
+
+
         const product_details = await sql`
             INSERT INTO Products (product_name, product_description, price, image_url, seller_id,product_type)
             VALUES (${requestData.product_name}, ${requestData.description}, ${requestData.price}, ${requestData.image_url},             
-                 ${requestData.seller_id},${requestData.product_type})
+                 ${seller_id[0].seller_id},${requestData.product_type})
             RETURNING product_id;
         `;
         const productId = product_details[0].product_id;

@@ -27,9 +27,9 @@ export default function Login() {
         });
 
         if (!response.ok) {
-          alert('Invalid Credentials! Please try again.');
-
-        }else if (response.ok) {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.message}`);
+        } else {
           router.push('/Home');
         }
 
@@ -71,7 +71,9 @@ export default function Login() {
           </div>
         </form>
 
-        <Link className="mt-4 text-black text-xl" href="/SignUp">Don’t have an account?</Link>
+        <Link className="mt-4 text-black text-xl" href="/SignUp">
+          <span>Don’t have an account?</span>
+        </Link>
       </div>
 
       <div className="flex items-center justify-center w-1/2 bg-black relative">
