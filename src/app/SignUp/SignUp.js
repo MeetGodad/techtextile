@@ -189,8 +189,8 @@ export default function SignUp() {
                             </div>
                         <button className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
                             CREATE AN ACCOUNT
+                            </button>
 
-                        </button>
                     </div>
                 </div>
                 </form>
