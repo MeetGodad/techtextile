@@ -22,7 +22,8 @@ GET http://localhost:3000/api/seller/0sZBgo4Vw1OciqK5QjcCJQ4spm43 HTTP/1.1
 
 # ####
 
-
+DELETE http://localhost:3000/api/seller/87
+###
 
 # GET http://localhost:3000/api/cart/RyNSMW3SqYc5emA6Xjx5omP0PcA3 HTTP/1.1
 
