@@ -1,4 +1,8 @@
-reference : 
-Github Copilot 
-NeonTech Documents 
-Perplexity AI
+reference (By Meet Patel) : 
+Github Copilot:(https://copilot.github.com/)
+
+NeonTech Documents : https://neon.tech/docs/introduction
+
+Perplexity AI : https://www.perplexity.ai/
+
+Next.js Documents : https://nextjs.org/

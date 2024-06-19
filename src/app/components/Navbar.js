@@ -86,7 +86,7 @@ const Header = () => {
           )}
         </div>
         <div className="flex items-center gap-6">
-          <a className="nav-link  font-semibold" href="/Home" passHref>Home</a>
+          <a className="nav-link  font-semibold" href="/Home">Home</a>
           <a className="nav-link  font-semibold" href="#">Category</a>
           <a className="nav-link  font-semibold" href="#">About</a>
         </div>
@@ -114,7 +114,7 @@ const Header = () => {
 
             <div className="flex items-center nav-link">
 
-              <span className="ml-2 font-semibold">Visit Profile</span>
+              <span className="ml-2 font-semibold">Profile</span>
             </div>
           </Link>
         ) : (

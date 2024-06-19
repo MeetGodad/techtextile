@@ -5,6 +5,8 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
+  deleteUser,
   signOut,
   onAuthStateChanged,
   GoogleAuthProvider,
@@ -41,6 +43,7 @@ export const AuthContextProvider = ({ children }) => {
       throw error;
     }
   }
+
  
   const firebaseSignOut = () => {
     return signOut(auth);
