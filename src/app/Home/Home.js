@@ -1,16 +1,18 @@
-//https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
+// https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
 "use client";
 
 import { useEffect, useState } from 'react';
 import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const { user } = useUserAuth(); 
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(12);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -25,8 +27,6 @@ export default function Home() {
 
     fetchProducts();
   }, [user]);
-
-
 
   const addToCart = async (product) => {
     if (!user) {
@@ -63,8 +63,13 @@ export default function Home() {
       alert(error.message);
   }
   };
+
   const showMoreProducts = () => {
     setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 12);
+  };
+
+  const handleProductClick = (productId) => {
+    router.push(`/productdetail?productId=${productId}`);
   };
 
   return  (
@@ -81,6 +86,7 @@ export default function Home() {
                   image={product.image_url}
                   product={product}
                   onAddToCart={addToCart}
+                  onProductClick={handleProductClick}
                 />
               ))}
             </section>

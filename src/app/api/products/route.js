@@ -1,24 +1,39 @@
 import { neon } from '@neondatabase/serverless';
 
-export async function GET() {
+export async function GET(req) {
     try {
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
-        const products = await sql`
-            SELECT * FROM Products;`;
 
-        if (products.length === 0) {
-            return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
+        const url = new URL(req.url);
+        const productId = url.searchParams.get('productId');
+
+        if (productId) {
+            const product = await sql`
+                SELECT * FROM Products WHERE product_id = ${productId};
+            `;
+
+            if (product.length === 0) {
+                return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
+            }
+
+            return new Response(JSON.stringify(product[0]), { status: 200 });
+        } else {
+            const products = await sql`
+                SELECT * FROM Products;
+            `;
+
+            if (products.length === 0) {
+                return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
+            }
+
+            return new Response(JSON.stringify(products), { status: 200 });
         }
-
-        return new Response(JSON.stringify(products), { status: 200 });
     } catch (error) {
         console.error('An error occurred: Internal server error', error);
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
 }
-
-
 
 export async function POST(req) {
     try {
@@ -35,26 +50,26 @@ export async function POST(req) {
         const seller_id = await sql`
         SELECT seller_id FROM sellers WHERE user_id = ${requestData.userId};`;
 
-
         const product_details = await sql`
-            INSERT INTO Products (product_name, product_description, price, image_url, seller_id,product_type)
+            INSERT INTO Products (product_name, product_description, price, image_url, seller_id, product_type)
             VALUES (${requestData.product_name}, ${requestData.description}, ${requestData.price}, ${requestData.image_url},             
-                 ${seller_id[0].seller_id},${requestData.product_type})
+                 ${seller_id[0].seller_id}, ${requestData.product_type})
             RETURNING product_id;
         `;
         const productId = product_details[0].product_id;
         console.log("ProductVariant inserted with ID:", productId);
 
-      if (requestData.product_type === 'yarn'){const Yarn = await sql`
-            INSERT INTO YarnProducts (product_id, yarn_type,yarn_denier,yarn_color)
+      if (requestData.product_type === 'yarn') {
+        const Yarn = await sql`
+            INSERT INTO YarnProducts (product_id, yarn_type, yarn_denier, yarn_color)
             VALUES (${productId}, 
-                 ${requestData.yarn_type},${requestData.yarn_denier},${requestData.yarn_color})
+                 ${requestData.yarn_type}, ${requestData.yarn_denier}, ${requestData.yarn_color})
             RETURNING yarn_id; `;
             
         const yarnId = Yarn[0].yarn_id;
         console.log("Category inserted with ID:", yarnId);
-    }
-    else if (requestData.product_type === 'fabric'){const Fabric = await sql`
+      } else if (requestData.product_type === 'fabric') {
+        const Fabric = await sql`
             INSERT INTO FabricProducts (product_id, fabric_type, fabric_print_tech, fabric_material, fabric_color)
             VALUES (${productId}, ${requestData.fabric_type}, ${requestData.fabric_print_tech}, ${requestData.fabric_material},         
                  ${requestData.fabric_color})
@@ -62,7 +77,7 @@ export async function POST(req) {
 
         const fabricId = Fabric[0].fabric_id;
         console.log("Marketplace data inserted successfully", fabricId);
-    }
+      }
 
         return new Response(JSON.stringify({ message: "Data inserted successfully" }), { status: 200 });
     } catch (error) {
@@ -70,6 +85,3 @@ export async function POST(req) {
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
 }
-
-
-

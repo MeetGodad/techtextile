@@ -21,6 +21,7 @@ export async function POST(req) {
                     INSERT INTO buyers (user_id, phone_num, shipping_address)
                     VALUES (${requestData.userId}, ${requestData.phone}, ${requestData.address}) RETURNING *;
                 `;
+                console.log(buyerResponse)
                 
                 if (buyerResponse.length === 0) {
                     return new Response(JSON.stringify({ message: "Buyer not created" }), { status: 400 });

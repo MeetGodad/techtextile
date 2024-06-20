@@ -61,18 +61,17 @@ GET http://localhost:3000/api/seller/0sZBgo4Vw1OciqK5QjcCJQ4spm43 HTTP/1.1
 # ####
 
 
-# POST http://localhost:3000/api/auth HTTP/1.1
-# content-type: application/json
-
-# {
-#   "userId": "1",
-#   "userType": "buyer",
-#   "firstName": "John",
-#   "LastName": "Doe",
-#   "email": "john.doe@example.com",
-#   "phone": "1234567890",
-#   "address": "123 Main St"
-# }
+POST http://localhost:3000/api/auth HTTP/1.1
+content-type: application/json
+{
+  "userId": "1dftvbunmk",
+  "userType": "buyer",
+  "firstName": "John",
+  "LastName": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "1234567890",
+  "address": "123 Main St",
+}
 
 
 # //new product
