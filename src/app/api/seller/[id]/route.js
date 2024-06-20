@@ -54,16 +54,17 @@ export async function DELETE(req) {
             return new Response(JSON.stringify({ message: "productId is required" }), { status: 400 });
         }
 
-        // Delete dependent records from yarnproducts first
+        // Delete dependent records from yarnproducts and fabricproducts
         await sql`
             DELETE FROM yarnproducts WHERE product_id = ${productId};`;
-
         console.log("Dependent records deleted from yarnproducts");
 
-        // Now delete the product
+        await sql`
+            DELETE FROM fabricproducts WHERE product_id = ${productId};`;
+        console.log("Dependent records deleted from fabricproducts");
+
         const result = await sql`
             DELETE FROM Products WHERE product_id = ${productId} RETURNING product_id;`;
-
         console.log("SQL Result:", result);
 
         if (result.length === 0) {
@@ -81,7 +82,8 @@ export async function DELETE(req) {
     }
 }
 
-// Delete Request that also delet's the image from firebase
+
+// Delete Request that also delete's the image from firebase
 // export async function DELETE(req) {
 //     try {
 //         const databaseUrl = process.env.DATABASE_URL || "";
@@ -158,7 +160,6 @@ export async function PUT(req) {
             SET product_name = ${product_name}, product_description = ${description}, price = ${price}, image_url = ${image_url}
             WHERE product_id = ${product_id};`;
 
-        // Update the specific product type details
         if (product_type === 'yarn') {
             await sql`
                 UPDATE YarnProducts
