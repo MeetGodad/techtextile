@@ -8,6 +8,7 @@ import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Home({ category }) {
   const { user } = useUserAuth();

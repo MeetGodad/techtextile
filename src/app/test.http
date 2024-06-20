@@ -1,4 +1,5 @@
 POST http://localhost:3000/api/auth HTTP/1.1
+GET http://localhost:3000/api/products/68
 
 
 
