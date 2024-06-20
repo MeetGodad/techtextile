@@ -1,4 +1,3 @@
-
 "use client";
 //https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
 
@@ -8,12 +7,14 @@ import { useEffect, useState } from 'react';
 import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
+import { useRouter } from 'next/navigation';
 
 export default function Home({ category }) {
   const { user } = useUserAuth();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(12);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -68,8 +69,13 @@ export default function Home({ category }) {
   }
   };
 
+
   const showMoreProducts = () => {
     setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 12);
+  };
+
+  const handleProductClick = (productId) => {
+    router.push(`/productdetail?productId=${productId}`);
   };
 
   const filteredProducts = category === 'all'
@@ -89,7 +95,8 @@ export default function Home({ category }) {
                   price={product.price}
                   image={product.image_url}
                   product={product}
-                  onAddToCart={() => addToCart(product)}
+                  onAddToCart={addToCart}
+                  onProductClick={handleProductClick}
                 />
               ))}
             </section>
@@ -110,4 +117,4 @@ export default function Home({ category }) {
       </main>
     </div>
   );
-}
+};

@@ -11,6 +11,7 @@ export default function ProductSection({
   price,
   image,
   onAddToCart,
+  onProductClick,
 }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [flyStyle, setFlyStyle] = useState({});
@@ -60,9 +61,12 @@ export default function ProductSection({
       }, 600);
     }
   };
-  return (
 
-    <div className="relative mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white">
+  return (
+    <div 
+      className="relative mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white"
+      onClick={() => onProductClick(product.product_id)}
+    >
       <div className="flex flex-col w-full h-48 items-center justify-center bg-lavenderblush-100" style={rectangleDivStyle}>
         <img
           ref={productRef}
@@ -74,7 +78,10 @@ export default function ProductSection({
         />
       </div>
       <button
-        onClick={addToCartHandler}
+        onClick={(e) => {
+          e.stopPropagation();
+          addToCartHandler();
+        }}
         className="flex items-center justify-center py-2 px-4 w-full bg-black text-white rounded-md hover:bg-darkslategray transition"
         style={addToCartStyle}
       >
