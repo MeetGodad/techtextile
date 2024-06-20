@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 
-export default function ProductDetail() {
-  const router = useRouter();
-  const { productId } = router.query;
+export default function ProductDetail({productId}) {
   const { user } = useUserAuth();
   const [product, setProduct] = useState(null);
   const [cart, setCart] = useState([]);
@@ -20,7 +17,7 @@ export default function ProductDetail() {
         const response = await fetch(`/api/products/${productId}`);
         const data = await response.json();
         if (response.ok) {
-          setProduct(data);
+          setProduct(data[0]);
         } else {
           console.error('Error fetching product details:', data.message);
         }
@@ -83,24 +80,32 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white p-8 overflow-x-auto overflow-hidden">
-      <main className="max-w-screen-xl mx-auto">
-        <section className="flex flex-col md:flex-row gap-8">
-          <div className="w-full md:w-1/2">
-            <img src={product.image_url} alt={product.product_name} className="w-full h-auto" />
-          </div>
-          <div className="w-full md:w-1/2">
-            <h1 className="text-3xl font-bold">{product.product_name}</h1>
-            <p className="text-xl mt-4">${product.price}</p>
-            <button
-              onClick={() => addToCart(product)}
-              className="mt-4 px-6 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
-            >
-              Add to Cart
-            </button>
-          </div>
-        </section>
-      </main>
+    
+    <div className="w-full min-h-screen text-black bg-white p-8 overflow-x-auto overflow-hidden">
+        {console.log(product)}
+        <div className="max-w-screen-xl mx-auto">
+            <div className="flex flex-col md:flex-row">
+            <div className="md:w-1/2">
+                <img
+                className="w-full h-auto"
+                src={product.image_url}
+                alt={product.product_name}
+                />
+            </div>
+            <div className="md:w-1/2 md:pl-8">
+                <h1 className="text-3xl font-semibold mb-4">{product.product_name}</h1>
+                <p className="text-lg mb-4">{product.product_description}</p>
+                <p className="text-2xl font-semibold mb-4">${product.price}</p>
+                <button
+                className="px-4 py-2 bg-black text-white rounded-lg"
+                onClick={() => addToCart(product)}
+                >
+                Add to cart
+                </button>
+            </div>
+            </div>
+        </div>
     </div>
+    
   );
 }

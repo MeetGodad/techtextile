@@ -6,6 +6,7 @@ import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Home() {
   const { user } = useUserAuth(); 
@@ -68,10 +69,6 @@ export default function Home() {
     setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 12);
   };
 
-  const handleProductClick = (productId) => {
-    router.push(`/productdetail?productId=${productId}`);
-  };
-
   return  (
     <div className="w-full min-h-0 bg-white p-8 overflow-x-auto overflow-hidden">
       <main className="max-w-screen-xl mx-auto">
@@ -86,7 +83,6 @@ export default function Home() {
                   image={product.image_url}
                   product={product}
                   onAddToCart={addToCart}
-                  onProductClick={handleProductClick}
                 />
               ))}
             </section>
