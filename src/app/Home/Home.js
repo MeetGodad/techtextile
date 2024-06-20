@@ -1,4 +1,8 @@
+
 "use client";
+//https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
+
+
 
 import { useEffect, useState } from 'react';
 import ProductSection from '../components/ProductSection';
@@ -14,7 +18,10 @@ export default function Home({ category }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch('/api/products' , {
+          headers: {
+            'Cache-Control': 'no-cache',
+        }});
         const data = await response.json();
         setProducts(data);
       } catch (error) {

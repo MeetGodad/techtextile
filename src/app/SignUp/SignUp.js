@@ -2,10 +2,13 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUserAuth } from '../auth/auth-context';
+import { useUserAuth} from '../auth/auth-context';
+import { auth } from '../auth/firebase';
+import { sendEmailVerification , deleteUser , reload} from 'firebase/auth';
 export default function SignUp() {
 
-    const { user, emailSignUp, } = useUserAuth();
+    const { emailSignUp} = useUserAuth();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [firstName, setFirstName] = useState("");
@@ -15,62 +18,140 @@ export default function SignUp() {
     const [address, setAddress] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [companyName, setCompanyName] = useState("");
+    const user = useUserAuth();
     const router = useRouter();
 
+
     const handleSubmit = async (event) => {
-        event.preventDefault();
+            event.preventDefault();
 
 
-        if (password !== confirmPassword) {
-            alert('Passwords do not match!');
-            return;
-        }
-        try {
-            const userId = await emailSignUp(email, password);
-
-            let data = {   
-                userId,
-                role,
-                firstName,
-                LastName,
-                email,
-                phone,
-                address,
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
             }
 
-            if (role === "seller") {
-                data = {
-                    ...data,
-                    companyName,
+
+            try {
+                const userId = await emailSignUp(email, password);
+
+                const checkUserAvailable = async () => {
+                    if (user) {
+                        return Promise.resolve(user);
+                    } else {
+                        // Check again after 1 second
+                        return new Promise((resolve, reject) => {
+                            setTimeout(() => {
+                                if (user) {
+                                    resolve(user);
+                                } else {
+                                    reject(new Error('User not available'));
+                                }
+                            }, 1000);
+                        });
+                    }
+                };
+                checkUserAvailable();
+
+                if (user) {
+                    try {
+                        await sendEmailVerification(auth.currentUser);
+                        alert('Verification email sent(Please Verify In 30 Seconds)!');
+                
+                        // Function to check if the email is verified
+                        const checkEmailVerified = async () => {
+                            let timeoutId;
+                            const timeoutPromise = new Promise((_, reject) => {
+                            timeoutId = setTimeout(() => reject(new Error('Email verification timeout')), 30000);
+                            });
+                        
+                            const checkPromise = new Promise((resolve, reject) => {
+                            const check = async () => {
+                                await auth.currentUser.reload();
+                                const user = auth.currentUser; 
+                                if (user.emailVerified) {
+                                clearTimeout(timeoutId); // Clear the timeout if the email is verified
+                                resolve();
+                                } else {
+                                // Check again after 5 seconds
+                                setTimeout(check, 2000);
+                                }
+                            };
+                            check();
+                            });
+                        
+                            // Wait for either the checkPromise or timeoutPromise to settle
+                            return Promise.race([checkPromise, timeoutPromise]);
+                        };
+                        
+                        // Wait for the email to be verified
+                                try {
+                                    await checkEmailVerified();
+
+                                    try {
+                                        let data = {   
+                                            userId,
+                                            role,
+                                            firstName,
+                                            LastName,
+                                            email,
+                                            phone,
+                                            address,
+                                        }
+
+                                        if (role === "seller") {
+                                            data = {
+                                                ...data,
+                                                companyName,
+                                            }
+                                        } 
+                                        
+                                        const response = await fetch('/api/auth', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify(data),
+                                        });
+                                
+                                        if (!response.ok) {
+                                            const errorData = await response.json();
+                                            alert(`Error: ${errorData.message}`);
+                                        } else {
+                                            router.push('/Home');
+                                        }
+                                    } catch (error) {
+                                        console.error("Failed to create user", error);
+                                        deleteUser(auth.currentUser);
+                                        event.preventDefault();
+                                        location.reload();
+                                        return;
+                                    }
+                                } catch (error) {   
+                                    await deleteUser(auth.currentUser);
+                                    event.preventDefault();
+                                    location.reload();
+                                    alert('SignUp Unsuccessful (email verification timeout)');
+                                }
+                           
+                    } catch (error) {
+                            console.error("verification Failed:", error);
+                            alert("Failed to send verification email: " + error.message);
+                            deleteUser(auth.currentUser);
+                            event.preventDefault();
+                            return;
+                    }
                 }
-            } 
-            
-            const response = await fetch('/api/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-    
-            if (!response.ok) {
-                const errorData = await response.json();
-                alert(`Error: ${errorData.message}`);
-            } else {
-                router.push('/Home');
-            }
 
-
-        } catch (error) {
-            if (error.code === "auth/email-already-in-use") {
-              alert("Email address is already in use.");
-            } else {
-              console.error("Failed to sign up:", error);
-              alert("Failed to sign up: " + error.message);
+            } catch (error) {
+                if (error.code === "auth/email-already-in-use") {
+                alert("Email address is already in use.");
+                } else {
+                console.error("Failed to sign up:", error);
+                alert("Failed to sign up: " + error.message);
+                }
             }
         }
-    }
-
     return (
         <div className="flex h-screen">
             <div className="flex items-center justify-center w-1/2 bg-black relative">
@@ -189,12 +270,12 @@ export default function SignUp() {
                             </div>
                         <button className="w-96 p-4 bg-black text-white rounded-md font-semibold text-xl">
                             CREATE AN ACCOUNT
+                            </button>
 
-                        </button>
                     </div>
                 </div>
                 </form>
-                <Link href="/Login" className="mt-4  text-black text-xl hover-box"> 
+                <Link href="/Login" className="mt-4  text-black text-xl"> 
                     <span>Already Have An Account ? Login Then</span>
                 </Link>
             </div>

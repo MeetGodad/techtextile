@@ -63,6 +63,7 @@ const Header = ({ category, onCategoryChange }) => {
   }, [user]);
 
   return (
+
     <div className="w-full bg-white overflow-visible flex flex-row items-center justify-between py-0 px-3 box-border top-0 z-40 sticky leading-normal tracking-normal gap-8 text-left text-xl text-black font-sans" style={{ borderBottom: '2px solid black' }}>
           <div className="flex items-center">
             <div className="relative flex items-center justify-center w-20 h-20"></div>
@@ -85,6 +86,7 @@ const Header = ({ category, onCategoryChange }) => {
                     src="/Images/Search.png"
                   />
                 )}
+
               </div>
               <Link className="nav-link font-semibold" href="/Home">Home</Link>
               {isHomePage &&
@@ -116,7 +118,9 @@ const Header = ({ category, onCategoryChange }) => {
                 </div>
               </Link>
             )}
+
         </div>
+
       </div>
     </div>
     
