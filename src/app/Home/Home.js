@@ -89,7 +89,7 @@ export default function Home({ category }) {
                   price={product.price}
                   image={product.image_url}
                   product={product}
-                  addToCart={() => addToCart(product)}
+                  onAddToCart={() => addToCart(product)}
                 />
               ))}
             </section>
