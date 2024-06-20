@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUserAuth } from '../auth/auth-context';
+import { usePathname } from 'next/navigation';
 
 
 const Header = () => {
@@ -11,6 +12,8 @@ const Header = () => {
   const [searchText, setSearchText] = useState('');
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [cart, setCart] = useState([]);
+  const router = usePathname();
+  const isHomePage = router === '/Home' || router === '/';
 
 
   useEffect(() => {
@@ -62,23 +65,21 @@ const Header = () => {
 
   return (
 
-    <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-0 px-3 box-border top-0 z-50 sticky leading-normal tracking-normal gap-3 text-left text-xl text-black font-sans" style={{ borderBottom: '2px solid black' }}>
-
+    <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-0 px-3 box-border top-0 z-50 sticky leading-normal tracking-normal gap-3 text-left text-xl text-black font-sans border-b-2 border-b-solid border-b-black    ">
       <div className="flex items-center">
         <div className="relative flex items-center justify-center w-20 h-20"></div>
         <h3 className="text-4xl font-bold">TECH TEXTILE</h3>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[200px] h-10" >
+      <div className="flex  items-center gap-4">
+        <div className="flex w-48 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[200px] h-10" >
           <input
             type="text"
             placeholder="What are you looking ?"
-            className="text-left bg-transparent outline-none text-sm"
+            className="text-left bg-transparent outline-none text-sm w-full h-full"
             onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 'calc(100% - 24px)' }}
           />
           {searchText === '' && (
-          <img
+          <img 
             className="ml-2 w-6 h-6"
             alt="Search"
             src="/Images/Search.png"
@@ -86,9 +87,9 @@ const Header = () => {
           )}
         </div>
         <div className="flex items-center gap-6">
-          <a className="nav-link  font-semibold" href="/Home">Home</a>
-          <a className="nav-link  font-semibold" href="#">Category</a>
-          <a className="nav-link  font-semibold" href="#">About</a>
+          <Link className="nav-link  font-semibold" href="/">Home</Link>
+          {isHomePage && <Link className="nav-link  font-semibold" href="#">Category</Link>}
+          <Link className="nav-link  font-semibold" href="#">About</Link>
         </div>
         <Link href="/Cart">
           <div className="flex items-center nav-link">
