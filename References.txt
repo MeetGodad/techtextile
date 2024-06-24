@@ -6,3 +6,15 @@ NeonTech Documents : https://neon.tech/docs/introduction
 Perplexity AI : https://www.perplexity.ai/
 
 Next.js Documents : https://nextjs.org/
+
+Refrence (By Nishit Patel):
+
+ChatGpt : https://chatgpt.com/
+
+NeonTech Documents : https://neon.tech/docs/introduction
+
+Tailwind CSS : https://tailwindcss.com/docs/installation
+
+Tailwind Animation: https://tailwindcss.com/docs/animation
+
+Next.js Documents : https://nextjs.org/
