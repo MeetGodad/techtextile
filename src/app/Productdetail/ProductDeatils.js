@@ -1,3 +1,4 @@
+// https://chatgpt.com/c/1c41013e-3b45-46ec-8fdf-30ece2ae6196 for the API and youtube
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -78,9 +79,7 @@ export default function ProductDetail({productId}) {
   if (!product) {
     return <div className="w-full min-h-screen flex items-center justify-center">Product not found</div>;
   }
-
   return (
-    
     <div className="w-full min-h-screen text-black bg-white p-8 overflow-x-auto overflow-hidden">
         {console.log(product)}
         <div className="max-w-screen-xl mx-auto">
@@ -98,8 +97,7 @@ export default function ProductDetail({productId}) {
                 <p className="text-2xl font-semibold mb-4">${product.price}</p>
                 <button
                 className="px-4 py-2 bg-black text-white rounded-lg"
-                onClick={() => addToCart(product)}
-                >
+                onClick={() => addToCart(product)}>
                 Add to cart
                 </button>
             </div>
