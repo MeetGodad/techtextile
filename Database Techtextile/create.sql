@@ -58,19 +58,33 @@ CREATE TABLE UserAccounts (
     user_type VARCHAR(10) CHECK (user_type IN ('buyer', 'seller'))
 );
 
+CREATE TABLE Addresses (
+    address_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
+    address_type VARCHAR(10) CHECK (address_type IN ('billing', 'shipping')),
+    address_first_name VARCHAR(50),
+    address_last_name VARCHAR(50),
+    address_email VARCHAR(100),
+    street VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    postal_code VARCHAR(20),
+);
+
 CREATE TABLE Buyers (
     buyer_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
-    phone_num  UNIQUE BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999)
-    user_address TEXT
+    phone_num   BIGINT UNIQUE CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
+    user_address INT REFERENCES Addresses(address_id)
 );
 
 CREATE TABLE Sellers (
     seller_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
     business_name VARCHAR(100),
-    business_address TEXT,
-    phone_num  UNIQUE BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999)
+    phone_num   BIGINT UNIQUE CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
+    business_address INT REFERENCES Addresses(address_id)
+   
 );
 
 CREATE TABLE Products (
@@ -86,13 +100,12 @@ CREATE TABLE Products (
 CREATE TABLE YarnProducts (
     yarn_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES Products(product_id),
-    yarn_type VARCHAR(50),
+    yarn_material VARCHAR(50),
 );
 
 CREATE TABLE FabricProducts (
     fabric_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES Products(product_id),
-    fabric_type VARCHAR(50),
     fabric_print_tech VARCHAR(50),
     fabric_material VARCHAR(50),
 );
@@ -101,6 +114,7 @@ CREATE TABLE ProductVariant (
     variant_id SERIAL PRIMARY KEY,
     variant_name VARCHAR(50),
     variant_value VARCHAR(50),
+    variant_images_url TEXT,
     product_id INT REFERENCES Products(product_id)
 );
 
@@ -118,22 +132,15 @@ CREATE TABLE CartItems (
     quantity INT NOT NULL
 );
 
-CREATE TABLE Addresses (
-    address_id SERIAL PRIMARY KEY,
-    user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
-    address_type VARCHAR(10) CHECK (address_type IN ('billing', 'shipping')),
-    street VARCHAR(255),
-    city VARCHAR(100),
-    state VARCHAR(100),
-    postal_code VARCHAR(20),
-    country VARCHAR(100)
-);
+
 
 CREATE TABLE Orders (
     order_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
     payment_method VARCHAR(50),
     shipping_address_id INT REFERENCES Addresses(address_id),
+    order_status VARCHAR(20) CHECK (order_status IN ('pending', 'shipped', 'delivered')),
+    order_total_price DECIMAL(10, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -142,7 +149,7 @@ CREATE TABLE OrderItems (
     order_id INT REFERENCES Orders(order_id),
     product_id INT REFERENCES Products(product_id),
     quantity INT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL
+    item_price DECIMAL(10, 2) NOT NULL
 );
 
 
@@ -150,7 +157,7 @@ CREATE TABLE Payments (
     payment_id SERIAL PRIMARY KEY,
     order_id INT REFERENCES Orders(order_id),
     payment_method VARCHAR(50),
-    payment_status VARCHAR(50),
+    payment_amount DECIMAL(10, 2) NOT NULL,
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

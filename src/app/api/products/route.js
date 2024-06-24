@@ -46,7 +46,7 @@ export async function POST(req) {
         console.log("ProductVariant inserted with ID:", productId);
 
     if (requestData.product_type === 'yarn'){const Yarn = await sql`
-            INSERT INTO YarnProducts (product_id, yarn_type)
+            INSERT INTO YarnProducts (product_id, yarn_material)
             VALUES (${productId}, 
                  ${requestData.yarn_type})
             RETURNING yarn_id; `;
@@ -65,8 +65,8 @@ export async function POST(req) {
         }
     }
     else if (requestData.product_type === 'fabric'){const Fabric = await sql`
-            INSERT INTO FabricProducts (product_id, fabric_type, fabric_print_tech, fabric_material)
-            VALUES (${productId}, ${requestData.fabric_type}, ${requestData.fabric_print_tech}, ${requestData.fabric_material})
+            INSERT INTO FabricProducts (product_id, fabric_print_tech, fabric_material)
+            VALUES (${productId}, ${requestData.fabric_print_tech}, ${requestData.fabric_material})
             RETURNING fabric_id;`;   
 
         for (let color of requestData.fabric_color) {
