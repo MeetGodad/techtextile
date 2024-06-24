@@ -1,7 +1,3 @@
-"use client";
-//https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
-
-
 // https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
 "use client";
 
