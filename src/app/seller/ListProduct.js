@@ -19,10 +19,9 @@ export default function ListProduct() {
         image_url: '',
         userId: '',
         product_type: '',
-        yarn_type: '',
+        yarn_material: '',
         yarn_denier: [''],
         yarn_color: [''],
-        fabric_type: '',
         fabric_print_tech: '',
         fabric_material: '',
         fabric_color: ['']
@@ -201,8 +200,8 @@ return (
                             <input 
                                 type="text" 
                                 required 
-                                name="yarn_type" 
-                                value={productData.yarn_type}  
+                                name="yarn_material" 
+                                value={productData.yarn_material}  
                                 onChange={handleChange} 
                                 className="w-full p-3 border border-gray-300 rounded-lg"
                             />
@@ -226,6 +225,15 @@ return (
                                     >
                                         <MdDeleteForever size={35} />
                                     </button>
+                                    <label className="block font-semibold">Upload Images</label>
+                                    <input 
+                                        type="file" 
+                                        required 
+                                        multiple
+                                        name="image_url" 
+                                        onChange={handleImageChange} 
+                                        className="w-full  "
+                                    />
                                 </div>
                             ))}
                             <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addDanier}>Add Denier</button>
@@ -240,7 +248,7 @@ return (
                                         name="yarn_color" 
                                         value={color}  
                                         onChange={handleColorChange(index)} 
-                                        className="w-full p-3 my-2 border border-gray-300 rounded-lg pr-10" // changed width to full
+                                        className="w-full p-3 my-2 border border-gray-300 rounded-lg pr-10"
                                     />
                                     <button 
                                         type="button" 
@@ -257,17 +265,6 @@ return (
                 )}
                 {productData.product_type === 'fabric' && (
                     <div className="space-y-2">
-                        <div>
-                            <label className="block font-semibold">Fabric Type</label>
-                            <input 
-                                type="text" 
-                                required 
-                                name="fabric_type" 
-                                value={productData.fabric_type}  
-                                onChange={handleChange} 
-                                className="w-full p-3 border border-gray-300 rounded-lg"
-                            />
-                        </div>
                         <div>
                             <label className="block font-semibold">Fabric Print Tech</label>
                             <input 
