@@ -1,3 +1,4 @@
+// refrence - https://chatgpt.com/c/49580c39-8ae7-4ee2-93e7-5b557a398485
 import { neon } from '@neondatabase/serverless';
 import { bucket } from '@/app/auth/firebaseAdmin';
 // GET REQUEST
@@ -21,10 +22,10 @@ export async function GET(req) {
             return new Response(JSON.stringify({ message: "No products found for this seller" }), { status: 404 });
         }
 
-        const sellerId = sellerResult[0].seller_id;
+        // const sellerId = sellerResult[0].seller_id;
 
         const products = await sql`
-            SELECT * FROM Products WHERE seller_id = ${sellerId};`;
+            SELECT * FROM Products WHERE seller_id = ${sellerResult[0].seller_id};`;
 
         if (products.length === 0) {
             return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
