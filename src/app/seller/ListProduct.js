@@ -176,7 +176,7 @@ return (
                         multiple
                         name="image_url" 
                         onChange={handleImageChange} 
-                        className="w-full  "
+                        className="w-full "
                     />
                 </div>
                 <div className="space-y-2">
@@ -225,15 +225,6 @@ return (
                                     >
                                         <MdDeleteForever size={35} />
                                     </button>
-                                    <label className="block font-semibold">Upload Images</label>
-                                    <input 
-                                        type="file" 
-                                        required 
-                                        multiple
-                                        name="image_url" 
-                                        onChange={handleImageChange} 
-                                        className="w-full  "
-                                    />
                                 </div>
                             ))}
                             <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addDanier}>Add Denier</button>
@@ -241,23 +232,34 @@ return (
                         <div>
                             <label className="block font-semibold">Yarn Colors</label>
                             {productData.yarn_color.map((color, index) => (
-                                <div key={index} className='relative w-2/12'>
-                                    <input 
-                                        type="text" 
-                                        required 
-                                        name="yarn_color" 
-                                        value={color}  
-                                        onChange={handleColorChange(index)} 
-                                        className="w-full p-3 my-2 border border-gray-300 rounded-lg pr-10"
-                                    />
-                                    <button 
-                                        type="button" 
-                                        className='absolute top-1/2 right-2 transform -translate-y-1/2' 
-                                        onClick={() => removeColor(index)}
-                                    >
-                                        <MdDeleteForever size={35} />
-                                    </button>
-                                </div>
+                               <div key={index} className="relative w-2/12 flex flex-col">
+                               <div className="flex flex-col my-2">
+                                 <input
+                                   type="text"
+                                   required
+                                   name="yarn_color"
+                                   value={color}
+                                   onChange={handleColorChange(index)}
+                                   className="w-full p-3 border border-gray-300 rounded-lg"
+                                 />
+                                 <button
+                                   type="button"
+                                   className="absolute top-1/2 right-2 transform -translate-y-1/2"
+                                   onClick={() => removeColor(index)}
+                                 >
+                                   <MdDeleteForever size={35} />
+                                 </button>
+                               </div>
+                               <label className="block font-semibold mt-2">Upload Images</label>
+                               <input
+                                 type="file"
+                                 required
+                                 multiple
+                                 name="image_url"
+                                 onChange={handleImageChange}
+                                 className="w-full flex items-center justify-center p-3 border border-gray-300 rounded-lg"
+                               />
+                             </div>
                             ))}
                             <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addColor}>Add Color</button>
                         </div>
@@ -306,6 +308,15 @@ return (
                                     >
                                         <MdDeleteForever size={35} />
                                     </button>
+                                    {/* <label className="block font-semibold">Upload Images</label>
+                                    <input 
+                                        type="file" 
+                                        required 
+                                        multiple
+                                        name="image_url" 
+                                        onChange={handleImageChange} 
+                                        className="w-full  "
+                                    /> */}
                                 </div>
                             ))}
                             <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addColor}>Add Color</button>
