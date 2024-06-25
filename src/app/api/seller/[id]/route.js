@@ -38,3 +38,45 @@ export async function GET(req) {
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
 }
+
+export async function DELETE(req) {
+    try {
+        const databaseUrl = process.env.DATABASE_URL || "";
+        const sql = neon(databaseUrl);
+        const url = new URL(req.url);
+        const pathSegments = url.pathname.split('/');
+        const productId = pathSegments[pathSegments.length - 1];
+        console.log("Product ID to delete:", productId);
+
+        if (!productId) {
+            console.error("Product ID is missing");
+            return new Response(JSON.stringify({ message: "productId is required" }), { status: 400 });
+        }
+
+        // Delete dependent records from yarnproducts and fabricproducts
+        await sql`
+            DELETE FROM yarnproducts WHERE product_id = ${productId};`;
+        console.log("Dependent records deleted from yarnproducts");
+
+        await sql`
+            DELETE FROM fabricproducts WHERE product_id = ${productId};`;
+        console.log("Dependent records deleted from fabricproducts");
+
+        const result = await sql`
+            DELETE FROM Products WHERE product_id = ${productId} RETURNING product_id;`;
+        console.log("SQL Result:", result);
+
+        if (result.length === 0) {
+            console.error("Product not found or already deleted");
+            return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
+        }
+
+        console.log("Product deleted:", productId);
+        return new Response(JSON.stringify({ message: "Product deleted" }), { status: 200 });
+
+    } catch (error) {
+        console.error('An error occurred: Internal server error', error);
+        console.error('Error details:', error);
+        return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
+    }
+}
