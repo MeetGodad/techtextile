@@ -1,13 +1,14 @@
-
-import ListProduct from "../seller/ListProduct";
+import Checkout from "./checkoutProcess";
 import Header from "../components/Navbar";
 import Footer from "../components/Footer";
+
+
 
 export default function Page() {
     return (
     <div>
         <Header />
-        <ListProduct />
+        <Checkout />
         <Footer />
     </div>
     );

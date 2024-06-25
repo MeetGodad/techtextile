@@ -5,6 +5,8 @@ import { storage } from '../auth/firebase';
 import { useUserAuth } from "../auth/auth-context";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
+import { MdDeleteForever } from "react-icons/md";
+
 
 export default function ListProduct() {
     const { user } = useUserAuth();
@@ -17,13 +19,12 @@ export default function ListProduct() {
         image_url: '',
         userId: '',
         product_type: '',
-        yarn_type: '',
-        yarn_denier: '',
-        yarn_color: '',
-        fabric_type: '',
+        yarn_material: '',
+        yarn_denier: [''],
+        yarn_color: [''],
         fabric_print_tech: '',
         fabric_material: '',
-        fabric_color: ''
+        fabric_color: ['']
     });
 
     useEffect(() => {
@@ -55,6 +56,56 @@ export default function ListProduct() {
         }
     };
 
+    const addColor = () => {
+        if (productData.product_type === 'yarn') {
+            setProductData({ ...productData, yarn_color: [...productData.yarn_color, ''] });
+        } else if (productData.product_type === 'fabric') {
+            setProductData({ ...productData, fabric_color: [...productData.fabric_color, ''] });
+        }
+    };
+
+    const removeColor = (index) => {
+        if (productData.product_type === 'yarn') {
+            const updatedColors = [...productData.yarn_color];
+            updatedColors.splice(index, 1);
+            setProductData({ ...productData, yarn_color: updatedColors });
+        } else if (productData.product_type === 'fabric') {
+            const updatedColors = [...productData.fabric_color];
+            updatedColors.splice(index, 1);
+            setProductData({ ...productData, fabric_color: updatedColors });
+        }
+    };
+
+    const handleColorChange = (index) => (e) => {
+        if (productData.product_type === 'yarn') {
+            const updatedColors = [...productData.yarn_color];
+            updatedColors[index] = e.target.value;
+            setProductData({ ...productData, yarn_color: updatedColors });
+        } else if (productData.product_type === 'fabric') {
+            const updatedColors = [...productData.fabric_color];
+            updatedColors[index] = e.target.value;
+            setProductData({ ...productData, fabric_color: updatedColors });
+        }
+    };
+
+    const handleDenierChange = (index) => (e) => {
+        const updatedDeniers = [...productData.yarn_denier];
+        updatedDeniers[index] = e.target.value;
+        setProductData({ ...productData, yarn_denier: updatedDeniers });
+    };
+
+    const addDanier = () => {
+        setProductData({ ...productData, yarn_denier: [...productData.yarn_denier, ''] });
+    };
+
+    const removeDenier = (index) => {
+        const updatedDeniers = [...productData.yarn_denier];
+        updatedDeniers.splice(index, 1);
+        setProductData({ ...productData, yarn_denier: updatedDeniers });
+    };
+    
+
+
     const handleChange = (e) => {
         setProductData({ ...productData, [e.target.name]: e.target.value });
     };
@@ -83,10 +134,10 @@ return (
     user ? (
 
         <div className="w-full min-h-screen bg-white p-8 text-black">
-            <h2 className="text-2xl font-bold mb-6 text-center">List Item</h2>
+            <h2 className="text-2xl font-bold mb-6 text-center">List Product</h2>
             <form onSubmit={handleSubmit} className="space-y-6 text-black">
                 <div className="space-y-2">
-                    <label className="block font-semibold">Item Name</label>
+                    <label className="block font-semibold">Product Name</label>
                     <input 
                         type="text" 
                         required 
@@ -125,7 +176,7 @@ return (
                         multiple
                         name="image_url" 
                         onChange={handleImageChange} 
-                        className="w-full  "
+                        className="w-full "
                     />
                 </div>
                 <div className="space-y-2">
@@ -149,49 +200,73 @@ return (
                             <input 
                                 type="text" 
                                 required 
-                                name="yarn_type" 
-                                value={productData.yarn_type}  
+                                name="yarn_material" 
+                                value={productData.yarn_material}  
                                 onChange={handleChange} 
                                 className="w-full p-3 border border-gray-300 rounded-lg"
                             />
                         </div>
                         <div>
-                            <label className="block font-semibold">Yarn Denier</label>
-                            <input 
-                                type="text" 
-                                required 
-                                name="yarn_denier" 
-                                value={productData.yarn_denier} 
-                                onChange={handleChange} 
-                                className="w-full p-3 border border-gray-300 rounded-lg"
-                            />
+                            <label className="block font-semibold">Yarn Deniers</label>
+                            {productData.yarn_denier.map((color, index) => (
+                                <div key={index} className='relative w-2/12'>
+                                    <input 
+                                        type="text" 
+                                        required 
+                                        name="yarn_color" 
+                                        value={color}  
+                                        onChange={handleDenierChange(index)} 
+                                        className="w-full p-3 my-2 border border-gray-300 rounded-lg pr-10" // changed width to full
+                                    />
+                                    <button 
+                                        type="button" 
+                                        className='absolute top-1/2 right-2 transform -translate-y-1/2' 
+                                        onClick={() => removeDenier(index)}
+                                    >
+                                        <MdDeleteForever size={35} />
+                                    </button>
+                                </div>
+                            ))}
+                            <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addDanier}>Add Denier</button>
                         </div>
                         <div>
-                            <label className="block font-semibold">Yarn Color</label>
-                            <input 
-                                type="text" 
-                                required 
-                                name="yarn_color" 
-                                value={productData.yarn_color}  
-                                onChange={handleChange} 
-                                className="w-full p-3 border border-gray-300 rounded-lg"
-                            />
+                            <label className="block font-semibold">Yarn Colors</label>
+                            {productData.yarn_color.map((color, index) => (
+                               <div key={index} className="relative w-2/12 flex flex-col">
+                               <div className="flex flex-col my-2">
+                                 <input
+                                   type="text"
+                                   required
+                                   name="yarn_color"
+                                   value={color}
+                                   onChange={handleColorChange(index)}
+                                   className="w-full p-3 border border-gray-300 rounded-lg"
+                                 />
+                                 <button
+                                   type="button"
+                                   className="absolute top-1/2 right-2 transform -translate-y-1/2"
+                                   onClick={() => removeColor(index)}
+                                 >
+                                   <MdDeleteForever size={35} />
+                                 </button>
+                               </div>
+                               <label className="block font-semibold mt-2">Upload Images</label>
+                               <input
+                                 type="file"
+                                 required
+                                 multiple
+                                 name="image_url"
+                                 onChange={handleImageChange}
+                                 className="w-full flex items-center justify-center p-3 border border-gray-300 rounded-lg"
+                               />
+                             </div>
+                            ))}
+                            <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addColor}>Add Color</button>
                         </div>
                     </div>
                 )}
                 {productData.product_type === 'fabric' && (
                     <div className="space-y-2">
-                        <div>
-                            <label className="block font-semibold">Fabric Type</label>
-                            <input 
-                                type="text" 
-                                required 
-                                name="fabric_type" 
-                                value={productData.fabric_type}  
-                                onChange={handleChange} 
-                                className="w-full p-3 border border-gray-300 rounded-lg"
-                            />
-                        </div>
                         <div>
                             <label className="block font-semibold">Fabric Print Tech</label>
                             <input 
@@ -215,15 +290,36 @@ return (
                             />
                         </div>
                         <div>
-                            <label className="block font-semibold">Fabric Color</label>
-                            <input 
-                                type="text" 
-                                required 
-                                name="fabric_color" 
-                                value={productData.fabric_color}  
-                                onChange={handleChange} 
-                                className="w-full p-3 border border-gray-300 rounded-lg"
-                            />
+                            <label className="block font-semibold">Fabric Colors</label>
+                            {productData.fabric_color.map((color, index) => (
+                                <div key={index} className='relative w-2/12'>
+                                    <input 
+                                        type="text" 
+                                        required 
+                                        name="yarn_color" 
+                                        value={color}  
+                                        onChange={handleColorChange(index)} 
+                                        className="w-full p-3 my-2 border border-gray-300 rounded-lg pr-10" // changed width to full
+                                    />
+                                    <button 
+                                        type="button" 
+                                        className='absolute top-1/2 right-2 transform -translate-y-1/2' 
+                                        onClick={() => removeColor(index)}
+                                    >
+                                        <MdDeleteForever size={35} />
+                                    </button>
+                                    {/* <label className="block font-semibold">Upload Images</label>
+                                    <input 
+                                        type="file" 
+                                        required 
+                                        multiple
+                                        name="image_url" 
+                                        onChange={handleImageChange} 
+                                        className="w-full  "
+                                    /> */}
+                                </div>
+                            ))}
+                            <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addColor}>Add Color</button>
                         </div>
                     </div>
                 )}

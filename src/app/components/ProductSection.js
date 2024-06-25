@@ -85,7 +85,7 @@ export default function ProductSection({
         />
         <span className="text-base font-bold">Add to cart</span>
       </button>
-      <h2 className="text-lg font-semibold text-center">{name}</h2>
+      <h2 className="text-lg font-semibold text-black text-center">{name}</h2>
       <div className="text-center text-lg font-medium text-gray-800">${price}</div>
     </div>
   );

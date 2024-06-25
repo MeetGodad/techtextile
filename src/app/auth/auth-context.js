@@ -9,7 +9,9 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
 } from "firebase/auth";
+import { ref ,  deleteObject} from "firebase/storage";
 import { auth } from "./firebase";
+import {storage} from './firebase';
  
 const AuthContext = createContext();
  
@@ -41,10 +43,28 @@ export const AuthContextProvider = ({ children }) => {
       throw error;
     }
   }
+
  
   const firebaseSignOut = () => {
     return signOut(auth);
   };
+  
+
+  const deleteImageFromFirebase = async (imageUrl) => {
+    try {
+  
+      // Create a reference to the file to delete
+      const imageRef = ref(storage, imageUrl);
+  
+      // Delete the file
+      await deleteObject(imageRef);
+  
+      console.log('File deleted successfully');
+    } catch (error) {
+      console.error('Error removing file: ', error);
+    }
+  };
+  
  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -57,7 +77,7 @@ export const AuthContextProvider = ({ children }) => {
   
 
   return (
-    <AuthContext.Provider value={{ user, googleSignIn, emailSignIn, emailSignUp , firebaseSignOut }}>
+    <AuthContext.Provider value={{ user, googleSignIn, emailSignIn, emailSignUp , firebaseSignOut , deleteImageFromFirebase }}>
       {children}
     </AuthContext.Provider>
   );

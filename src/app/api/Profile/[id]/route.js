@@ -16,6 +16,7 @@ export async function GET(req, { params }) {
 
     let user = response[0];
 
+    console.log("User Details:", user);
     if (user.user_type === "buyer") {
         const buyerResponse = await sql`SELECT * FROM buyers WHERE user_id = ${id};`;
 
@@ -24,6 +25,7 @@ export async function GET(req, { params }) {
         }
 
         user.buyerDetails = buyerResponse[0];
+        console.log("Buyer Details:", user.buyerDetails);
     } else if (user.user_type === "seller") {
         const sellerResponse = await sql`SELECT * FROM sellers WHERE user_id = ${id};`;
 

@@ -61,14 +61,15 @@ export default function Profile() {
 
   const handleAddProduct = () => {
     if (!showAddProduct) {
-      setListedItemsVisible(false);
-      setShowListedItems(false);
       setShowAddProduct(true);
-      setTimeout(() => setShowAddProduct(true), 10); 
+      setListedItemsVisible(false);
+      setTimeout(() => setShowAddProduct(true), 10);
+    } else {
       setShowAddProduct(false);
-      setTimeout(() => setListedItemsVisible(true), 1000); 
+      setTimeout(() => setListedItemsVisible(false), 1000);
+
     }
-  }
+  };
 
   const handleViewListedItems = () => {
     const event = new Event('sellerDataUpdated');
@@ -87,7 +88,7 @@ export default function Profile() {
   return (
     user && userDetails && (
       <div className="min-h-screen bg-gray-100 p-4 relative flex items-start justify-center">
-        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems ? 'absolute top-15 left-0 m-2' : showAddProduct ? 'absolute  pt-1 top-18 left-0 m-2' : 'm-auto'}`}    style={{ width: showListedItems ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems ? '15px' : '0' }}>
+        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems ? 'absolute top-15 left-0 m-2' : showAddProduct ? 'absolute  pt-1 top-18 left-0 m-2' : 'm-auto'}`}    style={{ width: showListedItems ? '30%' : showAddProduct ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems ? '15px' : showAddProduct ? '15px' : '0' }}>
           <section className="bg-white text-black shadow p-4 rounded-lg mb-6">
             <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏</h1>
             <h2 className="text-3xl font-semibold border-b pb-2 mb-4">User Information</h2>
@@ -108,7 +109,7 @@ export default function Profile() {
             )}
             {userDetails.user_type === 'buyer' && buyerInfo && (
               <>
-                <p className="text-xl mt-4"><strong>Address:</strong> {buyerInfo.address}</p>
+                <p className="text-xl mt-4"><strong>Address:</strong> {buyerInfo.shipping_address}</p>
                 <p className="text-xl"><strong>Phone Number:</strong> {buyerInfo.phone_num}</p>
                 <button className="flex mt-4 bg-green-500 text-white px-6 py-3 w-1/2 justify-center rounded-lg hover:bg-green-600 transition-colors duration-200">
                   View Purchase History

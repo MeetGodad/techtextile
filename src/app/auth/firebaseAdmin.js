@@ -5,12 +5,11 @@ const { Storage } = require('@google-cloud/storage');
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.applicationDefault(),
-    storageBucket: 'gs://techtextile-ca673.appspot.com' // Replace with your Firebase Storage bucket name
+    storageBucket: 'gs://techtextile-ca673.appspot.com' 
   });
 }
 
 // Initialize Cloud Storage and get a reference to the service
 const storage = new Storage();
-const bucket = storage.bucket('gs://techtextile-ca673.appspot.com'); // Replace with your Firebase Storage bucket name
-
+const bucket = storage.bucket('gs://techtextile-ca673.appspot.com'); 
 module.exports = { bucket, admin };
