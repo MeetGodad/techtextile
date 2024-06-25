@@ -18,8 +18,6 @@ export async function GET() {
     }
 }
 
-
-
 export async function POST(req) {
     try {
         console.log("Parsing request data");
@@ -48,7 +46,7 @@ export async function POST(req) {
     if (requestData.product_type === 'yarn'){const Yarn = await sql`
             INSERT INTO YarnProducts (product_id, yarn_material)
             VALUES (${productId}, 
-                 ${requestData.yarn_type})
+                 ${requestData.yarn_material})
             RETURNING yarn_id; `;
             
         

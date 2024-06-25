@@ -87,6 +87,16 @@ const SellerViewItem = () => {
     setDetailsItem(item);
   };
 
+  const handleRemove = (item) => {
+    setDetailsItem(null);
+    setSelectedItem(item);
+  };
+
+  const handleUpdate = (item) => {
+    setDetailsItem(null);
+    setUpdateItem(item);
+  };
+
   return (
     <div className={`w-full min-h-screen p-8 text-black relative`}>
       {selectedItem && (
@@ -112,6 +122,8 @@ const SellerViewItem = () => {
         <ProductDetails
           product={detailsItem}
           onClose={() => setDetailsItem(null)}
+          onRemove={handleRemove}
+          onUpdate={handleUpdate}
           position={popupPosition}
         />
       )}

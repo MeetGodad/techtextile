@@ -87,9 +87,9 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
         <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="fixed inset-0 bg-black bg-opacity-50"></div>
             <div
-                className="relative bg-white p-8 rounded-lg shadow-lg w-full max-w-md transition-transform duration-300 ease-in-out"
+                className="relative bg-white p-8 rounded-lg shadow-lg w-full max-w-xl transition-transform duration-300 ease-in-out"
             >
-                <h2 className="text-2xl font-bold mb-4">Update Item</h2>
+                <h2 className="text-2xl font-bold mb-4 text-center">Update Item</h2>
                 {error && <p className="text-red-500 mb-4">{error}</p>}
                 <form onSubmit={handleSubmit} className="space-y-6 text-black">
                     <div className="space-y-2">
@@ -107,8 +107,8 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                         <label className="block font-semibold">Description</label>
                         <textarea
                             required
-                            name="description"
-                            value={productData.description}
+                            name="product_description"
+                            value={productData.product_description}
                             onChange={handleChange}
                             className="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none"
                         ></textarea>
@@ -150,12 +150,12 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                     {productData.product_type === 'yarn' && (
                         <div className="space-y-2">
                             <div>
-                                <label className="block font-semibold">Yarn Type</label>
+                                <label className="block font-semibold">Yarn Material</label>
                                 <input
                                     type="text"
                                     required
-                                    name="yarn_type"
-                                    value={productData.yarn_type}
+                                    name="yarn_material"
+                                    value={productData.yarn_material}
                                     onChange={handleChange}
                                     className="w-full p-3 border border-gray-300 rounded-lg"
                                 />
@@ -186,17 +186,6 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                     )}
                     {productData.product_type === 'fabric' && (
                         <div className="space-y-2">
-                            <div>
-                                <label className="block font-semibold">Fabric Type</label>
-                                <input
-                                    type="text"
-                                    required
-                                    name="fabric_type"
-                                    value={productData.fabric_type}
-                                    onChange={handleChange}
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                />
-                            </div>
                             <div>
                                 <label className="block font-semibold">Fabric Print Tech</label>
                                 <input
