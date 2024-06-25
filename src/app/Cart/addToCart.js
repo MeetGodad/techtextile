@@ -8,6 +8,8 @@ export default function Cart({ children }) {
   const [errorMessages, setErrorMessages] = useState('');
   const { user } = useUserAuth();
   const router = useRouter();
+  
+  
 
   useEffect(() => {
     fetchCart();
@@ -89,58 +91,85 @@ export default function Cart({ children }) {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
-      <div className="overflow-x-auto">
-        <div className="w-full bg-white shadow-md rounded-lg overflow-hidden">
-          <div className="w-full bg-gray-100 p-4 font-semibold text-gray-800">
-            <div className="grid grid-cols-5 gap-4">
-              <div>Product</div>
-              <div>Price</div>
-              <div>Quantity</div>
-              <div>Subtotal</div>
-              <div>Action</div>
-            </div>
-          </div>
-          {cart.map(item => (
-            <div key={item.product_id} className="w-full p-4 border-t text-black border-gray-200">
-              <div className="grid grid-cols-5 gap-4">
-                <div className="flex items-center space-x-4">
-                  <img src={item.image_url} alt={item.product_name} className="w-16 h-16 object-cover" />
-                  <div>{item.product_name}</div>
+    <div className="min-h-screen bg-black">
+      <div className="container mx-auto px-4 py-8 animate-fade-in-down">
+        <h1 className="text-4xl font-bold mb-8 text-white">Your Shopping Cart</h1>
+        {cart.length > 0 ? (
+          <>
+            <div className="overflow-x-auto">
+              <div className="w-full bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+                <div className="w-full bg-gray-50 p-4 font-semibold text-gray-800">
+                  <div className="grid grid-cols-5 gap-4">
+                    <div>Product</div>
+                    <div>Price</div>
+                    <div>Quantity</div>
+                    <div>Subtotal</div>
+                    <div>Action</div>
+                  </div>
                 </div>
-                <div>${parseFloat(item.price).toFixed(2)}</div>
-                <div>
-                  <input
-                    type="number"
-                    className="border border-gray-300 rounded w-16"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) => updateQuantity(item.product_id, e.target.value)}
-                  />
-                  {errorMessages && <div className="text-red-500 text-sm">{errorMessages}</div>}
-                </div>
-                <div>${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
-                <div>
-                  <button onClick={() => removeItem(item.product_id)} className="text-red-500">Remove</button>
-                </div>
+                {cart.map((item, index) => (
+                  <div 
+                    key={item.product_id} 
+                    className="w-full p-4 border-t text-black border-gray-200 transition-all duration-300 hover:bg-gray-50"
+                    style={{animationDelay: `${index * 0.1}s`}}
+                  >
+                    <div className="grid grid-cols-5 gap-4 items-center">
+                      <div className="flex items-center space-x-4">
+                        
+                        <img src={item.image_url.split(',')[[0]]} alt={item.product_name} className="w-16 h-16 object-cover rounded-md shadow-sm" />
+                        <div className="font-medium">{item.product_name}</div>
+                      </div>
+                      <div className="text-blue-600 font-semibold">${parseFloat(item.price).toFixed(2)}</div>
+                      <div>
+                        <input
+                          type="number"
+                          className="border border-gray-300 rounded-md w-20 p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(e) => updateQuantity(item.product_id, e.target.value)}
+                        />
+                        {errorMessages && <div className="text-red-500 text-sm mt-1">{errorMessages}</div>}
+                      </div>
+                      <div className="font-semibold">${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
+                      <div>
+                        <button 
+                          onClick={() => removeItem(item.product_id)} 
+                          className="text-red-500 hover:text-red-700 transition-colors duration-300"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="mt-8 flex justify-end">
-        <div className="text-right">
-          <div className="text-lg font-semibold">Subtotal: ${calculateSubtotal().toFixed(2)}</div>
-          <div className="text-sm text-gray-400">Shipping: Free</div>
-          <div className="text-lg font-bold mt-2">Total: ${calculateSubtotal().toFixed(2)}</div>
-          <button
-            className="mt-4 px-6 py-2 bg-black text-white font-bold rounded"
-            onClick={handleCheckout}
-          >
-            Proceed to checkout
-          </button>
-        </div>
+            <div className="mt-8 flex justify-end">
+              <div className="text-right bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
+                <div className="text-xl font-semibold text-gray-800">Subtotal: <span className="text-blue-600">${calculateSubtotal().toFixed(2)}</span></div>
+                <div className="text-sm text-gray-500 mt-1">Shipping: Free</div>
+                <div className="text-2xl font-bold mt-4 text-gray-800">Total: <span className="text-blue-600">${calculateSubtotal().toFixed(2)}</span></div>
+                <button
+                  className="mt-6 px-8 py-3 bg-blue-600 text-white font-bold rounded-full transition-all duration-300 transform hover:bg-blue-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                  onClick={handleCheckout}
+                >
+                  Proceed to Checkout
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-16">
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Your cart is empty</h2>
+            <p className="text-gray-500 mb-8">Looks like you haven't added any items to your cart yet.</p>
+            <button
+              onClick={() => router.push('/Home')}
+              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

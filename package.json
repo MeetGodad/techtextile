@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mantine/core": "^7.10.2",
+    "@mantine/hooks": "^7.10.2",
     "@neondatabase/serverless": "^0.9.3",
     "bootstrap": "^5.3.3",
     "firebase": "^10.12.2",
@@ -16,7 +18,12 @@
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.2",
     "react-dom": "^18.3.1",
+<<<<<<< Updated upstream
     "react-router-dom": "^6.23.1",
+=======
+    "react-icons": "^5.2.1",
+    "react-router-dom": "^6.24.0",
+>>>>>>> Stashed changes
     "uuid": "^9.0.1"
   },
   "devDependencies": {
