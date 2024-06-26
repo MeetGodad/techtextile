@@ -106,7 +106,7 @@ export default function Cart({ children }) {
             <div key={item.product_id} className="w-full p-4 border-t text-black border-gray-200">
               <div className="grid grid-cols-5 gap-4">
                 <div className="flex items-center space-x-4">
-                  <img src={item.image_url} alt={item.product_name} className="w-16 h-16 object-cover" />
+                  <img src={item.image_url.split(',')[0]} alt={item.product_name} className="w-16 h-16 object-cover" />
                   <div>{item.product_name}</div>
                 </div>
                 <div>${parseFloat(item.price).toFixed(2)}</div>

@@ -6,7 +6,7 @@ import { useUserAuth } from "../auth/auth-context";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { MdDeleteForever } from "react-icons/md";
-
+import { SketchPicker } from 'react-color';
 
 export default function ListProduct() {
     const { user } = useUserAuth();
@@ -26,6 +26,7 @@ export default function ListProduct() {
         fabric_material: '',
         fabric_color: ['']
     });
+    
 
     useEffect(() => {
         if (user) {
@@ -58,11 +59,11 @@ export default function ListProduct() {
 
     const addColor = () => {
         if (productData.product_type === 'yarn') {
-            setProductData({ ...productData, yarn_color: [...productData.yarn_color, ''] });
+          setProductData({ ...productData, yarn_color: [...productData.yarn_color, ''] });
         } else if (productData.product_type === 'fabric') {
-            setProductData({ ...productData, fabric_color: [...productData.fabric_color, ''] });
+          setProductData({ ...productData, fabric_color: [...productData.fabric_color, ''] });
         }
-    };
+      };
 
     const removeColor = (index) => {
         if (productData.product_type === 'yarn') {
@@ -76,18 +77,18 @@ export default function ListProduct() {
         }
     };
 
-    const handleColorChange = (index) => (e) => {
+    const handleColorChange = (index) => (event) => {
+        const color = event.target.value; // Extracting the color value from the event object
         if (productData.product_type === 'yarn') {
-            const updatedColors = [...productData.yarn_color];
-            updatedColors[index] = e.target.value;
-            setProductData({ ...productData, yarn_color: updatedColors });
+          const updatedColors = [...productData.yarn_color];
+          updatedColors[index] = color;
+          setProductData({ ...productData, yarn_color: updatedColors });
         } else if (productData.product_type === 'fabric') {
-            const updatedColors = [...productData.fabric_color];
-            updatedColors[index] = e.target.value;
-            setProductData({ ...productData, fabric_color: updatedColors });
+          const updatedColors = [...productData.fabric_color];
+          updatedColors[index] = color;
+          setProductData({ ...productData, fabric_color: updatedColors });
         }
-    };
-
+      };
     const handleDenierChange = (index) => (e) => {
         const updatedDeniers = [...productData.yarn_denier];
         updatedDeniers[index] = e.target.value;
@@ -196,7 +197,7 @@ return (
                 {productData.product_type === 'yarn' && (
                     <div className="space-y-2">
                         <div>
-                            <label className="block font-semibold">Yarn Type</label>
+                            <label className="block font-semibold">Yarn Material</label>
                             <input 
                                 type="text" 
                                 required 
@@ -208,61 +209,62 @@ return (
                         </div>
                         <div>
                             <label className="block font-semibold">Yarn Deniers</label>
-                            {productData.yarn_denier.map((color, index) => (
-                                <div key={index} className='relative w-2/12'>
-                                    <input 
-                                        type="text" 
-                                        required 
-                                        name="yarn_color" 
-                                        value={color}  
-                                        onChange={handleDenierChange(index)} 
-                                        className="w-full p-3 my-2 border border-gray-300 rounded-lg pr-10" // changed width to full
-                                    />
-                                    <button 
-                                        type="button" 
-                                        className='absolute top-1/2 right-2 transform -translate-y-1/2' 
-                                        onClick={() => removeDenier(index)}
-                                    >
-                                        <MdDeleteForever size={35} />
-                                    </button>
-                                </div>
-                            ))}
+                            <div className="flex flex-wrap">
+                                {productData.yarn_denier.map((color, index) => (
+                                    <div key={index} className='relative w-40 mr-2'>
+                                        <input 
+                                            type="text" 
+                                            required 
+                                            name="yarn_color" 
+                                            value={color}  
+                                            onChange={handleDenierChange(index)} 
+                                            className="w-full my-2 p-3 border border-black rounded-lg" // changed width to full
+                                        />
+                                        <button 
+                                            type="button" 
+                                            className='absolute top-1/2 right-2 transform -translate-y-1/2' 
+                                            onClick={() => removeDenier(index)}
+                                        >
+                                            <MdDeleteForever size={35} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                             <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addDanier}>Add Denier</button>
                         </div>
                         <div>
                             <label className="block font-semibold">Yarn Colors</label>
-                            {productData.yarn_color.map((color, index) => (
-                               <div key={index} className="relative w-2/12 flex flex-col">
-                               <div className="flex flex-col my-2">
-                                 <input
-                                   type="text"
-                                   required
-                                   name="yarn_color"
-                                   value={color}
-                                   onChange={handleColorChange(index)}
-                                   className="w-full p-3 border border-gray-300 rounded-lg"
-                                 />
-                                 <button
-                                   type="button"
-                                   className="absolute top-1/2 right-2 transform -translate-y-1/2"
-                                   onClick={() => removeColor(index)}
-                                 >
-                                   <MdDeleteForever size={35} />
-                                 </button>
-                               </div>
-                               <label className="block font-semibold mt-2">Upload Images</label>
-                               <input
-                                 type="file"
-                                 required
-                                 multiple
-                                 name="image_url"
-                                 onChange={handleImageChange}
-                                 className="w-full flex items-center justify-center p-3 border border-gray-300 rounded-lg"
-                               />
-                             </div>
-                            ))}
-                            <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addColor}>Add Color</button>
+                            <div className="flex flex-wrap"> {/* Added flex and flex-wrap to the parent container */}
+                                {productData.yarn_color.map((color, index) => (
+                                    <div key={index} className="flex flex-col my-2 mr-2"> {/* Adjusted width and added horizontal margin for spacing */}
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="color"
+                                                required
+                                                name="yarn_color"
+                                                value={color}
+                                                onChange={handleColorChange(index)}
+                                                className="w-40 min-h-14 my-1 p-1 border bg-white border-black rounded-lg pr-10" // Added pr-10 for padding right
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeColor(index)}
+                                                className="absolute top-1/2 right-2 transform -translate-y-1/2">
+                                                <MdDeleteForever size={35} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button 
+                                type="button" 
+                                className="block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white mt-2" 
+                                onClick={addColor}
+                            >
+                                Add Color
+                            </button>
                         </div>
+
                     </div>
                 )}
                 {productData.product_type === 'fabric' && (
@@ -291,35 +293,35 @@ return (
                         </div>
                         <div>
                             <label className="block font-semibold">Fabric Colors</label>
-                            {productData.fabric_color.map((color, index) => (
-                                <div key={index} className='relative w-2/12'>
-                                    <input 
-                                        type="text" 
-                                        required 
-                                        name="yarn_color" 
-                                        value={color}  
-                                        onChange={handleColorChange(index)} 
-                                        className="w-full p-3 my-2 border border-gray-300 rounded-lg pr-10" // changed width to full
-                                    />
-                                    <button 
-                                        type="button" 
-                                        className='absolute top-1/2 right-2 transform -translate-y-1/2' 
-                                        onClick={() => removeColor(index)}
-                                    >
-                                        <MdDeleteForever size={35} />
-                                    </button>
-                                    {/* <label className="block font-semibold">Upload Images</label>
-                                    <input 
-                                        type="file" 
-                                        required 
-                                        multiple
-                                        name="image_url" 
-                                        onChange={handleImageChange} 
-                                        className="w-full  "
-                                    /> */}
-                                </div>
-                            ))}
-                            <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addColor}>Add Color</button>
+                            <div className="flex flex-wrap"> {/* Added flex and flex-wrap to the parent container */}
+                                {productData.fabric_color.map((color, index) => (
+                                    <div key={index} className="flex flex-col my-2 mr-2"> {/* Adjusted width and added horizontal margin for spacing */}
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="color"
+                                                required
+                                                name="yarn_color"
+                                                value={color}
+                                                onChange={handleColorChange(index)}
+                                                className="w-40 min-h-14 my-1 p-1 border bg-white border-black rounded-lg pr-10" 
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeColor(index)}
+                                                className="absolute top-1/2 right-2 transform -translate-y-1/2">
+                                                <MdDeleteForever size={35} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button 
+                                type="button" 
+                                className="block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white mt-2" 
+                                onClick={addColor}
+                            >
+                                Add Color
+                            </button>
                         </div>
                     </div>
                 )}
