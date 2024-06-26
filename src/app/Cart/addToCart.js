@@ -91,9 +91,9 @@ export default function Cart({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-gray-200">
       <div className="container mx-auto px-4 py-8 animate-fade-in-down">
-        <h1 className="text-4xl font-bold mb-8 text-white">Your Shopping Cart</h1>
+        <h1 className="text-4xl font-bold mb-8 text-black">Your Shopping Cart</h1>
         {cart.length > 0 ? (
           <>
             <div className="overflow-x-auto">
@@ -119,7 +119,7 @@ export default function Cart({ children }) {
                         <img src={item.image_url.split(',')[[0]]} alt={item.product_name} className="w-16 h-16 object-cover rounded-md shadow-sm" />
                         <div className="font-medium">{item.product_name}</div>
                       </div>
-                      <div className="text-blue-600 font-semibold">${parseFloat(item.price).toFixed(2)}</div>
+                      <div className="text-black-600 font-semibold">${parseFloat(item.price).toFixed(2)}</div>
                       <div>
                         <input
                           type="number"
@@ -146,9 +146,9 @@ export default function Cart({ children }) {
             </div>
             <div className="mt-8 flex justify-end">
               <div className="text-right bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
-                <div className="text-xl font-semibold text-gray-800">Subtotal: <span className="text-blue-600">${calculateSubtotal().toFixed(2)}</span></div>
+                <div className="text-xl font-semibold text-gray-800">Subtotal: <span className="text-black-600">${calculateSubtotal().toFixed(2)}</span></div>
                 <div className="text-sm text-gray-500 mt-1">Shipping: Free</div>
-                <div className="text-2xl font-bold mt-4 text-gray-800">Total: <span className="text-blue-600">${calculateSubtotal().toFixed(2)}</span></div>
+                <div className="text-2xl font-bold mt-4 text-gray-800">Total: <span className="text-black-600">${calculateSubtotal().toFixed(2)}</span></div>
                 <button
                   className="mt-6 px-8 py-3 bg-blue-600 text-white font-bold rounded-full transition-all duration-300 transform hover:bg-blue-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                   onClick={handleCheckout}

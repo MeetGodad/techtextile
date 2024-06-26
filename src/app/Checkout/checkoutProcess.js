@@ -288,34 +288,6 @@ const Checkout = () => {
             </form>
           </div>
         );
-<<<<<<< Updated upstream
-      case 2:
-        return (
-          <div className="animate-fade-in">
-            <h2 className="text-xl font-semibold mb-4">Payment Options</h2>
-            <div className="flex space-x-4 mb-4">
-              <button
-                type="button"
-                onClick={() => setSelectedPaymentMethod('Visa')}
-                className={`p-2 border rounded ${selectedPaymentMethod === 'Visa' ? 'border-blue-500' : 'border-gray-300'}`}
-              >
-                <img src="/visa-logo.png" alt="Visa" className="w-8 h-8" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedPaymentMethod('Mastercard')}
-                className={`p-2 border rounded ${selectedPaymentMethod === 'Mastercard' ? 'border-blue-500' : 'border-gray-300'}`}
-              >
-                <img src="/mastercard-logo.png" alt="Mastercard" className="w-8 h-8" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedPaymentMethod('PayPal')}
-                className={`p-2 border rounded ${selectedPaymentMethod === 'PayPal' ? 'border-blue-500' : 'border-gray-300'}`}
-              >
-                <img src="/paypal-logo.png" alt="PayPal" className="w-8 h-8" />
-              </button>
-=======
         case 2:
           return (
             <div className="animate-fade-in-down">
@@ -344,7 +316,6 @@ const Checkout = () => {
               <form className="space-y-6 bg-white p-6 rounded-lg shadow-md animate-fade-in">
                 {renderPaymentForm()}
               </form>
->>>>>>> Stashed changes
             </div>
           );
       case 3:
