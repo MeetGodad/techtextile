@@ -71,8 +71,6 @@ GROUP BY
     a.city,
     a.state,
     a.postal_code;`;
-
-
     if (Products.length === 0) {
         return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
     }
