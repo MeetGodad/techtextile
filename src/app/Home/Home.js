@@ -9,7 +9,7 @@ import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 
-export default function Home({ category }) {
+export default function Home({ category, subCategory, subSubCategory }) {
   const { user } = useUserAuth();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
@@ -23,7 +23,9 @@ export default function Home({ category }) {
             'Cache-Control': 'no-cache',
         }});
         const data = await response.json();
+     
         setProducts(data);
+         console.log("Data",data);
       } catch (error) {
         console.error('Error fetching the products:', error);
       }
@@ -72,13 +74,27 @@ export default function Home({ category }) {
     setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 12);
   };
 
-  const filteredProducts = category === 'all'
-    ? products
-    : products.filter(product => product.product_type === category);
+const filteredProducts = products.filter(product => {
+  // Filter by category unless it's 'all'
+  if (category !== 'all' && product.product_type !== category) return false;
 
+  // Additional filtering based on category
+  switch (category) {
+    case 'fabric':
+      // For 'fabric', check both 'fabricProducts' for 'subCategory' match in 'fabric_print_tech' or 'fabric_material'
+     return subCategory ? (product.fabric_print_tech === subSubCategory || product.fabric_material === subSubCategory) : true;
+    case 'yarn':
+      // For 'yarn', match 'yarn_material' with 'subCategory'
+      return subCategory ? product.yarn_material === subCategory : true;
+    default:
+      // If no specific category logic is needed, return true to include the product
+      return true;
+  }
+});
   return (
     <div className="w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden" style={{ paddingTop: '100px' }}>
       <main className="max-w-screen-xl mx-auto">
+      
         {products.length > 0 ? (
           <>
             <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
