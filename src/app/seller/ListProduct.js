@@ -225,15 +225,6 @@ return (
                                     >
                                         <MdDeleteForever size={35} />
                                     </button>
-                                    <label className="block font-semibold">Upload Images</label>
-                                    <input 
-                                        type="file" 
-                                        required 
-                                        multiple
-                                        name="image_url" 
-                                        onChange={handleImageChange} 
-                                        className="w-full  "
-                                    />
                                 </div>
                             ))}
                             <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addDanier}>Add Denier</button>
@@ -243,7 +234,7 @@ return (
                             {productData.yarn_color.map((color, index) => (
                                 <div key={index} className='relative w-2/12'>
                                     <input 
-                                        type="text" 
+                                        type="color" 
                                         required 
                                         name="yarn_color" 
                                         value={color}  

@@ -114,7 +114,6 @@ CREATE TABLE ProductVariant (
     variant_id SERIAL PRIMARY KEY,
     variant_name VARCHAR(50),
     variant_value VARCHAR(50),
-    variant_images_url TEXT,
     product_id INT REFERENCES Products(product_id)
 );
 

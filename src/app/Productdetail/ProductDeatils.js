@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
@@ -9,6 +11,7 @@ export default function ProductDetail({ productId }) {
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(null);
   const [quantity, setQuantity] = useState(1); // State for quantity
+  const [selectedVariant, setSelectedVariant] = useState({}); // Initialize with an empty object
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -30,7 +33,7 @@ export default function ProductDetail({ productId }) {
     };
 
     fetchProductDetails();
-  }, [productId]);
+  }, [productId, user]);
 
   const addToCart = async () => {
     if (!user) {
@@ -46,7 +49,8 @@ export default function ProductDetail({ productId }) {
         body: JSON.stringify({
           userId: user.uid,
           productId: product.product_id,
-          quantity: quantity, // Include quantity in the request body
+          quantity: quantity,
+          variant: selectedVariant,
         }),
       });
 
@@ -79,6 +83,14 @@ export default function ProductDetail({ productId }) {
     }
   };
 
+  const handleVariantSelection = (variantName, variantValue, variantId) => {
+    setSelectedVariant((prev) => ({
+      ...prev,
+      [variantName]: { value: variantValue, id: variantId },
+    }));
+    console.log(selectedVariant);
+  };
+
   if (loading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
@@ -102,7 +114,9 @@ export default function ProductDetail({ productId }) {
               {imageUrls.map((url, index) => (
                 <img
                   key={index}
-                  className={`w-16 h-16 mb-2 cursor-pointer ${currentImage === url.trim() ? 'border-2 border-black' : ''}`}
+                  className={`w-16 h-16 mb-2 cursor-pointer ${
+                    currentImage === url.trim() ? 'border-2 border-black' : ''
+                  }`}
                   src={url.trim()}
                   alt={`${product.product_name} thumbnail ${index + 1}`}
                   onClick={() => setCurrentImage(url.trim())}
@@ -121,7 +135,31 @@ export default function ProductDetail({ productId }) {
             <h1 className="text-3xl font-semibold mb-4">{product.product_name}</h1>
             <p className="text-lg mb-4">{product.product_description}</p>
             <p className="text-2xl font-semibold mb-4">${product.price}</p>
-            
+            {product.variants && (
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-4">Variants</h3>
+              {Object.keys(product.variants).map((variantName, index) => (
+                <div key={index} className="mb-4">
+                  <p className="font-medium text-xlg mb-2">{variantName.charAt(0).toUpperCase() + variantName.slice(1)}</p>
+                  <div className="flex flex-wrap gap-4">
+                    {product.variants[variantName].map((variant, variantIndex) => (
+                      <div
+                        key={variantIndex}
+                        className={`cursor-pointer p-2 border rounded-md transition-colors duration-200 ease-in-out ${
+                          selectedVariant[variantName]?.value === variant.variant_value ? 'bg-black text-white border-black ring-2 ring-white' : 'bg-white text-black border-gray-300'
+                        }`}
+                        style={variantName === 'color' ? { backgroundColor: variant.variant_value, width: '60px', height: '60px' } : { padding: '10px 16px' }}
+                        onClick={() => handleVariantSelection(variantName, variant.variant_value, variant.variant_id)}
+                      >
+                        {variantName === 'color' ? '' : variant.variant_value}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
 
             <div className="mb-4">
               <label htmlFor="quantity" className="mr-2">Quantity:</label>
@@ -140,10 +178,7 @@ export default function ProductDetail({ productId }) {
             >
               Add to cart
             </button>
-                        {/* Display additional product details */}
-                        {product.variants && (
-              <p className="text-lg mb-4">Variants: {product.variants}</p>
-            )}
+
             {product.yarn_material && (
               <p className="text-lg mb-4">Yarn Material: {product.yarn_material}</p>
             )}
@@ -156,9 +191,6 @@ export default function ProductDetail({ productId }) {
 
             {/* Display seller details */}
             <p className="text-lg mb-4">Seller Company: {product.seller_business_name}</p>
-
-            <p className="text-lg mb-4">Address: {product.seller_business_address}</p>
-            
           </div>
         </div>
       </div>

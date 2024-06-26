@@ -7,10 +7,71 @@ export async function GET(req, { params }) {
 
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
-    const Products = await sql `SELECT p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material, STRING_AGG(DISTINCT pv.variant_name || ': ' || pv.variant_value, ', ') AS variants, s.business_name AS seller_business_name, s.phone_num AS seller_phone_num, s.business_address AS seller_business_address 
-    FROM Products p LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id LEFT JOIN ProductVariant pv ON p.product_id = pv.product_id LEFT JOIN Sellers s ON p.seller_id = s.seller_id
-    WHERE p.product_id = ${id}
-    GROUP BY p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material, s.user_id,  s.business_name, s.phone_num, s.business_address`;
+    const Products = await sql `
+   SELECT 
+    p.product_id, 
+    p.product_name, 
+    p.product_description, 
+    p.price, 
+    p.image_url, 
+    p.seller_id, 
+    p.product_type, 
+    yp.yarn_material, 
+    fp.fabric_print_tech, 
+    fp.fabric_material, 
+    (
+        SELECT jsonb_object_agg(
+            variant_name,
+            variant_values
+        )
+        FROM (
+            SELECT 
+                pv.variant_name,
+                jsonb_agg(
+                    jsonb_build_object(
+                        'variant_id', pv.variant_id,
+                        'variant_value', pv.variant_value
+                    )
+                ) AS variant_values
+            FROM ProductVariant pv
+            WHERE pv.product_id = p.product_id
+            GROUP BY pv.variant_name
+        ) AS grouped_variants
+    ) AS variants,
+    s.business_name AS seller_business_name, 
+    s.phone_num AS seller_phone_num, 
+    jsonb_build_object(
+        'street', a.street,
+        'city', a.city,
+        'state', a.state,
+        'postal_code', a.postal_code
+    ) AS seller_address
+FROM 
+    Products p 
+    LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id 
+    LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id 
+    LEFT JOIN Sellers s ON p.seller_id = s.seller_id
+    LEFT JOIN Addresses a ON s.business_address = a.address_id
+WHERE 
+    p.product_id = ${id}
+GROUP BY 
+    p.product_id, 
+    p.product_name, 
+    p.product_description, 
+    p.price, 
+    p.image_url, 
+    p.seller_id, 
+    p.product_type, 
+    yp.yarn_material, 
+    fp.fabric_print_tech, 
+    fp.fabric_material, 
+    s.business_name, 
+    s.phone_num, 
+    a.street,
+    a.city,
+    a.state,
+    a.postal_code;`;
+
 
     if (Products.length === 0) {
         return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
