@@ -6,7 +6,10 @@ export async function GET() {
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
         const products = await sql`
-            SELECT * FROM Products;`;
+            SELECT p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material,STRING_AGG(DISTINCT pv.variant_name || ': ' || pv.variant_value, ', ') AS variants
+            FROM Products p LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id
+            LEFT JOIN ProductVariant pv ON p.product_id = pv.product_id
+            GROUP BY p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material;`;
 
         if (products.length === 0) {
             return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });

@@ -1,13 +1,9 @@
-import Home from "./Home/Home";
-import Header from "./components/Navbar";
-import Footer from "./components/Footer";
+import Page from "./Home/page";
 
-export default function Page() {
+export default function App() {
     return (
     <div>
-        <Header/>
-        <Home/>
-        <Footer/>
+        <Page/>
     </div>
     );
 }
