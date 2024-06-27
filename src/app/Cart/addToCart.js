@@ -8,8 +8,6 @@ export default function Cart({ children }) {
   const [errorMessages, setErrorMessages] = useState('');
   const { user } = useUserAuth();
   const router = useRouter();
-  
-  
 
   useEffect(() => {
     fetchCart();
@@ -113,66 +111,58 @@ export default function Cart({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-200">
-      <div className="container mx-auto px-4 py-8 animate-fade-in-down">
-        <h1 className="text-4xl font-bold mb-8 text-black">Your Shopping Cart</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray via-black to-black p-8">
+      <div className="max-w-6xl mx-auto bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-3xl shadow-2xl p-8 animate-fade-in-up">
+        <h1 className="text-5xl font-extrabold mb-12 text-black text-center animate-pulse">
+          Your Cart
+        </h1>
         {cart.length > 0 ? (
           <>
-            <div className="overflow-x-auto">
-              <div className="w-full bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
-                <div className="w-full bg-gray-50 p-4 font-semibold text-gray-800">
-                  <div className="grid grid-cols-5 gap-4">
-                    <div>Product</div>
-                    <div>Price</div>
-                    <div>Quantity</div>
-                    <div>Subtotal</div>
-                    <div>Action</div>
-                  </div>
-                </div>
-                {cart.map((item, index) => (
-                  <div 
-                    key={item.product_id} 
-                    className="w-full p-4 border-t text-black border-gray-200 transition-all duration-300 hover:bg-gray-50"
-                    style={{animationDelay: `${index * 0.1}s`}}
-                  >
-                    <div className="grid grid-cols-5 gap-4 items-center">
-                      <div className="flex items-center space-x-4">
-                        
-                        <img src={item.image_url.split(',')[[0]]} alt={item.product_name} className="w-16 h-16 object-cover rounded-md shadow-sm" />
-                        <div className="font-medium">{item.product_name}</div>
-                      </div>
-                      <div className="text-black-600 font-semibold">${parseFloat(item.price).toFixed(2)}</div>
-                      <div>
-                        <input
-                          type="number"
-                          className="border border-gray-300 rounded-md w-20 p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
-                          min="1"
-                          value={item.quantity}
-                          onChange={(e) => updateQuantity(item.product_id, e.target.value)}
-                        />
-                        {errorMessages && <div className="text-red-500 text-sm mt-1">{errorMessages}</div>}
-                      </div>
-                      <div className="font-semibold">${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
-                      <div>
-                        <button 
-                          onClick={() => removeItem(item.product_id)} 
-                          className="text-red-500 hover:text-red-700 transition-colors duration-300"
-                        >
-                          Remove
-                        </button>
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {cart.map((item, index) => (
+                <div 
+                  key={item.product_id} 
+                  className="bg-white-800 bg-opacity-50 rounded-2xl p-6 transform transition duration-500 hover:scale-105 hover:rotate-1 hover:shadow-2xl"
+                >
+                  <div className="relative mb-6 group">
+                    <img 
+                      src={item.image_url.split(',')[0]} 
+                      alt={item.product_name} 
+                      className="w-full h-48 object-cover rounded-xl shadow-md transition duration-300 group-hover:shadow-xl"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition duration-300 rounded-xl flex items-center justify-center">
+                      <span className="text-white text-lg font-semibold">{item.product_name}</span>
                     </div>
                   </div>
-                ))}
-              </div>
+                  <div className="text-black font-bold text-2xl mb-4">${parseFloat(item.price).toFixed(2)}</div>
+                  <div className="mb-6">
+                    <label className="block text-black-300 mb-2">Quantity</label>
+                    <input
+                      type="number"
+                      className="w-full bg-gray-700 border-2 border-black-600 rounded-full py-2 px-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition duration-300"
+                      min="1"
+                      value={item.quantity}
+                      onChange={(e) => updateQuantity(item.product_id, e.target.value)}
+                    />
+                    {errorMessages && <div className="text-red-300 text-sm mt-2 animate-bounce">{errorMessages}</div>}
+                  </div>
+                  <div className="font-semibold text-black-300 mb-4">Subtotal: ${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
+                  <button 
+                    onClick={() => removeItem(item.product_id)} 
+                    className="text-red-500 hover:text-red transition duration-300 transform hover:scale-110"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
             </div>
-            <div className="mt-8 flex justify-end">
-              <div className="text-right bg-white p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
-                <div className="text-xl font-semibold text-gray-800">Subtotal: <span className="text-black-600">${calculateSubtotal().toFixed(2)}</span></div>
-                <div className="text-sm text-gray-500 mt-1">Shipping: Free</div>
-                <div className="text-2xl font-bold mt-4 text-gray-800">Total: <span className="text-black-600">${calculateSubtotal().toFixed(2)}</span></div>
+            <div className="mt-12 flex justify-end">
+              <div className="bg-white-800 bg-opacity-50 p-8 rounded-2xl shadow-xl transform transition duration-500 hover:scale-105 hover:-rotate-1">
+                <div className="text-2xl font-bold text-black mb-2">Subtotal: <span className="text-black-300">${calculateSubtotal().toFixed(2)}</span></div>
+                <div className="text-lg text-black-400 mb-4">Shipping: Free</div>
+                <div className="text-3xl font-extrabold text-black mb-6">Total: <span className="text-black-300">${calculateSubtotal().toFixed(2)}</span></div>
                 <button
-                  className="mt-6 px-8 py-3 bg-blue-600 text-white font-bold rounded-full transition-all duration-300 transform hover:bg-blue-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                  className="w-full py-4 bg-gradient-to-r from-gray-700 to-gray-900 text-white font-bold rounded-full transition duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                   onClick={handleCheckout}
                 >
                   Proceed to Checkout
@@ -181,14 +171,14 @@ export default function Cart({ children }) {
             </div>
           </>
         ) : (
-          <div className="text-center py-16">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Your cart is empty</h2>
-            <p className="text-gray-500 mb-8">Looks like you haven't added any items to your cart yet.</p>
+          <div className="text-center py-20 animate-float">
+            <h2 className="text-3xl font-bold text-white mb-6">Your cart is as empty as space</h2>
+            <p className="text-xl text-gray-400 mb-10">Time to fill it with some stellar items!</p>
             <button
               onClick={() => router.push('/Home')}
-              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300"
+              className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-900 text-white font-bold rounded-full hover:from-gray-800 hover:to-black transition duration-300 transform hover:scale-110 hover:rotate-3 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
             >
-              Continue Shopping
+              Explore the Galaxy
             </button>
           </div>
         )}

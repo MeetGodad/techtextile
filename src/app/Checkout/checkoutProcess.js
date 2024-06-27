@@ -308,11 +308,13 @@ const Checkout = () => {
                       src={`/Images/${method.toLowerCase()}.png`}
                       alt={method}
                       className="w-12 h-12 object-contain"
+                      onError={() => console.log(`Failed to load image: /Images/${method.toLowerCase()}.png`)}
                     />
                     <p className="mt-2 text-sm font-semibold text-gray-700">{method}</p>
                   </button>
                 ))}
               </div>
+
               <form className="space-y-6 bg-white p-6 rounded-lg shadow-md animate-fade-in">
                 {renderPaymentForm()}
               </form>
