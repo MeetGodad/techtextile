@@ -96,7 +96,6 @@ export async function DELETE(req) {
             return new Response(JSON.stringify({ message: "productId is required" }), { status: 400 });
         }
 
-        // Fetch the product type to determine which table to delete from
         const productTypeResult = await sql`
             SELECT product_type FROM products WHERE product_id = ${productId};`;
 
@@ -107,17 +106,14 @@ export async function DELETE(req) {
 
         const productType = productTypeResult[0].product_type;
 
-        // Delete dependent records from specific tables
         if (productType === 'yarn') {
             await sql`DELETE FROM yarnproducts WHERE product_id = ${productId};`;
         } else if (productType === 'fabric') {
             await sql`DELETE FROM fabricproducts WHERE product_id = ${productId};`;
         }
 
-        // Delete product variants
         await sql`DELETE FROM productvariant WHERE product_id = ${productId};`;
 
-        // Delete the main product record
         const result = await sql`DELETE FROM products WHERE product_id = ${productId} RETURNING product_id;`;
 
         console.log("SQL Result:", result);
@@ -151,7 +147,6 @@ export async function PUT(req) {
 
         const { product_type, product_name, product_description, price, image_url, yarn_material, yarn_denier, yarn_color, fabric_print_tech, fabric_material, fabric_color } = body;
 
-        // Check if the product type is changing
         const productTypeResult = await sql`
             SELECT product_type FROM products WHERE product_id = ${productId};`;
 
@@ -165,20 +160,17 @@ export async function PUT(req) {
             return new Response(JSON.stringify({ message: "Changing product type from yarn to fabric or vice versa is not allowed. Please remove the product and add a new one." }), { status: 400 });
         }
 
-        // Update product details in the Products table
         await sql`
             UPDATE products 
             SET product_name = ${product_name}, product_description = ${product_description}, price = ${price}, image_url = ${image_url}
             WHERE product_id = ${productId}`;
 
-        // Update specific details based on product type
         if (product_type === 'yarn') {
             await sql`
                 UPDATE yarnproducts
                 SET yarn_material = ${yarn_material}
                 WHERE product_id = ${productId}`;
             
-            // Insert or update the variants in productvariant table
             await sql`
                 DELETE FROM productvariant WHERE product_id = ${productId}`;
             await sql`
@@ -191,7 +183,6 @@ export async function PUT(req) {
                 SET fabric_print_tech = ${fabric_print_tech}, fabric_material = ${fabric_material}
                 WHERE product_id = ${productId}`;
             
-            // Insert or update the variants in productvariant table
             await sql`
                 DELETE FROM productvariant WHERE product_id = ${productId}`;
             await sql`

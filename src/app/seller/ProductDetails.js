@@ -40,10 +40,11 @@ const ProductDetails = ({ product, onClose, onRemove, onUpdate, position }) => {
           )}
         </div>
         {product.error && <p className="text-red-500 mb-4">{product.error}</p>}
-        <div className="flex justify-end space-x-4">
-          <button onClick={handleClose} className="px-4 py-2 bg-gray-500 text-white rounded-md">Close</button>
+        <div className="flex space-x-4">
+        <button onClick={() => onUpdate(product)} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Update</button>
           <button onClick={() => onRemove(product)} className="px-4 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-md shadow-md">Remove</button>
-          <button onClick={() => onUpdate(product)} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Update</button>
+          <button onClick={handleClose} className="px-6 py-2 bg-gray-500 text-white rounded-md">Close</button>
+
         </div>
       </div>
     </div>
