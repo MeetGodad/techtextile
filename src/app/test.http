@@ -1,17 +1,32 @@
-POST http://localhost:3000/api/auth HTTP/1.1
+PUT http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 content-type: application/json
 
 {
-  "userId": "user123",
-  "role": "buyer",
-  "firstName": "John",
-  "LastName": "Doe",
-  "email": "john.doe@example.com",
-  "phone": "1234567890",
-  "address": {
-    "street": "123 Main St",
-    "city": "Anytown",
-    "state": "Anystate",
-    "postalCode": "12345"
-  }
+  "quantity": 3,
+  "cartItemId": "21"
+}
+
+###
+
+
+GET http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+
+
+###
+
+
+DELETE http://localhost:3000//api/cart/24 HTTP/1.1
+
+
+###
+
+
+POST http://localhost:3000//api/cart HTTP/1.1
+content-type: application/json
+
+{
+  "userId": "e7vVMBprlRYB7PHuaJgv2u2RAVb2",
+  "productId": "11",
+  "quantity": 1,
+  "variantIds": []
 }

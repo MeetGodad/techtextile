@@ -228,21 +228,21 @@ const Checkout = () => {
                 onClick={() => setSelectedPaymentMethod('Visa')}
                 className={`p-2 border rounded ${selectedPaymentMethod === 'Visa' ? 'border-blue-500' : 'border-gray-300'}`}
               >
-                <img src="/visa-logo.png" alt="Visa" className="w-8 h-8" />
+                <img src="/Images/visa.png" alt="Visa" className="w-8 h-8" />
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedPaymentMethod('Mastercard')}
                 className={`p-2 border rounded ${selectedPaymentMethod === 'Mastercard' ? 'border-blue-500' : 'border-gray-300'}`}
               >
-                <img src="/mastercard-logo.png" alt="Mastercard" className="w-8 h-8" />
+                <img src="/Images/mastercard.png" alt="Mastercard" className="w-8 h-8" />
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedPaymentMethod('PayPal')}
                 className={`p-2 border rounded ${selectedPaymentMethod === 'PayPal' ? 'border-blue-500' : 'border-gray-300'}`}
               >
-                <img src="/paypal-logo.png" alt="PayPal" className="w-8 h-8" />
+                <img src="/Images/paypal.png" alt="PayPal" className="w-8 h-8" />
               </button>
             </div>
             <form className="space-y-4">

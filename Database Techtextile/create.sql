@@ -114,7 +114,6 @@ CREATE TABLE ProductVariant (
     variant_id SERIAL PRIMARY KEY,
     variant_name VARCHAR(50),
     variant_value VARCHAR(50),
-    variant_images_url TEXT,
     product_id INT REFERENCES Products(product_id)
 );
 
@@ -131,6 +130,7 @@ CREATE TABLE CartItems (
     product_id INT REFERENCES Products(product_id),
     variant_id INT[],
     quantity INT NOT NULL
+
 );
 
 
@@ -152,6 +152,7 @@ CREATE TABLE OrderItems (
     quantity INT NOT NULL,
     item_price DECIMAL(10, 2) NOT NULL,
     variant_id INT[]
+
 );
 
 
