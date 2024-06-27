@@ -32,40 +32,36 @@ export default function Home({ category }) {
     fetchProducts();
   }, [user]);
 
-  const addToCart = async (product) => {
+  const addToCart = async (productId) => {
     if (!user) {
       alert('Please sign up or log in first.');
       return;
     }
+  
     try {
       const response = await fetch('/api/cart', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userId: user.uid, productId: product.product_id }),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          productId: productId.product_id,
+          quantity: 1, 
+          variantIds: [], // Empty array for no variants
+        }),
       });
-
+  
       if (!response.ok) {
-          throw new Error('Failed to add product to cart');
+        throw new Error('Failed to add product to cart');
       }
 
-      const updatedCart = await response.json();
-
-      const index = cart.findIndex((item) => item.product_id === updatedCart.product_id);
-      if (index !== -1) {
-          cart[index] = updatedCart;
-      } else {
-          cart.push(updatedCart);
-      }
-
-      setCart([...cart]);
-      
       const event = new Event('cartUpdated');
       window.dispatchEvent(event);
-  } catch (error) {
+      
+    } catch (error) {
       alert(error.message);
-  }
+    }
   };
 
 

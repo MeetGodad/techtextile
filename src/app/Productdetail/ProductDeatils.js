@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState , useContext } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
+
 
 export default function ProductDetail({ productId }) {
   const { user } = useUserAuth();
@@ -12,7 +13,7 @@ export default function ProductDetail({ productId }) {
   const [selectedVariant, setSelectedVariant] = useState({}); // Initialize with an empty object
   const [showSellerDetails, setShowSellerDetails] = useState(false); // State for seller details dropdown
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // State for current image index
-
+  
   useEffect(() => {
     const fetchProductDetails = async () => {
       if (!productId) return;
@@ -40,6 +41,7 @@ export default function ProductDetail({ productId }) {
       alert('Please sign up or log in first.');
       return;
     }
+  
     try {
       const response = await fetch('/api/cart', {
         method: 'POST',
@@ -49,38 +51,27 @@ export default function ProductDetail({ productId }) {
         body: JSON.stringify({
           userId: user.uid,
           productId: product.product_id,
-          quantity: quantity, // Include quantity in the request body
-          variant: selectedVariant,
+          quantity: quantity,
+          variantIds: Object.values(selectedVariant).map(v => v.id),
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to add product to cart');
       }
-
-      const updatedCart = await response.json();
-
-      const index = cart.findIndex((item) => item.product_id === updatedCart.product_id);
-      if (index !== -1) {
-        cart[index] = updatedCart;
-      } else {
-        cart.push(updatedCart);
-      }
-
-      setCart([...cart]);
-
+  
       const event = new Event('cartUpdated');
       window.dispatchEvent(event);
+  
+      alert('Product added to cart successfully');
     } catch (error) {
       alert(error.message);
     }
   };
+  
 
-  const handleQuantityChange = (e) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value) && value > 0) {
-      setQuantity(value);
-    }
+  const handleQuantityChange = (event) => { 
+    setQuantity(parseInt(event.target.value));
   };
 
   const handleVariantSelection = (variantName, variantValue, variantId) => {
@@ -175,9 +166,9 @@ export default function ProductDetail({ productId }) {
                       {product.variants[variantName].map((variant, variantIndex) => (
                         <div
                           key={variantIndex}
-                          className={`cursor-pointer p-2 border rounded-md transition-colors duration-200 ease-in-out ${
+                          className={`cursor-pointer p-2 border-4 rounded-md transition-colors duration-200 ease-in-out ${
                             selectedVariant[variantName]?.value === variant.variant_value
-                              ? 'bg-black text-white border-black ring-2 ring-white'
+                              ? 'bg-black text-white border-black ring-4 ring-white'
                               : 'bg-white text-black border-gray-300'
                           }`}
                           style={
@@ -223,8 +214,7 @@ export default function ProductDetail({ productId }) {
             {product.fabric_material && (
               <p className="text-lg mb-4">Fabric Material: {product.fabric_material}</p>
             )}
-  
-            {/* Display seller details in a dropdown */}
+
             <div className="mb-4">
               <button
                 className="px-4 py-2 bg-white border-2 border-black text-black rounded-lg mb-2 h-11"
