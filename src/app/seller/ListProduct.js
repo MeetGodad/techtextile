@@ -176,7 +176,7 @@ return (
                         multiple
                         name="image_url" 
                         onChange={handleImageChange} 
-                        className="w-full  "
+                        className="w-full "
                     />
                 </div>
                 <div className="space-y-2">
@@ -297,6 +297,15 @@ return (
                                     >
                                         <MdDeleteForever size={35} />
                                     </button>
+                                    {/* <label className="block font-semibold">Upload Images</label>
+                                    <input 
+                                        type="file" 
+                                        required 
+                                        multiple
+                                        name="image_url" 
+                                        onChange={handleImageChange} 
+                                        className="w-full  "
+                                    /> */}
                                 </div>
                             ))}
                             <button type="button" className=" block p-2 border-2 border-black text-white bg-black rounded-lg hover:text-black hover:bg-white" onClick={addColor}>Add Color</button>
