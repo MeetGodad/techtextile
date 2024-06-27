@@ -109,7 +109,7 @@ export default function Cart({ children }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray via-black to-black p-8">
       <div className="max-w-6xl mx-auto bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-3xl shadow-2xl p-8 animate-fade-in-up">
-        <h1 className="text-5xl font-extrabold mb-12 text-black text-center animate-pulse">
+        <h1 className="text-5xl font-extrabold mb-12 text-gray-400 text-center animate-pulse">
           Your Cart
         </h1>
         {cart.length > 0 ? (
@@ -132,16 +132,20 @@ export default function Cart({ children }) {
                   </div>
                   <div className="text-black font-bold text-2xl mb-4">${parseFloat(item.price).toFixed(2)}</div>
                   {item.selected_variants && item.selected_variants.length > 0 && (
-                    <div className="mb-4">
-                      <label className="block text-black-300 mb-2">Variants:</label>
-                      {item.selected_variants.map(variant => (
-                        <div key={variant.variant_id} className="text-black-600 mb-2">
-                          <span className="font-semibold">{variant.variant_name}: </span>
+                  <div className="mb-4">
+                    <label className="block text-black-300 mb-2">Variants:</label>
+                    {item.selected_variants.map(variant => (
+                      <div key={variant.variant_id} className="text-black-600 mb-2">
+                        <span className="font-semibold">{variant.variant_name.toUpperCase()}: </span>
+                        {variant.variant_name.toLowerCase() === 'color' ? (
+                          <span style={{ display: 'inline-block', backgroundColor: variant.variant_value, width: '20px', height: '20px', borderRadius: '50%' }}></span>
+                        ) : (
                           <span>{variant.variant_value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
                   <div className="mb-6">
                     <label className="block text-black-300 mb-2">Quantity</label>
                     <input
