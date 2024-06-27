@@ -5,6 +5,3 @@ content-type: application/json
   "quantity": 3,
   "cartItemId": "21"
 }
-###
-DELETE http://localhost:3000/api/seller/4
-###
