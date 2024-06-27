@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 
+
 export async function GET() {
     try {
         const databaseUrl = process.env.DATABASE_URL || "";
@@ -18,8 +19,6 @@ export async function GET() {
     }
 }
 
-
-
 export async function POST(req) {
     try {
         console.log("Parsing request data");
@@ -35,11 +34,10 @@ export async function POST(req) {
         const seller_id = await sql`
         SELECT seller_id FROM sellers WHERE user_id = ${requestData.userId};`;
 
-
         const product_details = await sql`
-            INSERT INTO Products (product_name, product_description, price, image_url, seller_id,product_type)
+            INSERT INTO Products (product_name, product_description, price, image_url, seller_id, product_type)
             VALUES (${requestData.product_name}, ${requestData.description}, ${requestData.price}, ${requestData.image_url},             
-                 ${seller_id[0].seller_id},${requestData.product_type})
+                 ${seller_id[0].seller_id}, ${requestData.product_type})
             RETURNING product_id;
         `;
         const productId = product_details[0].product_id;
@@ -82,6 +80,3 @@ export async function POST(req) {
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
 }
-
-
-
