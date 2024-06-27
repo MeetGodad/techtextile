@@ -38,7 +38,7 @@ const ProductDetails = ({ product, onClose, onRemove, onUpdate, position }) => {
       >
         <h2 className="text-2xl font-bold mb-4">Product Details</h2>
         <div className="mb-4">
-          <img src={product.image_url} alt={product.product_description} className="h-48 w-full object-cover rounded-md mb-2" />
+          <img src={product.image_url.split(',')[0]} alt={product.product_description} className="h-48 w-full object-cover rounded-md mb-2" />
           <p><strong>Product Name:</strong> {product.product_name}</p>
           <p><strong>Description:</strong> {showFullDescription ? product.product_description : shortDescription}</p>
           {isLongDescription && (

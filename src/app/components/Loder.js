@@ -1,4 +1,3 @@
-
 import './Loder.css';
 
 export default function Loder() {
