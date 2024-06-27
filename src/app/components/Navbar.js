@@ -65,7 +65,7 @@ const Header = () => {
     <div className="w-full bg-white overflow-hidden flex flex-row items-center justify-between py-0 px-3 box-border top-0 z-50 sticky leading-normal tracking-normal gap-3 text-left text-xl text-black font-sans" style={{ borderBottom: '2px solid black' }}>
 
       <div className="flex items-center">
-        <div className="relative flex items-center justify-center w-20 h-20"></div>
+        <div className="relative flex items-center gap-5 w-20 h-20"></div>
         <h3 className="text-4xl font-bold">TECH TEXTILE</h3>
       </div>
       <div className="flex items-center gap-4">
