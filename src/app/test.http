@@ -6,27 +6,3 @@ content-type: application/json
   "cartItemId": "21"
 }
 
-###
-
-
-GET http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
-
-
-###
-
-
-DELETE http://localhost:3000//api/cart/24 HTTP/1.1
-
-
-###
-
-
-POST http://localhost:3000//api/cart HTTP/1.1
-content-type: application/json
-
-{
-  "userId": "e7vVMBprlRYB7PHuaJgv2u2RAVb2",
-  "productId": "11",
-  "quantity": 1,
-  "variantIds": []
-}
