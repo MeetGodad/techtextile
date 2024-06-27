@@ -158,6 +158,7 @@ export default function SignUp() {
                 alert("Email address is already in use.");
                 } else {
                 console.error("Failed to sign up:", error);
+                deleteUser(auth.currentUser);
                 alert("Failed to sign up: " + error.message);
                 }
             }
@@ -335,6 +336,15 @@ export default function SignUp() {
                                 <div className="mb-4 w-full">
                                     <label className="block text-sm text-black font-semibold mb-2">COMPANY ADDRESS</label>
                                     <div className="mb-4 w-full">
+                                        <div className="w-1/2 pr-2">
+                                            <label className="block text-sm text-black font-semibold mb-2">Company Name</label>
+                                            <input
+                                            type="text"
+                                            required
+                                            disabled={role === ""}
+                                            onChange={(e) => setCompanyName(e.target.value)}
+                                            className="w-full p-2 border text-black border-black rounded-md"/>
+                                        </div>
                                         <div className="w-1/2 pr-2">
                                             <label className="block text-sm text-black font-semibold mb-2">Street</label>
                                             <input 

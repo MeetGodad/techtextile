@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 
+
 export default function ProductDetail({ productId }) {
   const { user } = useUserAuth();
   const [product, setProduct] = useState(null);
@@ -62,6 +63,7 @@ export default function ProductDetail({ productId }) {
       alert('Please sign up or log in first.');
       return;
     }
+  
     try {
       const response = await fetch('/api/cart', {
         method: 'POST',
@@ -72,37 +74,26 @@ export default function ProductDetail({ productId }) {
           userId: user.uid,
           productId: product.product_id,
           quantity: quantity,
-          variant: selectedVariant,
+          variantIds: Object.values(selectedVariant).map(v => v.id),
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to add product to cart');
       }
-
-      const updatedCart = await response.json();
-
-      const index = cart.findIndex((item) => item.product_id === updatedCart.product_id);
-      if (index !== -1) {
-        cart[index] = updatedCart;
-      } else {
-        cart.push(updatedCart);
-      }
-
-      setCart([...cart]);
-
+  
       const event = new Event('cartUpdated');
       window.dispatchEvent(event);
+  
+      alert('Product added to cart successfully');
     } catch (error) {
       alert(error.message);
     }
   };
+  
 
-  const handleQuantityChange = (e) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value) && value > 0) {
-      setQuantity(value);
-    }
+  const handleQuantityChange = (event) => { 
+    setQuantity(parseInt(event.target.value));
   };
 
   const handleVariantSelection = (variantName, variantValue, variantId) => {
