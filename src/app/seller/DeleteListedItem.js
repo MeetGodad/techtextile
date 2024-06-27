@@ -25,7 +25,7 @@ const DeleteListedItem = ({ item, onClose, onDeleteSuccess, position }) => {
         throw new Error(data.message || 'Failed to remove the item');
       }
 
-      onDeleteSuccess(); // Call the success handler from the parent component
+      onDeleteSuccess(); 
     } catch (error) {
       setError(error.message);
     } finally {
