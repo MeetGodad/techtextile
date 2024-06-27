@@ -83,7 +83,7 @@ export async function PUT(request , {params}) {
         WHERE cart_item_id = ${requestData.cartItemId} 
         AND cart_id = (SELECT cart_id FROM user_cart)
         AND (
-            (${requestData.variantIds}::int[] IS NULL AND variant_ids IS NULL)
+            (${requestData.variantIds}::int[] IS [] AND variant_ids IS NULL)
             OR
             (${requestData.variantIds}::int[] IS NOT NULL AND variant_ids = ${requestData.variantIds}::int[])
         )

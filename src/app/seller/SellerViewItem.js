@@ -137,7 +137,7 @@ const SellerViewItem = () => {
           ) : (
             items.map((item, index) => (
               <div key={item.product_id} className="bg-white rounded-lg shadow-lg p-4 relative transition transform hover:scale-105">
-                <img src={item.image_url} alt={item.product_name} className="h-48 w-full object-cover rounded-t-lg" />
+                <img src={item.image_url.split(',')[0]} alt={item.product_name} className="h-48 w-full object-cover rounded-t-lg" />
                 <div className="mt-4">
                   <h2 className="text-lg font-semibold text-gray-800">{item.product_name}</h2>
                   <p className="text-gray-600 mt-2">${item.price}</p>

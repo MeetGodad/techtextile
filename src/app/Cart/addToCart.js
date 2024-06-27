@@ -119,15 +119,16 @@ export default function Cart({ children }) {
         {cart.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {cart.map((item, index) => (
+              {cart.map((item) => (
                 <div 
-                  key={item.product_id} 
+                  key={item.cart_item_id} 
                   className="bg-white-800 bg-opacity-50 rounded-2xl p-6 transform transition duration-500 hover:scale-105 hover:rotate-1 hover:shadow-2xl"
                 >
                   <div className="relative mb-6 group">
                     <img 
                       src={item.image_url.split(',')[0]} 
                       alt={item.product_name} 
+
                       className="w-full h-48 object-cover rounded-xl shadow-md transition duration-300 group-hover:shadow-xl"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition duration-300 rounded-xl flex items-center justify-center">
@@ -142,13 +143,19 @@ export default function Cart({ children }) {
                       className="w-full bg-gray-700 border-2 border-black-600 rounded-full py-2 px-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition duration-300"
                       min="1"
                       value={item.quantity}
-                      onChange={(e) => updateQuantity(item.product_id, e.target.value)}
+                      onChange={(e) =>
+                        updateQuantity(
+                          item.cart_item_id, 
+                          e.target.value, 
+                          item.selected_variants ? item.selected_variants.map(v => v.variant_id) : []
+                         )}
+
                     />
                     {errorMessages && <div className="text-red-300 text-sm mt-2 animate-bounce">{errorMessages}</div>}
                   </div>
                   <div className="font-semibold text-black-300 mb-4">Subtotal: ${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
                   <button 
-                    onClick={() => removeItem(item.product_id)} 
+                    onClick={() =>  removeItem(item.cart_item_id)} 
                     className="text-red-500 hover:text-red transition duration-300 transform hover:scale-110"
                   >
                     Remove
