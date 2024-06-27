@@ -128,8 +128,9 @@ CREATE TABLE CartItems (
     cart_item_id SERIAL PRIMARY KEY,
     cart_id INT REFERENCES ShoppingCart(cart_id),
     product_id INT REFERENCES Products(product_id),
-    quantity INT NOT NULL,
-    variant_ids INT[] NOT NULL
+    variant_id INT[],
+    quantity INT NOT NULL
+
 );
 
 
@@ -150,7 +151,8 @@ CREATE TABLE OrderItems (
     product_id INT REFERENCES Products(product_id),
     quantity INT NOT NULL,
     item_price DECIMAL(10, 2) NOT NULL,
-    variant_ids INT[] NOT NULL
+    variant_id INT[]
+
 );
 
 
