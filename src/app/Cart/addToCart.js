@@ -31,45 +31,67 @@ export default function Cart({ children }) {
     }
   };
 
-  const updateQuantity = async (productId, quantity) => {
+  const updateQuantity = async (cart_item_id, quantity , variantIds) => {
     try {
+      console.log(cart_item_id, quantity) 
       const parsedQuantity = parseInt(quantity);
       if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
         setErrorMessages('Please enter a valid quantity');
         return;
       }
       setErrorMessages('');
+      if(user){
 
-      const response = await fetch(`/api/cart/${productId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ quantity: parsedQuantity }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update quantity');
+        const body = {
+          cartItemId: cart_item_id,
+          quantity: parsedQuantity,
+        };
+        if (variantIds && variantIds.length > 0) {
+          body.variantIds = variantIds;
+        }
+        const response = await fetch(`/api/cart/${user.uid}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to update quantity');
+        }
+        const updatedCart = cart.map(item => {
+          if (item.cart_item_id === cart_item_id) {
+            return { ...item, quantity: parsedQuantity };
+          }
+          return item;
+        });
+        setCart(updatedCart);
       }
-      const updatedItem = await response.json();
-      const updatedCart = cart.map(item =>
-        item.product_id === productId ? { ...updatedItem, quantity: parsedQuantity } : item
-      );
-      setCart(updatedCart);
     } catch (error) {
       console.error('Error updating quantity:', error);
     }
   };
 
-  const removeItem = async (productId) => {
+  const removeItem = async (cartItemId) => {
     try {
-      const response = await fetch(`/api/cart/${productId}`, {
+      const response = await fetch(`/api/cart/${cartItemId}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          cartItemId: cartItemId  
+        }),
       });
       if (!response.ok) {
         throw new Error('Failed to remove item from cart');
       }
-      const updatedCart = cart.filter(item => item.product_id !== productId);
-      setCart(updatedCart);
+      const deletedItem = await response.json();
+      setCart(prevCart => prevCart.filter(item => item.cart_item_id !== deletedItem.cart_item_id));
+
+      const event = new Event('cartUpdated');
+      window.dispatchEvent(event);
+
     } catch (error) {
       console.error('Error removing item:', error);
     }
