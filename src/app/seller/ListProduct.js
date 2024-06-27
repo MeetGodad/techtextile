@@ -6,7 +6,6 @@ import { useUserAuth } from "../auth/auth-context";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { MdDeleteForever } from "react-icons/md";
-import { SketchPicker } from 'react-color';
 
 export default function ListProduct() {
     const { user } = useUserAuth();

@@ -96,6 +96,7 @@ export async function DELETE(req) {
             return new Response(JSON.stringify({ message: "productId is required" }), { status: 400 });
         }
 
+        // Fetch the product type to determine which table to delete from
         const productTypeResult = await sql`
             SELECT product_type FROM products WHERE product_id = ${productId};`;
 
@@ -106,14 +107,21 @@ export async function DELETE(req) {
 
         const productType = productTypeResult[0].product_type;
 
+        // Handle foreign key constraint in orderitems table
+        await sql`
+            DELETE FROM orderitems WHERE product_id = ${productId};`;
+
+        // Delete dependent records from specific tables
         if (productType === 'yarn') {
             await sql`DELETE FROM yarnproducts WHERE product_id = ${productId};`;
         } else if (productType === 'fabric') {
             await sql`DELETE FROM fabricproducts WHERE product_id = ${productId};`;
         }
 
+        // Delete product variants
         await sql`DELETE FROM productvariant WHERE product_id = ${productId};`;
 
+        // Delete the main product record
         const result = await sql`DELETE FROM products WHERE product_id = ${productId} RETURNING product_id;`;
 
         console.log("SQL Result:", result);
