@@ -108,7 +108,7 @@ const filteredProducts = products.filter(product => {
                   image={product.image_url}
                   product={product}
                   onAddToCart={addToCart}
-                  onProductClick={handleProductClick}
+                  onProductClick={() => handleProductClick(product.product_id)}
                 />
               ))}
             </section>
