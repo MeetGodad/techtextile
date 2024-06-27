@@ -29,24 +29,20 @@ export default function Cart({ children }) {
     }
   };
 
-  const updateQuantity = async (cart_item_id, quantity , variantIds) => {
+  const updateQuantity = async (cart_item_id, quantity, variantIds) => {
     try {
-      console.log(cart_item_id, quantity) 
       const parsedQuantity = parseInt(quantity);
       if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
         setErrorMessages('Please enter a valid quantity');
         return;
       }
       setErrorMessages('');
-      if(user){
-
+      if (user) {
         const body = {
           cartItemId: cart_item_id,
           quantity: parsedQuantity,
+          variantIds: variantIds,
         };
-        if (variantIds && variantIds.length > 0) {
-          body.variantIds = variantIds;
-        }
         const response = await fetch(`/api/cart/${user.uid}`, {
           method: 'PUT',
           headers: {
@@ -77,8 +73,8 @@ export default function Cart({ children }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          cartItemId: cartItemId  
+        body: JSON.stringify({
+          cartItemId: cartItemId,
         }),
       });
       if (!response.ok) {
@@ -135,6 +131,17 @@ export default function Cart({ children }) {
                     </div>
                   </div>
                   <div className="text-black font-bold text-2xl mb-4">${parseFloat(item.price).toFixed(2)}</div>
+                  {item.selected_variants && item.selected_variants.length > 0 && (
+                    <div className="mb-4">
+                      <label className="block text-black-300 mb-2">Variants:</label>
+                      {item.selected_variants.map(variant => (
+                        <div key={variant.variant_id} className="text-black-600 mb-2">
+                          <span className="font-semibold">{variant.variant_name}: </span>
+                          <span>{variant.variant_value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <div className="mb-6">
                     <label className="block text-black-300 mb-2">Quantity</label>
                     <input
@@ -142,13 +149,13 @@ export default function Cart({ children }) {
                       className="w-full bg-gray-700 border-2 border-black-600 rounded-full py-2 px-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition duration-300"
                       min="1"
                       value={item.quantity}
-                      onChange={(e) => updateQuantity(item.product_id, e.target.value)}
+                      onChange={(e) => updateQuantity(item.cart_item_id, e.target.value, item.variant_ids)}
                     />
                     {errorMessages && <div className="text-red-300 text-sm mt-2 animate-bounce">{errorMessages}</div>}
                   </div>
                   <div className="font-semibold text-black-300 mb-4">Subtotal: ${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
                   <button 
-                    onClick={() => removeItem(item.product_id)} 
+                    onClick={() => removeItem(item.cart_item_id)} 
                     className="text-red-500 hover:text-red transition duration-300 transform hover:scale-110"
                   >
                     Remove
