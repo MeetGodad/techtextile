@@ -1,19 +1,19 @@
-
+// https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
 "use client";
-//https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
-
-
 
 import { useEffect, useState } from 'react';
 import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Home({ category, subCategory, subSubCategory }) {
   const { user } = useUserAuth();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState(12);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,49 +34,51 @@ export default function Home({ category, subCategory, subSubCategory }) {
     fetchProducts();
   }, [user]);
 
-  const addToCart = async (product) => {
+  const addToCart = async (productId) => {
     if (!user) {
       alert('Please sign up or log in first.');
       return;
     }
+  
     try {
       const response = await fetch('/api/cart', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userId: user.uid, productId: product.product_id }),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          productId: productId.product_id,
+          quantity: 1, 
+          variantIds: [], // Empty array for no variants
+        }),
       });
-
+  
       if (!response.ok) {
-          throw new Error('Failed to add product to cart');
+        throw new Error('Failed to add product to cart');
       }
 
-      const updatedCart = await response.json();
-
-      const index = cart.findIndex((item) => item.product_id === updatedCart.product_id);
-      if (index !== -1) {
-          cart[index] = updatedCart;
-      } else {
-          cart.push(updatedCart);
-      }
-
-      setCart([...cart]);
-      
       const event = new Event('cartUpdated');
       window.dispatchEvent(event);
-  } catch (error) {
+      
+    } catch (error) {
       alert(error.message);
-  }
+    }
   };
+
 
   const showMoreProducts = () => {
     setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 12);
   };
 
+
 const filteredProducts = products.filter(product => {
   // Filter by category unless it's 'all'
   if (category !== 'all' && product.product_type !== category) return false;
+
+  const handleProductClick = (productId) => {
+    router.push(`/productdetail?productId=${productId}`);
+  };
 
   // Additional filtering based on category
   switch (category) {
@@ -105,7 +107,8 @@ const filteredProducts = products.filter(product => {
                   price={product.price}
                   image={product.image_url}
                   product={product}
-                  onAddToCart={() => addToCart(product)}
+                  onAddToCart={addToCart}
+                  onProductClick={handleProductClick}
                 />
               ))}
             </section>
@@ -126,4 +129,4 @@ const filteredProducts = products.filter(product => {
       </main>
     </div>
   );
-}
+};
