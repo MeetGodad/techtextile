@@ -1,45 +1,8 @@
-POST http://localhost:3000/api/auth HTTP/1.1
+PUT http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 content-type: application/json
 
 {
-  "userId": "user123",
-  "role": "buyer",
-  "firstName": "John",
-  "LastName": "Doe",
-  "email": "john.doe@example.com",
-  "phone": "1234567890",
-  "address": {
-    "street": "123 Main St",
-    "city": "Anytown",
-    "state": "Anystate",
-    "postalCode": "12345"
-  }
+  "quantity": 3,
+  "cartItemId": "21"
 }
 
-###
-GET http://localhost:3000/api/products HTTP/1.1
-###
-
-GET http://localhost:3000/api/seller/mUyHgeZKexSIMNeVHvKIMLFipJi1 HTTP/1.1
-###
-
-PUT http://localhost:3000/api/seller/5 HTTP/1.1
-Content-Type: application/json
-
-{
-    "product_type": "yarn",
-    "product_name": "Updated Yarn Name",
-    "product_description": "Updated Yarn Description",
-    "price": "100.00",
-    "image_url": "http://example.com/updated-image.jpg",
-    "yarn_material": "Updated Material",
-    "yarn_denier": "Updated Denier",
-    "yarn_color": "Updated Color",
-    "fabric_print_tech": null,
-    "fabric_material": null,
-    "fabric_color": null
-}
-
-###
-DELETE http://localhost:3000/api/seller/6 HTTP/1.1
-###

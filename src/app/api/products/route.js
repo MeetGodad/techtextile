@@ -1,11 +1,15 @@
 import { neon } from '@neondatabase/serverless';
 
+
 export async function GET() {
     try {
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
         const products = await sql`
-            SELECT * FROM Products;`;
+            SELECT p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material,STRING_AGG(DISTINCT pv.variant_name || ': ' || pv.variant_value, ', ') AS variants
+            FROM Products p LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id
+            LEFT JOIN ProductVariant pv ON p.product_id = pv.product_id
+            GROUP BY p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material;`;
 
         if (products.length === 0) {
             return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
@@ -33,11 +37,10 @@ export async function POST(req) {
         const seller_id = await sql`
         SELECT seller_id FROM sellers WHERE user_id = ${requestData.userId};`;
 
-
         const product_details = await sql`
-            INSERT INTO Products (product_name, product_description, price, image_url, seller_id,product_type)
+            INSERT INTO Products (product_name, product_description, price, image_url, seller_id, product_type)
             VALUES (${requestData.product_name}, ${requestData.description}, ${requestData.price}, ${requestData.image_url},             
-                 ${seller_id[0].seller_id},${requestData.product_type})
+                 ${seller_id[0].seller_id}, ${requestData.product_type})
             RETURNING product_id;
         `;
         const productId = product_details[0].product_id;
@@ -80,6 +83,3 @@ export async function POST(req) {
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
 }
-
-
-

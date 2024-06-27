@@ -1,4 +1,5 @@
 import { useMemo, useState, useRef } from "react";
+import Link from "next/link";
 
 export default function ProductSection({
   shoppingCart = "/shopping-cart.png",
@@ -60,9 +61,18 @@ export default function ProductSection({
       }, 600);
     }
   };
-  return (
 
-    <div className="relative mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white">
+  return (
+    <div 
+      className="relative mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white"
+    >
+      <Link 
+                href={{ 
+                  pathname: '/Productdetail', 
+                  query: {productId : product.product_id} 
+                }} 
+                as={`/Productdetail?productId=${product.product_id}`}
+                >
       <div className="flex flex-col w-full h-48 items-center justify-center bg-lavenderblush-100" style={rectangleDivStyle}>
         <img
           ref={productRef}
@@ -72,9 +82,14 @@ export default function ProductSection({
           alt={name}
           src={firstImageUrl}
         />
+
       </div>
+      </Link>
       <button
-        onClick={addToCartHandler}
+        onClick={(e) => {
+          e.stopPropagation();
+          addToCartHandler();
+        }}
         className="flex items-center justify-center py-2 px-4 w-full bg-black text-white rounded-md hover:bg-darkslategray transition"
         style={addToCartStyle}
       >
