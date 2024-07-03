@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
+import { sendOrderEmail } from '../email/Mailgun';
 
 const Checkout = () => {
   const router = useRouter();
@@ -78,14 +79,14 @@ const Checkout = () => {
     }
   };
 
+  const handlePreviousStep = () => {
+    setStep(step - 1);
+  };
+
   const handleNextStep = () => {
     if (isStepValid) {
       setStep(step + 1);
     }
-  };
-
-  const handlePreviousStep = () => {
-    setStep(step - 1);
   };
 
   const handleSubmit = async () => {
@@ -108,6 +109,7 @@ const Checkout = () => {
           cart,
         }),
       });
+
       const data = await response.json();
       if (response.ok) {
         alert('Order Submitted');
@@ -121,9 +123,10 @@ const Checkout = () => {
       return null;
     }
   };
+
   const handlePayment = async (orderId) => {
     const orderTotalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  
+
     try {
       const response = await fetch('/api/payment', {
         method: 'POST',
@@ -131,29 +134,77 @@ const Checkout = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          orderId: orderId,
+          orderId,
           paymentMethod: selectedPaymentMethod,
           paymentAmount: orderTotalPrice,
         }),
       });
+
       const data = await response.json();
       if (response.ok) {
-        alert('Payment Submitted');
+        console.log('Payment Submitted');
+        return { orderId, detailedCart: cart, orderTotalPrice }; // Return detailed response
       } else {
         console.error('Failed to submit payment:', data.error);
+        return null; // Indicate payment failure
       }
     } catch (error) {
       console.error('Error submitting payment:', error);
+      return null; // Indicate payment failure
     }
   };
+
   const handlePayAndSubmit = async () => {
-    const orderId = await handleSubmit();
-    if (orderId) {
-      await handlePayment(orderId);
-    } else {
-      alert('Failed to create order. Please try again.');
+    try {
+      const orderId = await handleSubmit();
+
+      if (orderId) {
+        const paymentResponse = await handlePayment(orderId);
+
+        if (paymentResponse) {
+          const { detailedCart, orderTotalPrice } = paymentResponse;
+
+          const emailData = {
+            shippingInfo,
+            paymentInfo: { selectedPaymentMethod },
+            cart: detailedCart,
+            totalAmount: orderTotalPrice,
+          };
+
+          try {
+            const response = await fetch('/api/email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: 'techtextile@gmail.com',
+                subject: 'Order Confirmation',
+                body: `
+                  <h1>Order Confirmation</h1>
+                  <p>Thank you for your order!</p>
+                  <p>Total Amount: ${orderTotalPrice}</p>
+                  <!-- Add more detailed email content here -->
+                `,
+              }),
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(`Email API error: ${errorData.message}`);
+            }
+
+            console.log('Order confirmation email sent successfully');
+          } catch (error) {
+            console.error('Failed to send order confirmation email:', error);
+            // Handle the error appropriately (e.g., display an error message to the user)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to complete order:', error);
+      // Handle the error appropriately (e.g., display an error message to the user)
     }
   };
+  
   const renderPaymentForm = () => {
     const inputClass = "w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300";
   
@@ -447,4 +498,5 @@ const Checkout = () => {
     </div>
   );
 };
+
 export default Checkout;
