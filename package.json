@@ -9,20 +9,28 @@
     "lint": "next lint"
   },
   "dependencies": {
+<<<<<<< Updated upstream
+=======
+    "@emailjs/browser": "^4.3.3",
+>>>>>>> Stashed changes
     "@emotion/react": "^11.11.4",
-    "@mantine/core": "^7.10.2",
-    "@mantine/hooks": "^7.10.2",
+    "@mantine/core": "^7.11.1",
+    "@mantine/hooks": "^7.11.1",
     "@mui/material": "^5.15.20",
     "@neondatabase/serverless": "^0.9.3",
     "axios": "^1.7.2",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "emailjs-com": "^3.2.0",
+<<<<<<< Updated upstream
     "express": "^4.19.2",
     "firebase": "^10.12.2",
     "form-data": "^4.0.0",
     "mailgun-js": "^0.6.7",
     "mailgun.js": "^10.2.1",
+=======
+    "firebase": "^10.12.2",
+>>>>>>> Stashed changes
     "mui-color-input": "^2.0.3",
     "next": "^14.2.4",
     "next-connect": "^1.0.0",
@@ -33,7 +41,9 @@
     "react-hook-form": "^7.52.0",
     "react-icons": "^5.2.1",
     "react-input-color": "^4.0.1",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^6.24.1",
+    "styled-components": "^6.1.11",
+    "sweetalert2": "^11.6.13",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

@@ -1,3 +1,42 @@
+POST http://localhost:3000//api/email HTTP/1.1
+Content-Type: application/json
+
+{
+  "userId": "12345",
+  "shippingInfo": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "address": "123 Main St",
+    "city": "Anytown",
+    "state": "CA",
+    "zip": "12345",
+    "email": "john.doe@example.com"
+  },
+  "cart": [
+    {
+      "product_name": "T-Shirt",
+      "quantity": 2
+    },
+    {
+      "product_name": "Jeans",
+      "quantity": 1
+    }
+  ],
+  "selectedPaymentMethod": "Credit Card",
+  "totalPrice": 100.00,
+  "paymentInfo": {
+    "cardNumber": "4111111111111111",
+    "expiryDate": "12/24",
+    "cvv": "123"
+  }
+}
+
+
+
+
+
+
+
 PUT http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 content-type: application/json
 
