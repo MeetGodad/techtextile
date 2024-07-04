@@ -64,25 +64,21 @@ export default function ProductSection({
 
   return (
     <div 
-      className="relative mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white"
-    >
+      className="relative mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white">
       <Link 
                 href={{ 
                   pathname: '/Productdetail', 
                   query: {productId : product.product_id} 
                 }} 
-                as={`/Productdetail?productId=${product.product_id}`}
-                >
+                as={`/Productdetail?productId=${product.product_id}`}>
       <div className="flex flex-col w-full h-48 items-center justify-center bg-lavenderblush-100" style={rectangleDivStyle}>
         <img
           ref={productRef}
-          className={`max-w-full max-h-full object-cover ${isAnimating ? 'animate-fly' : ''}`}
+          className={`h-40 w-48 object-cover ${isAnimating ? 'animate-fly' : ''}`}
           style={flyStyle}
           loading="lazy"
           alt={name}
-          src={firstImageUrl}
-        />
-
+          src={firstImageUrl}/> 
       </div>
       </Link>
       <button
@@ -91,13 +87,11 @@ export default function ProductSection({
           addToCartHandler();
         }}
         className="flex items-center justify-center py-2 px-4 w-full bg-black text-white rounded-md hover:bg-darkslategray transition"
-        style={addToCartStyle}
-      >
+        style={addToCartStyle}>
         <img
           className="w-6 h-6 mr-2"
           alt="cart"
-          src="/Images/white_cart.png"
-        />
+          src="/Images/white_cart.png"/>
         <span className="text-base font-bold">Add to cart</span>
       </button>
       <h2 className="text-lg font-semibold text-black text-center">{name}</h2>
