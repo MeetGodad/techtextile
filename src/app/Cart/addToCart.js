@@ -107,19 +107,12 @@ export default function Cart({ children }) {
   };
 
   return (
-<<<<<<< Updated upstream
-    <div className="min-h-screen bg-gradient-to-br from-gray via-black to-black p-8">
-      <div className="max-w-6xl mx-auto bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-3xl shadow-2xl p-8 animate-fade-in-up">
-        <h1 className="text-5xl font-extrabold mb-12 text-black text-center animate-pulse">
-          Your Cart
-=======
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-400 to-gray-200 p-8 relative overflow-hidden">
       <div className="absolute inset-0 bg-cover bg-center opacity-10 animate-pulse"></div>
       <div className="stars absolute inset-0"></div>
       <div className="max-w-6xl mx-auto bg-white bg-opacity-5 backdrop-filter backdrop-blur-xl rounded-3xl shadow-2xl p-8 animate-fade-in-up relative z-10">
         <h1 className="text-5xl font-extrabold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-gray-300 to-gray-100 text-center animate-pulse">
           Your Shopping Cart
->>>>>>> Stashed changes
         </h1>
         {cart.length > 0 ? (
           <>

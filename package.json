@@ -9,10 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< Updated upstream
-=======
     "@emailjs/browser": "^4.3.3",
->>>>>>> Stashed changes
     "@emotion/react": "^11.11.4",
     "@mantine/core": "^7.11.1",
     "@mantine/hooks": "^7.11.1",
@@ -22,15 +19,7 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "emailjs-com": "^3.2.0",
-<<<<<<< Updated upstream
-    "express": "^4.19.2",
     "firebase": "^10.12.2",
-    "form-data": "^4.0.0",
-    "mailgun-js": "^0.6.7",
-    "mailgun.js": "^10.2.1",
-=======
-    "firebase": "^10.12.2",
->>>>>>> Stashed changes
     "mui-color-input": "^2.0.3",
     "next": "^14.2.4",
     "next-connect": "^1.0.0",

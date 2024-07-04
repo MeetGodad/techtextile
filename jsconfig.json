@@ -1,18 +1,10 @@
 {
   "compilerOptions": {
-<<<<<<< Updated upstream
-    "baseUrl": "./",
-=======
     "baseUrl": ".",
->>>>>>> Stashed changes
     "paths": {
       "@/*": ["src/*"]
     }
   },
-<<<<<<< Updated upstream
-  "include": ["src/**/*"]
-=======
   "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.jsx", "src/**/*.tsx"],
   "exclude": ["node_modules"]
->>>>>>> Stashed changes
 }

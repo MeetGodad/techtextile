@@ -2,12 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
-<<<<<<< Updated upstream
-import { sendOrderEmail } from '../email/Mailgun';
-=======
 import { sendOrderConfirmationEmails } from './emailService';
 
->>>>>>> Stashed changes
 
 const Checkout = () => {
   const router = useRouter();
@@ -159,63 +155,6 @@ const Checkout = () => {
     }
   };
 
-<<<<<<< Updated upstream
-  const handlePayAndSubmit = async () => {
-    try {
-      const orderId = await handleSubmit();
-
-      if (orderId) {
-        const paymentResponse = await handlePayment(orderId);
-
-        if (paymentResponse) {
-          const { detailedCart, orderTotalPrice } = paymentResponse;
-
-          const emailData = {
-            shippingInfo,
-            paymentInfo: { selectedPaymentMethod },
-            cart: detailedCart,
-            totalAmount: orderTotalPrice,
-          };
-
-          try {
-            const response = await fetch('/api/email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                to: 'techtextile@gmail.com',
-                subject: 'Order Confirmation',
-                body: `
-                  <h1>Order Confirmation</h1>
-                  <p>Thank you for your order!</p>
-                  <p>Total Amount: ${orderTotalPrice}</p>
-                  <!-- Add more detailed email content here -->
-                `,
-              }),
-            });
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(`Email API error: ${errorData.message}`);
-            }
-
-            console.log('Order confirmation email sent successfully');
-          } catch (error) {
-            console.error('Failed to send order confirmation email:', error);
-            // Handle the error appropriately (e.g., display an error message to the user)
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Failed to complete order:', error);
-      // Handle the error appropriately (e.g., display an error message to the user)
-    }
-  };
-  
-  const renderPaymentForm = () => {
-    const inputClass = "w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300";
-=======
-
->>>>>>> Stashed changes
   
   
 const handlePayAndSubmit = async () => {
