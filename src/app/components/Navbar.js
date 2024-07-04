@@ -70,7 +70,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
         <div className="relative flex items-center justify-center w-20 h-20"></div>
         <h3 className="text-4xl font-bold" style={{fontSize: '2.5rem' }}>TECH TEXTILE</h3>
       </div>
-      <div className="flex justify-between items-start gap-5">
+      <div className="flex justify-between items-start gap-6">
         <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[200px] h-10">
           <input
             type="text"

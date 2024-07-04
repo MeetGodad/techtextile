@@ -4,6 +4,8 @@ import { useUserAuth } from '../auth/auth-context';
 import { useRouter } from 'next/navigation';
 import SellerViewItem from '../seller/SellerViewItem';
 import ListProduct from '../seller/ListProduct';
+import UpdateUserInfo from './UpdateUserInfo';
+import { AiOutlineEdit } from 'react-icons/ai';
 
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
@@ -13,6 +15,7 @@ export default function Profile() {
   const [showListedItems, setShowListedItems] = useState(false);
   const [listedItemsVisible, setListedItemsVisible] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [showUpdateUser, setShowUpdateUser] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,7 +28,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
-      fetch(`api/profile/${userId}`, {
+      fetch(`api/Profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -63,11 +66,11 @@ export default function Profile() {
     if (!showAddProduct) {
       setShowAddProduct(true);
       setListedItemsVisible(false);
+      setShowUpdateUser(false);
       setTimeout(() => setShowAddProduct(true), 10);
     } else {
       setShowAddProduct(false);
       setTimeout(() => setListedItemsVisible(false), 1000);
-
     }
   };
 
@@ -78,6 +81,7 @@ export default function Profile() {
     if (!showListedItems) {
       setListedItemsVisible(true);
       setShowAddProduct(false);
+      setShowUpdateUser(false);
       setTimeout(() => setShowListedItems(true), 10);
     } else {
       setShowListedItems(false);
@@ -85,12 +89,28 @@ export default function Profile() {
     }
   };
 
+  const handleUpdateUserInfo = () => {
+    if (!showUpdateUser) {
+      setShowUpdateUser(true);
+      setShowAddProduct(false);
+      setListedItemsVisible(false);
+      setTimeout(() => setShowUpdateUser(true), 10);
+    } else {
+      setShowUpdateUser(false);
+      setTimeout(() => setShowUpdateUser(false), 1000);
+    }
+  };
+
   return (
     user && userDetails && (
       <div className="min-h-screen bg-gray-100 p-4 relative flex items-start justify-center">
-        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems ? 'absolute top-15 left-0 m-2' : showAddProduct ? 'absolute  pt-1 top-18 left-0 m-2' : 'm-auto'}`}    style={{ width: showListedItems ? '30%' : showAddProduct ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems ? '15px' : showAddProduct ? '15px' : '0' }}>
-          <section className="bg-white text-black shadow p-4 rounded-lg mb-6">
-            <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏</h1>
+        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems || showAddProduct || showUpdateUser ? 'absolute top-15 left-0 m-2' : 'm-auto'}`}    style={{ width: showListedItems || showAddProduct || showUpdateUser ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems || showAddProduct || showUpdateUser ? '15px' : '0' }}>
+          <section className="bg-white text-black shadow p-4 rounded-lg mb-6 relative">
+            <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏
+              <button onClick={handleUpdateUserInfo} className="absolute right-4 top-4">
+                <AiOutlineEdit size={24} />
+              </button>
+            </h1>
             <h2 className="text-3xl font-semibold border-b pb-2 mb-4">User Information</h2>
             <p className="text-xl"><strong>Email:</strong> {userDetails.email}</p>
             <button onClick={firebaseSignOut} className="mt-4 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-200">Sign Out</button>
@@ -128,6 +148,12 @@ export default function Profile() {
         {userDetails.user_type === 'seller' && showAddProduct && (
           <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showAddProduct ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
             <ListProduct userId={user.uid} />
+          </aside>
+        )}
+
+        {showUpdateUser && (
+          <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showUpdateUser ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
+            <UpdateUserInfo userDetails={userDetails} setShowUpdateUser={setShowUpdateUser} />
           </aside>
         )}
       </div>
