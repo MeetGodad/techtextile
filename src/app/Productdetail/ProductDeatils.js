@@ -168,7 +168,7 @@ export default function ProductDetail({ productId }) {
               </div>
               <div className="border-2 border-gray-500 ml-10 w-full max-w-lg h-96 flex items-center justify-center p-2 rounded-lg" style={{ borderRadius: '20px' }}>
                 <img
-                  className="max-w-full h-full object-cover object-center"
+                  className="w-screen h-[365px] object-cover object-center"
                   style={{ borderRadius: '20px' }}
                   src={currentImage}
                   alt={`${product.product_name} current`}
