@@ -1,6 +1,5 @@
 // https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
 "use client";
-
 import { useEffect, useState } from 'react';
 import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
@@ -24,8 +23,11 @@ export default function Home({ category, subCategory, subSubCategory }) {
         }});
         const data = await response.json();
      
-        setProducts(data);
-         console.log("Data",data);
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          console.error('Fetched data is not an array:', data);
+        }
       } catch (error) {
         console.error('Error fetching the products:', error);
       }
@@ -66,33 +68,27 @@ export default function Home({ category, subCategory, subSubCategory }) {
     }
   };
 
-
   const showMoreProducts = () => {
     setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 12);
   };
 
+  const filteredProducts = Array.isArray(products) ? products.filter(product => {
+    if (category !== 'all' && product.product_type !== category) return false;
 
-const filteredProducts = products.filter(product => {
-  // Filter by category unless it's 'all'
-  if (category !== 'all' && product.product_type !== category) return false;
+    const handleProductClick = (productId) => {
+      router.push(`/productdetail?productId=${productId}`);
+    };
 
-  const handleProductClick = (productId) => {
-    router.push(`/productdetail?productId=${productId}`);
-  };
+    switch (category) {
+      case 'fabric':
+        return subCategory ? (product.fabric_print_tech === subSubCategory || product.fabric_material === subSubCategory) : true;
+      case 'yarn':
+        return subCategory ? product.yarn_material === subCategory : true;
+      default:
+        return true;
+    }
+  }) : [];
 
-  // Additional filtering based on category
-  switch (category) {
-    case 'fabric':
-      // For 'fabric', check both 'fabricProducts' for 'subCategory' match in 'fabric_print_tech' or 'fabric_material'
-     return subCategory ? (product.fabric_print_tech === subSubCategory || product.fabric_material === subSubCategory) : true;
-    case 'yarn':
-      // For 'yarn', match 'yarn_material' with 'subCategory'
-      return subCategory ? product.yarn_material === subCategory : true;
-    default:
-      // If no specific category logic is needed, return true to include the product
-      return true;
-  }
-});
   return (
     <div className="w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden" style={{ paddingTop: '100px' }}>
       <main className="max-w-screen-xl mx-auto">

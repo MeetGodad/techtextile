@@ -32,3 +32,7 @@ PUT http://localhost:3000/api/Profile/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 }
 
 ###
+GET http://localhost:3000/api/history/H90xcnH1O5SkFhvlm539dK8NgBR2 HTTP/1.1
+###
+GET http://localhost:3000/api/orderDetails/H90xcnH1O5SkFhvlm539dK8NgBR2/ORDER_ID/PRODUCT_ID HTTP/1.1
+###
