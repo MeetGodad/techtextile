@@ -44,7 +44,7 @@ export default function Login() {
         <div className="absolute  text-black top-0 right-6 text-5xl font-semibold mb-8">LOG</div>
 
 
-        <form  onSubmit={handleSubmit}  className="w-full max-w-md">
+        <form  onSubmit={handleSubmit}  className="max-w-2xl mx-auto p-8 pt-12 bg-white rounded-md shadow-2xl w-96">
          <div className="w-full max-w-md">
 
             <div className="mb-4">
@@ -53,7 +53,7 @@ export default function Login() {
               type="email" 
               required
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border text-black border-black rounded-md"/>
+              className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"/>
             </div>
 
             <div className="mb-4">
@@ -62,7 +62,7 @@ export default function Login() {
               required  
               type="password" 
                 onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border text-black border-black rounded-md" />
+              className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
             </div>
 
             <button className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
@@ -70,10 +70,11 @@ export default function Login() {
             </button>
           </div>
         </form>
-
-        <Link className="mt-4 text-black text-xl" href="/SignUp">
-          <span>Don’t have an account?</span>
-        </Link>
+        <div className="absolute bottom-28 left-0 w-full text-center mb-4">
+          <Link className="mt-4 text-black text-2xl" href="/SignUp">
+            <span>Don’t have an account?</span>
+          </Link>
+        </div>
       </div>
 
       <div className="flex items-center justify-center w-1/2 bg-black relative">
