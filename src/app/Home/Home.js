@@ -71,7 +71,6 @@ export default function Home({ category, subCategory, subSubCategory }) {
     setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 12);
   };
 
-
 const filteredProducts = products.filter(product => {
   // Filter by category unless it's 'all'
   if (category !== 'all' && product.product_type !== category) return false;

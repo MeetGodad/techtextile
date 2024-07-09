@@ -51,8 +51,6 @@ export async function GET(req, { params }) {
         }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }
-
-
 export async function PUT(request, { params }) {
     try {
         const userId = params.id;
@@ -73,7 +71,7 @@ export async function PUT(request, { params }) {
         WHERE cart_item_id = ${requestData.cartItemId} 
         AND cart_id = (SELECT cart_id FROM user_cart)
         AND (
-            (${requestData.variantIds}::int[] IS [] AND variant_ids IS NULL)
+            (${requestData.variantIds}::int[] IS NULL AND variant_ids IS NULL)
             OR
             (${requestData.variantIds}::int[] IS NOT NULL AND variant_ids = ${requestData.variantIds}::int[])
         )
@@ -87,29 +85,21 @@ export async function PUT(request, { params }) {
         const cartId = updatedCart[0].cart_id;
 
         const updatedProduct = await sql`
-          SELECT 
-              ci.cart_item_id,
-              ci.cart_id,
-              ci.quantity,
-              p.product_id,
-              p.product_name,
-              p.price,
-              p.image_url,
-              (
-                  SELECT jsonb_agg(
-                      jsonb_build_object(
-                          'variant_id', pv.variant_id,
-                          'variant_name', pv.variant_name,
-                          'variant_value', pv.variant_value
-                      )
+          SELECT p.*, ci.quantity,
+          (
+              SELECT jsonb_agg(
+                  jsonb_build_object(
+                      'variant_id', pv.variant_id,
+                      'variant_name', pv.variant_name,
+                      'variant_value', pv.variant_value
                   )
-                  FROM ProductVariant pv
-                  WHERE pv.variant_id = ANY(ci.variant_ids)
-              ) AS selected_variants
-          FROM 
-              CartItems ci
-              JOIN Products p ON ci.product_id = p.product_id
-              JOIN ShoppingCart sc ON ci.cart_id = sc.cart_id
+              )
+              FROM ProductVariant pv
+              WHERE pv.variant_id = ANY(ci.variant_ids)
+          ) AS selected_variants
+          FROM ShoppingCart sc
+          JOIN CartItems ci ON sc.cart_id = ci.cart_id
+          JOIN Products p ON ci.product_id = p.product_id
           WHERE ci.cart_item_id = ${requestData.cartItemId} AND sc.cart_id = ${cartId}
       `;
 
@@ -130,8 +120,6 @@ export async function PUT(request, { params }) {
         }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }
-
-
 export async function DELETE(req, { params }) {
     try {
         const id = params.id;
