@@ -12,37 +12,45 @@ export async function GET(req, { params }) {
         const sql = neon(databaseUrl);
 
         const cart = await sql`
-         WITH UserCart AS (
-              SELECT cart_id 
-              FROM ShoppingCart 
-              WHERE user_id = ${id}
-          )
-          SELECT 
-              ci.cart_item_id,
-              ci.cart_id,
-              ci.quantity,
-              p.product_id,
-              p.product_name,
-              p.price,
-              p.image_url,
-              (
-                  SELECT jsonb_agg(
-                      jsonb_build_object(
-                          'variant_id', pv.variant_id,
-                          'variant_name', pv.variant_name,
-                          'variant_value', pv.variant_value
-                      )
-                  )
-                  FROM ProductVariant pv
-                  WHERE pv.variant_id = ANY(ci.variant_ids)
-              ) AS selected_variants
-          FROM 
-              CartItems ci
-              JOIN Products p ON ci.product_id = p.product_id
-              JOIN UserCart uc ON ci.cart_id = uc.cart_id `;
-
-
-        
+        WITH UserCart AS (
+            SELECT cart_id 
+            FROM ShoppingCart 
+            WHERE user_id = ${id}
+        )
+        SELECT 
+            ci.cart_item_id,
+            ci.cart_id,
+            ci.quantity,
+            p.product_id,
+            p.product_name,
+            p.price,
+            p.image_url,
+            (
+                SELECT jsonb_agg(
+                    jsonb_build_object(
+                        'variant_id', pv.variant_id,
+                        'variant_name', pv.variant_name,
+                        'variant_value', pv.variant_value
+                    )
+                )
+                FROM ProductVariant pv
+                WHERE pv.variant_id = ANY(ci.variant_ids)
+            ) AS selected_variants,
+            s.seller_id,
+            s.business_name,
+            s.phone_num,
+            a.street,
+            a.city,
+            a.state,
+            a.country,
+            a.postal_code
+        FROM 
+            CartItems ci
+            JOIN Products p ON ci.product_id = p.product_id
+            JOIN UserCart uc ON ci.cart_id = uc.cart_id
+            JOIN Sellers s ON p.seller_id = s.seller_id
+            JOIN Addresses a ON s.business_address = a.address_id
+          `;
 
         if (cart.length === 0) {
             return new Response(JSON.stringify({ message: "No items in the cart" }), { status: 400 });
@@ -70,13 +78,14 @@ export async function PUT(request , {params}) {
       const databaseUrl = process.env.DATABASE_URL || "";
       const sql = neon(databaseUrl);
 
-      console.log('Received data:', requestData ,  userId);
-     
-      const updatedCart = await sql`
-         WITH user_cart AS (
-          SELECT cart_id 
-          FROM ShoppingCart 
-          WHERE user_id = ${userId}
+
+        console.log('Received data:', requestData, userId);
+
+        const updatedCart = await sql`
+        WITH user_cart AS (
+            SELECT cart_id 
+            FROM ShoppingCart 
+            WHERE user_id = ${userId}
         )
         UPDATE CartItems 
         SET quantity = ${requestData.quantity} 
@@ -84,6 +93,8 @@ export async function PUT(request , {params}) {
         AND cart_id = (SELECT cart_id FROM user_cart)
         AND (
             (${requestData.variantIds}::int[] IS NULL AND variant_ids IS NULL)
+            OR
+            (${requestData.variantIds}::int[] = '{}' AND variant_ids IS NULL)
             OR
             (${requestData.variantIds}::int[] IS NOT NULL AND variant_ids = ${requestData.variantIds}::int[])
         )

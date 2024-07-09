@@ -34,7 +34,26 @@ export default function ProductDetail({ productId }) {
     };
 
     fetchProductDetails();
-  }, [productId, user]);
+  }, [currentProductId, user]);
+
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product) return;
+      try {
+        const response = await fetch(`/api/products?material=${product.fabric_material}`);
+        const data = await response.json();
+        if (response.ok) {
+          setRelatedProducts(data);
+        } else {
+          console.error('Error fetching related products:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching related products:', error);
+      }
+    };
+
+    fetchRelatedProducts();
+  }, [product]);
 
   const addToCart = async () => {
     if (!user) {
@@ -116,40 +135,58 @@ export default function ProductDetail({ productId }) {
     <div className="w-full min-h-screen text-black bg-white p-8 overflow-x-auto overflow-hidden">
       <div className="max-w-screen-xl mx-auto">
         <div className="flex flex-col md:flex-row">
-          <div className="md:w-1/2 flex flex-row items-start relative">
-            <div className="flex flex-col items-center relative">
-              <button
-                onClick={handlePrevImage}
-                className="flex bg-gray-200 p-2 rounded-full"
-                style={{ top: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}
-              >
-                &uarr;
-              </button>
-              <div className="flex flex-col items-center mt-2 p-2 rounded-lg" style={{ borderRadius: '20px' }}>
-                {imageUrls.map((url, index) => (
-                  <img
-                    key={index}
-                    className={`w-16 h-16 mb-2 cursor-pointer ${currentImage === url.trim() ? 'border-2 border-black' : ''}`}
-                    src={url.trim()}
-                    alt={`${product.product_name} thumbnail ${index + 1}`}
-                    onClick={() => setCurrentImage(url.trim())}
-                  />
-                ))}
+          <div className="md:w-1/2 flex flex-col items-start relative">
+            <div className="flex flex-row items-start">
+              <div className="flex flex-col items-center relative">
+                <button
+                  onClick={handlePrevImage}
+                  className="flex bg-gray-200 p-2 rounded-full"
+                  style={{ top: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
+                  &uarr;
+                </button>
+                <div className="flex flex-col items-center mt-2 p-2 rounded-lg" style={{ borderRadius: '20px' }}>
+                  {imageUrls.map((url, index) => (
+                    <img
+                      key={index}
+                      className={`w-16 h-16 mb-2 cursor-pointer ${currentImage === url.trim() ? 'border-2 border-black' : ''}`}
+                      style={{ borderRadius: '20px' }}
+                      src={url.trim()}
+                      alt={`${product.product_name} thumbnail ${index + 1}`}
+                      onClick={() => setCurrentImage(url.trim())}
+                    />
+                  ))}
+                </div>
+                <button
+                  onClick={handleNextImage}
+                  className="flex bg-gray-200 p-2 rounded-full"
+                  style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
+                  &darr;
+                </button>
               </div>
-              <button
-                onClick={handleNextImage}
-                className="flex bg-gray-200 p-2 rounded-full"
-                style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}
-              >
-                &darr;
-              </button>
+              <div className="border-2 border-gray-500 ml-10 w-full max-w-lg h-96 flex items-center justify-center p-2 rounded-lg" style={{ borderRadius: '20px' }}>
+                <img
+                  className="max-w-full h-full object-cover object-center"
+                  style={{ borderRadius: '20px' }}
+                  src={currentImage}
+                  alt={`${product.product_name} current`}
+                />
+              </div>
             </div>
-            <div className="border-2 border-gray-500 ml-10 w-full max-w-lg h-96 flex items-center justify-center p-2 rounded-lg" style={{ borderRadius: '20px' }}>
-              <img
-                className="max-w-full h-full object-cover object-center"
-                src={currentImage}
-                alt={`${product.product_name} current`}
-              />
+            <div className="mt-4 w-full">
+              <button
+                className="px-1 py-2 bg-white border-2 border-black text-black rounded-lg mb-2 ml-28 h-11 w-48"
+                onClick={() => setShowSellerDetails(!showSellerDetails)}>
+                Seller Details {showSellerDetails ? '▲' : '▼'}
+              </button>
+              {showSellerDetails && (
+                <div className="p-4 border border-gray-300 rounded-lg ml-28">
+                  <p className="text-lg mb-2"><strong>Seller Company:</strong> {product.seller_business_name}</p>
+                  <p className="text-lg mb-2"><strong>Phone :</strong>{product.seller_phone_num}</p>
+                  <p className="text-lg mb-2"><strong>
+                    Address:</strong> {`${product.seller_address.street}, ${product.seller_address.city}, ${product.seller_address.state}, ${product.seller_address.postal_code}`}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
           <div className="md:w-1/2 md:pl-8">
