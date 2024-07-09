@@ -9,7 +9,18 @@ content-type: application/json
 
 
 
-#####3
+#####
+
+POST http://localhost:3000//api/review  HTTP/1.1
+content-type: application/json
+
+{
+  "": "e7vVMBprlRYB7PHuaJgv2u2RAVb2",
+  "rating": 5,
+  "review": "This is a good product"
+}
+
+
 
 
 GET  http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1

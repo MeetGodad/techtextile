@@ -1,8 +1,8 @@
-//https://chatgpt.com/c/1594564d-c434-4e44-8cd9-e0efa34f4736 apart from teh color variants i have taken a help from this webiste to make the code perfect and working
+//https://chatgpt.com/c/1594564d-c434-4e44-8cd9-e0efa34f4736 apart from the color variants i have taken a help from this webiste to make the code perfect and working
 import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
-
+import Ratings from '../components/Ratings';
 
 export default function ProductDetail({ productId }) {
   const { user } = useUserAuth();
@@ -16,6 +16,8 @@ export default function ProductDetail({ productId }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [currentProductId, setCurrentProductId] = useState(productId); // Add currentProductId state
+  const [isRatingsOpen, setIsRatingsOpen] = useState(false);
+  const [reviews, setReviews] = useState([]); 
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -36,7 +38,23 @@ export default function ProductDetail({ productId }) {
       }
     };
 
+    const fetchProductReviews = async () => {
+      if (!currentProductId) return;
+      try {
+        const response = await fetch(`/api/review?product_id=${currentProductId}`);
+        const data = await response.json();
+        if (response.ok) {
+          setReviews(data);
+        } else {
+          console.error('Error fetching reviews:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+      }
+    };
+
     fetchProductDetails();
+    fetchProductReviews();
   }, [currentProductId, user]); // Update dependencies to currentProductId
 
   useEffect(() => {
@@ -81,7 +99,6 @@ export default function ProductDetail({ productId }) {
       if (!response.ok) {
         throw new Error('Failed to add product to cart');
       }
-  
       const event = new Event('cartUpdated');
       window.dispatchEvent(event);
   
@@ -120,6 +137,15 @@ export default function ProductDetail({ productId }) {
     }
   };
 
+
+  const handleReviewAdd = () => {
+    setIsRatingsOpen(true);
+  };
+
+  const handleCloseRatings = () => {
+    setIsRatingsOpen(false);
+  };
+
   if (loading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
@@ -133,6 +159,7 @@ export default function ProductDetail({ productId }) {
   }
 
   const imageUrls = product.image_url.split(',');
+  
 
   return (
     <div className="w-full min-h-screen text-black bg-white p-8 overflow-x-auto overflow-hidden">
@@ -242,11 +269,16 @@ export default function ProductDetail({ productId }) {
                       onClick={() => addToCart(product)}>
                       Add to cart
                     </button>
+                    <button 
+                      className="px-4 py-2 bg-black text-white rounded-lg mt-4"
+                      onClick={handleReviewAdd}>
+                      Add Review
+                    </button>
                   </div>
                 </div>
               </div>
             )}
-  
+            
             {/* Display additional product details */}
             {product.yarn_material && (
               <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
@@ -261,7 +293,7 @@ export default function ProductDetail({ productId }) {
         </div>
         {/* Related Products Section */}
         <div className="mt-8">
-          <h2 className="w-auto text-2xl text-center relative text-inherit inline-block italic font-bold font-inherit shrink-0 ">Related Products</h2>
+          <h2 className="w-auto text-3xl text-center italic font-bold font-inherit mb-5">Related Products</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedProducts.map((relatedProduct) => (
               <div key={relatedProduct.product_id} className="border p-4 rounded-lg">
@@ -285,6 +317,38 @@ export default function ProductDetail({ productId }) {
           </div>
         </div>
       </div>
+      {isRatingsOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={handleCloseRatings}>
+              &times;
+            </button>
+            <Ratings productId={currentProductId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
+          </div>
+        </div>
+      )}
+        {/* Display reviews */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Reviews</h2>
+          {reviews.length > 0 ? (
+            reviews.map((review, index) => (
+              <div key={index} className="border-b border-gray-200 pb-4 mb-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold">{review.feedback_heading}</h3>
+                  <div className="text-yellow-400 text-4xl">
+                    {'★'.repeat(review.feedback_rating)}{'☆'.repeat(5 - review.feedback_rating)}
+                  </div>
+                </div>
+                <p>{review.feedback_text}</p>
+                <p className="text-gray-500">Reviewed by: {review.first_name} {review.last_name}</p>
+              </div>
+            ))
+          ) : (
+            <p>No reviews yet. Be the first to review this product!</p>
+          )}
+        </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 // https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option
+
 "use client";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -27,8 +28,8 @@ const fadeOut = keyframes`
 `;
 
 const SlideShowContainer = styled.div`
-  width: 100%;
-  height: 300px; // adjust as necessary
+  width: 300px;
+  height: 250px; // adjust as necessary
   overflow: hidden;
   margin-bottom: 20px; // space between slideshow and products
 `;
@@ -138,18 +139,19 @@ export default function Home({ category, subCategory, subSubCategory }) {
 
   return (
     <div className="flex flex-col w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden">
+      <div className="bg-gray-400 box-content">
       {/* Animated slideshow */}
-      <SlideShowContainer>
-        {images.map((image, index) => (
-          <Slide
-            key={index}
-            src={image}
-            alt={`Textile Image ${index + 1}`}
-            fadeType={index === currentImageIndex ? 'in' : 'out'}
-            className="w-fit h-fit"
-          />
-        ))}
-      </SlideShowContainer>
+        <SlideShowContainer>
+          {images.map((image, index) => (
+            <Slide
+              key={index}
+              src={image}
+              alt={`Textile Image ${index + 1}`}
+              fadeType={index === currentImageIndex ? 'in' : 'out'}
+            />
+          ))}
+        </SlideShowContainer>
+      </div>
       <main className="max-w-screen-xl mx-auto mt-20"> {/* Add margin-top to move products down */}
         {products.length > 0 ? (
           <>

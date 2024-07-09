@@ -155,7 +155,6 @@ CREATE TABLE OrderItems (
 
 );
 
-
 CREATE TABLE Payments (
     payment_id SERIAL PRIMARY KEY,
     order_id INT REFERENCES Orders(order_id),
@@ -164,3 +163,12 @@ CREATE TABLE Payments (
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE Feedback (
+    feedback_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
+    product_id INT REFERENCES Products(product_id),
+    feedback_heading VARCHAR(100),
+    feedback_text TEXT,
+    feedback_rating INT CHECK (feedback_rating >= 1 AND feedback_rating <= 5),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

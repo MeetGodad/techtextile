@@ -66,10 +66,10 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
 
   
   return (
-    <div className="w-full bg-white overflow-visible flex flex-row items-center gap-80 px-3 box-border z-40 sticky leading-normal tracking-normal text-xl text-black font-sans" style={{ borderBottom: '2px solid black' }}>
+    <div className="w-full bg-white overflow-visible flex flex-row items-center gap-80 px-3 box-border z-40 sticky leading-normal tracking-normal text-xl text-black font-sans" /*style={{ borderBottom: '2px solid black' }}*/>
     <div className="flex flex-auto items-center">
       <div className="flex items-center justify-center w-20 h-20"></div>
-      <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}>TECH TEXTILE</h3>
+      <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}><Link href="/Home">TECH TEXTILE</Link></h3>
     </div>
       <div className="flex justify-between items-start gap-5">
         <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[200px] h-10">
@@ -88,7 +88,11 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
             />
           )}
         </div>
-        <Link className="nav-link font-semibold ml-4" href="/Home">Home</Link>
+
+
+
+
+
         {isHomePage && (
           <div className="flex items-center ml-4">
             <CategoryDropdown

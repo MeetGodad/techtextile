@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Correctly import useRouter from next/router
 import SellerViewItem from '../seller/SellerViewItem';
 import ListProduct from '../seller/ListProduct';
 
@@ -67,7 +67,6 @@ export default function Profile() {
     } else {
       setShowAddProduct(false);
       setTimeout(() => setListedItemsVisible(false), 1000);
-
     }
   };
 
@@ -81,14 +80,14 @@ export default function Profile() {
       setTimeout(() => setShowListedItems(true), 10);
     } else {
       setShowListedItems(false);
-      setTimeout(() => setListedItemsVisible(false), 1000); 
+      setTimeout(() => setListedItemsVisible(false), 1000);
     }
   };
 
   return (
     user && userDetails && (
       <div className="min-h-screen bg-gray-100 p-4 relative flex items-start justify-center">
-        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems ? 'absolute top-15 left-0 m-2' : showAddProduct ? 'absolute  pt-1 top-18 left-0 m-2' : 'm-auto'}`}    style={{ width: showListedItems ? '30%' : showAddProduct ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems ? '15px' : showAddProduct ? '15px' : '0' }}>
+        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems ? 'absolute top-15 left-0 m-2' : showAddProduct ? 'absolute  pt-1 top-18 left-0 m-2' : 'm-auto'}`} style={{ width: showListedItems ? '30%' : showAddProduct ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems ? '15px' : showAddProduct ? '15px' : '0' }}>
           <section className="bg-white text-black shadow p-4 rounded-lg mb-6">
             <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏</h1>
             <h2 className="text-3xl font-semibold border-b pb-2 mb-4">User Information</h2>
@@ -115,6 +114,7 @@ export default function Profile() {
                   View Purchase History
                 </button>
               </>
+              
             )}
           </section>
         </main>
