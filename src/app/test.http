@@ -16,23 +16,29 @@ GET  http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 ###
 
 PUT http://localhost:3000/api/Profile/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+Content-Type: application/json
 
 {
-    "firstName": "Meetkumar1",
+    "firstName": "Meetkumar",
     "lastName": "Patel",
     "phone": "4039250096",
     "address": {
-        "street": "212",
+        "street": "212, 4516 Valiant Dr NW",
         "city": "Calagary",
         "state": "Alberta",
         "postalCode": "T3A0X9"
     },
-    "companyName": "Henil.co.",
+    "companyName": "Nishit.co.",
     "role": "seller"
 }
+
 
 ###
 GET http://localhost:3000/api/history/H90xcnH1O5SkFhvlm539dK8NgBR2 HTTP/1.1
 ###
 GET http://localhost:3000/api/orderDetails/H90xcnH1O5SkFhvlm539dK8NgBR2/ORDER_ID/PRODUCT_ID HTTP/1.1
+###
+GET http://localhost:3000/api/orderDetails/H90xcnH1O5SkFhvlm539dK8NgBR2/ORDER_ID/PRODUCT_ID HTTP/1.1
+###
+GET http://localhost:3000/api/admin/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 ###

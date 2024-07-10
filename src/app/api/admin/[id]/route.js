@@ -1,19 +1,12 @@
 import { neon } from '@neondatabase/serverless';
 
 export async function GET(req, { params }) {
-  const { userId, orderId, productId } = params;
+  const sellerUserId = params.id;
   const databaseUrl = process.env.DATABASE_URL || "";
   const sql = neon(databaseUrl);
 
-  // Comment to mark the start of the check
-  // Check if all necessary parameters are present
-  if (!userId || !orderId || !productId) {
-    return new Response(JSON.stringify({ message: "Missing parameters" }), { status: 400 });
-  }
-  // End of the check
-
   try {
-    const orders = await sql`
+    const result = await sql`
       SELECT 
         o.order_id, 
         o.order_total_price, 
@@ -30,21 +23,25 @@ export async function GET(req, { params }) {
         a.street, 
         a.city, 
         a.state, 
-        a.postal_code
+        a.postal_code,
+        ua.first_name AS buyer_first_name,
+        ua.last_name AS buyer_last_name,
+        ua.email AS buyer_email
       FROM Orders o
       JOIN OrderItems oi ON o.order_id = oi.order_id
       JOIN Products p ON oi.product_id = p.product_id
       LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id
       LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id
       JOIN Addresses a ON o.shipping_address_id = a.address_id
-      WHERE o.user_id = ${userId} AND o.order_id = ${orderId} AND oi.product_id = ${productId};
-    `;
+      JOIN UserAccounts ua ON o.user_id = ua.user_id
+      JOIN Sellers s ON p.seller_id = s.seller_id
+      WHERE s.user_id = ${sellerUserId};`;
 
-    if (orders.length === 0) {
+    if (result.length === 0) {
       return new Response(JSON.stringify([]), { status: 200 });
     }
 
-    return new Response(JSON.stringify(orders), { status: 200 });
+    return new Response(JSON.stringify(result), { status: 200 });
   } catch (error) {
     console.error('An error occurred:', error);
     return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });

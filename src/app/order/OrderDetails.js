@@ -31,7 +31,7 @@ const OrderDetails = ({ userId, orderId, productId, onClose }) => {
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-lg relative">
         <button className="absolute top-2 right-2 text-gray-600" onClick={onClose}>Close</button>
-        {orderDetails && (
+        {orderDetails ? (
           <>
             <h2 className="text-2xl font-bold mb-4">Order Details</h2>
             <p><strong>Order ID:</strong> {orderDetails.order_id}</p>
@@ -52,6 +52,8 @@ const OrderDetails = ({ userId, orderId, productId, onClose }) => {
               </>
             )}
           </>
+        ) : (
+          <p>Loading order details...</p>
         )}
       </div>
     </div>
@@ -59,3 +61,4 @@ const OrderDetails = ({ userId, orderId, productId, onClose }) => {
 };
 
 export default OrderDetails;
+  
