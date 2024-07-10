@@ -138,11 +138,12 @@ export default function SignUp() {
                                         if (!response.ok) {
                                             const errorData = await response.json();
                                             Swal.fire({
-                                                title: 'Error',
+                                                title: 'DataBase Error',
                                                 text: errorData.message,
                                                 icon: 'error',
                                                 confirmButtonText: 'OK'
                                             });
+                                            deleteUser(auth.currentUser);
                                         } else {
                                             router.push('/Home');
                                         }

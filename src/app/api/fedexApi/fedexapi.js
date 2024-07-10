@@ -1,4 +1,5 @@
-
+// References : ShipEngine API
+// References : GitHub CoPilot
   
 export async function shippingRates(sellerAddress, buyerAddress, packages) {
   const shipment = {

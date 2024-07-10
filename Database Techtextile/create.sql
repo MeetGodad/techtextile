@@ -64,7 +64,6 @@ CREATE TABLE Addresses (
     address_type VARCHAR(10) CHECK (address_type IN ('billing', 'shipping')),
     address_first_name VARCHAR(50),
     address_last_name VARCHAR(50),
-    address_email VARCHAR(100),
     street VARCHAR(255),
     city VARCHAR(100),
     state VARCHAR(100),
@@ -128,12 +127,9 @@ CREATE TABLE CartItems (
     cart_item_id SERIAL PRIMARY KEY,
     cart_id INT REFERENCES ShoppingCart(cart_id),
     product_id INT REFERENCES Products(product_id),
-    variant_id INT[],
+    variant_id INT REFERENCES ProductVariant(variant_id),
     quantity INT NOT NULL
-
 );
-
-
 
 CREATE TABLE Orders (
     order_id SERIAL PRIMARY KEY,
@@ -154,7 +150,6 @@ CREATE TABLE OrderItems (
     variant_id INT[]
 
 );
-
 
 CREATE TABLE Payments (
     payment_id SERIAL PRIMARY KEY,

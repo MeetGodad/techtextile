@@ -290,15 +290,6 @@ const Checkout = () => {
                 onChange={handleShippingChange}
                 className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
               />
-              <input 
-                type="tel"
-                name="phone"
-                placeholder="Phone Number"
-                pattern="[0-9]{10}"
-                value={shippingInfo.phone}
-                onChange={handleShippingChange}
-                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
-              />
             </form>
           </div>
         );

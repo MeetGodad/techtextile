@@ -184,8 +184,6 @@ export default function Cart({ children }) {
             <div className="mt-12 flex justify-end">
               <div className="bg-white-800 bg-opacity-50 p-8 rounded-2xl shadow-xl transform transition duration-500 hover:scale-105 hover:-rotate-1">
                 <div className="text-2xl font-bold text-black mb-2">Subtotal: <span className="text-black-300">${calculateSubtotal().toFixed(2)}</span></div>
-                <div className="text-lg text-black-400 mb-4">Shipping: Free</div>
-                <div className="text-3xl font-extrabold text-black mb-6">Total: <span className="text-black-300">${calculateSubtotal().toFixed(2)}</span></div>
                 <button
                   className="w-full py-4 bg-gradient-to-r from-gray-700 to-gray-900 text-white font-bold rounded-full transition duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                   onClick={handleCheckout}

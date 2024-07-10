@@ -22,6 +22,17 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
     country: 'IN',
     phone_num: '4039510992',
   };
+  const AVERAGE_FABRIC_WEIGHT = 0.15; // kg/m²
+
+
+  const calculateProductWeight = (item) => {
+    if (item.type === 'fabric') {
+      return parseFloat((item.quantity * AVERAGE_FABRIC_WEIGHT).toFixed(2));
+    } else {
+      // Assume it's yarn or any other product type
+      return parseFloat(item.quantity.toFixed(2));
+    }
+  };
 
   useEffect(() => {
     calculateShippingRates();
@@ -226,7 +237,7 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
 
   const calculatePackages = (items) => {
     return items.map(item => ({
-      weight: parseFloat(item.quantity.toFixed(2)),
+      weight: calculateProductWeight(item),
       length: 10,
       width: 10,
       height: 10,
