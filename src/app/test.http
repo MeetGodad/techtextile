@@ -1,10 +1,15 @@
-PUT http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+PUT http://localhost:3000//api/cart/RUHSDGwCDoXoGZMGM2i1X7pybMn1 HTTP/1.1
 content-type: application/json
 
 {
   "quantity": 3,
-  "cartItemId": "21"
+  "cartItemId": "5"
 }
+
+
+#######
+
+GET http://localhost:3000/api/products/21 HTTP/1.1
 
 
 
@@ -12,6 +17,13 @@ content-type: application/json
 #####3
 
 
-GET  http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+GET  http://localhost:3000/api/cart/RUHSDGwCDoXoGZMGM2i1X7pybMn1 HTTP/1.1
 
 
+####
+
+GET http://localhost:3000/api/searc?searchTerm=dewefgh HTTP/1.1
+
+
+####
+GET http://localhost:3000/api/products/21 HTTP/1.1
