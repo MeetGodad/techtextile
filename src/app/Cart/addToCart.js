@@ -167,6 +167,11 @@ export default function Cart({ children }) {
                     />
                     {errorMessages && <div className="text-red-300 text-sm mt-2 animate-bounce">{errorMessages}</div>}
                   </div>
+                  <div>
+                    {/* Display selected color and denier */}
+                    <span>Color: {item.selected_variants.color}</span>
+                    <span>Denier: {item.selected_variants.denier}</span>
+                  </div>
                   <div className="font-semibold text-black-300 mb-4">Subtotal: ${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
                   <button 
                     onClick={() => removeItem(item.cart_item_id)} 

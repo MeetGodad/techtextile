@@ -18,7 +18,6 @@ export default function ProductDetail({ productId }) {
   const [showSellerDetails, setShowSellerDetails] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [currentProductId, setCurrentProductId] = useState(productId); 
   const [isRatingsOpen, setIsRatingsOpen] = useState(false);
   const [reviews, setReviews] = useState([]); 
 
@@ -42,9 +41,9 @@ export default function ProductDetail({ productId }) {
     };
 
     const fetchProductReviews = async () => {
-      if (!currentProductId) return;
+      if (!productId) return;
       try {
-        const response = await fetch(`/api/review?product_id=${currentProductId}`);
+        const response = await fetch(`/api/review?product_id=${productId}`);
         const data = await response.json();
         if (response.ok) {
           setReviews(data);
@@ -58,7 +57,7 @@ export default function ProductDetail({ productId }) {
 
     fetchProductDetails();
     fetchProductReviews();
-  }, [currentProductId, user]);
+  }, [productId, user]);
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
@@ -147,6 +146,10 @@ useEffect(() => {
         productId: product.product_id,
         quantity: quantity,
         variantId: variantId,
+        selected_variants: { // Send selected variants to the backend
+          color: selectedColor,
+          denier: selectedDenier,
+        },
       }),
     });
 
@@ -154,12 +157,13 @@ useEffect(() => {
       throw new Error('Failed to add product to cart');
     }
 
+    const cartItem = await response.json();
+    setCart([...cart, cartItem]);
     const eventData = { productId: product.product_id, quantity: quantity };
     const event = new CustomEvent('cartUpdated', { detail: eventData });
     window.dispatchEvent(event);
 
-    alert('Product added to cart successfully');
-  } catch (error) {
+    } catch (error) {
     alert(error.message);
   }
 };
@@ -215,8 +219,9 @@ useEffect(() => {
   const imageUrls = product.image_url.split(',');
   
 
-  
-  const uniqueColors = [...new Set(product.variants.map(v => v.color.split(': ')[1]))];
+  const uniqueColors = product.variants
+  ? [...new Set(product.variants.map(v => v.color.split(': ')[1]))]
+  : [];
 
   return (
     <div className="w-full min-h-screen text-black bg-white p-8 overflow-x-auto overflow-hidden">
@@ -360,8 +365,8 @@ useEffect(() => {
                 <button
                   className="px-4 py-2 bg-black text-white rounded-lg"
                   onClick={() => {
-                    // Update the currentProductId state to the related product's ID
-                    setCurrentProductId(relatedProduct.product_id);
+                    // Update the productId state to the related product's ID
+                    setproductId(relatedProduct.product_id);
                   }}>
                   View Details
                 </button>
@@ -377,7 +382,7 @@ useEffect(() => {
               onClick={handleCloseRatings}>
               &times;
             </button>
-            <Ratings productId={currentProductId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
+            <Ratings productId={productId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
           </div>
         </div>
       )}
