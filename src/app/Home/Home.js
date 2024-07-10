@@ -76,6 +76,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   };
 
 
+
 // Ensure products is an array before filtering
 const filteredProducts = Array.isArray(products) ? products.filter(product => {
   // Filter by category unless it's 'all'

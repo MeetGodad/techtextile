@@ -53,8 +53,6 @@ export async function GET(req, { params }) {
         }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }
-
-
 export async function PUT(request, { params }) {
     try {
         const userId = params.id;
@@ -65,6 +63,7 @@ export async function PUT(request, { params }) {
         console.log('Received data:', requestData, userId);
 
         const updatedCart = await sql`
+        
             WITH user_cart AS (
                 SELECT cart_id 
                 FROM ShoppingCart 
@@ -80,6 +79,7 @@ export async function PUT(request, { params }) {
             RETURNING *
         `;
 
+
         if (updatedCart.length === 0) {
             throw new Error('Failed to update the product in the cart. No matching cart item found.');
         }
@@ -87,6 +87,7 @@ export async function PUT(request, { params }) {
         const cartId = updatedCart[0].cart_id;
 
         const updatedProduct = await sql`
+
             SELECT 
                 ci.cart_item_id,
                 ci.cart_id,
@@ -115,6 +116,7 @@ export async function PUT(request, { params }) {
             WHERE ci.cart_item_id = ${requestData.cartItemId} AND sc.cart_id = ${cartId}
         `;
 
+
         if (updatedProduct.length === 0) {
             throw new Error('Failed to get updated product of the product in the cart.');
         }
@@ -133,8 +135,6 @@ export async function PUT(request, { params }) {
         }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }
-
-
 
 export async function DELETE(req, { params }) {
     try {
