@@ -68,7 +68,7 @@ CREATE TABLE Addresses (
     street VARCHAR(255),
     city VARCHAR(100),
     state VARCHAR(100),
-    postal_code VARCHAR(20),
+    postal_code VARCHAR(20)
 );
 
 CREATE TABLE Buyers (
@@ -100,21 +100,21 @@ CREATE TABLE Products (
 CREATE TABLE YarnProducts (
     yarn_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES Products(product_id),
-    yarn_material VARCHAR(50),
+    yarn_material VARCHAR(50)
 );
 
 CREATE TABLE FabricProducts (
     fabric_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES Products(product_id),
     fabric_print_tech VARCHAR(50),
-    fabric_material VARCHAR(50),
+    fabric_material VARCHAR(50)
 );
 
 CREATE TABLE ProductVariant (
     variant_id SERIAL PRIMARY KEY,
-    variant_name VARCHAR(50),
-    variant_value VARCHAR(50),
-    product_id INT REFERENCES Products(product_id)
+    product_id INT REFERENCES Products(product_id),
+    variant_attributes VARCHAR(100),
+    quantity INT NOT NULL
 );
 
 
@@ -152,7 +152,6 @@ CREATE TABLE OrderItems (
     quantity INT NOT NULL,
     item_price DECIMAL(10, 2) NOT NULL,
     variant_id INT[]
-
 );
 
 
@@ -164,3 +163,12 @@ CREATE TABLE Payments (
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE Feedback (
+    feedback_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
+    order_id INT REFERENCES Orders(order_id),
+    Feedback_heading VARCHAR(100),
+    feedback_text TEXT,
+    feedback_rating INT CHECK (feedback_rating >= 1 AND feedback_rating <= 5),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

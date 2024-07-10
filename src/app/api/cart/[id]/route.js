@@ -18,18 +18,20 @@ export async function GET(req, { params }) {
               ci.quantity,
               p.product_id,
               p.product_name,
+              p.product_type,
               p.price,
               p.image_url,
               (
-                  SELECT jsonb_agg(
-                      jsonb_build_object(
-                          'variant_id', pv.variant_id,
-                          'variant_name', pv.variant_name,
-                          'variant_value', pv.variant_value
-                      )
-                  )
+                   SELECT jsonb_agg(
+                        jsonb_build_object(
+                            'variant_id', pv.variant_id,
+                            'color', split_part(pv.variant_attributes, ', ', 1),
+                            'denier', split_part(pv.variant_attributes, ', ', 2),
+                            'quantity', pv.quantity
+                        )
+                    )
                   FROM ProductVariant pv
-                  WHERE pv.variant_id = ANY(ci.variant_ids)
+                  WHERE pv.variant_id = p.product_id
               ) AS selected_variants
           FROM 
               CartItems ci
@@ -61,47 +63,59 @@ export async function PUT(request, { params }) {
         console.log('Received data:', requestData, userId);
 
         const updatedCart = await sql`
-         WITH user_cart AS (
-          SELECT cart_id 
-          FROM ShoppingCart 
-          WHERE user_id = ${userId}
-        )
-        UPDATE CartItems 
-        SET quantity = ${requestData.quantity} 
-        WHERE cart_item_id = ${requestData.cartItemId} 
-        AND cart_id = (SELECT cart_id FROM user_cart)
-        AND (
-            (${requestData.variantIds}::int[] IS NULL AND variant_ids IS NULL)
-            OR
-            (${requestData.variantIds}::int[] IS NOT NULL AND variant_ids = ${requestData.variantIds}::int[])
-        )
-        RETURNING *, (SELECT cart_id FROM user_cart) as cart_id
-      `;
+        
+            WITH user_cart AS (
+                SELECT cart_id 
+                FROM ShoppingCart 
+                WHERE user_id = ${userId}
+            )
+            UPDATE CartItems 
+            SET quantity = ${requestData.quantity} 
+            WHERE cart_item_id = ${requestData.cartItemId} 
+                AND cart_id = (SELECT cart_id FROM user_cart)
+                AND (
+                    ${requestData.variantId ? `variant_id = ${requestData.variantId}` : 'TRUE'}
+                )
+            RETURNING *
+        `;
+
 
         if (updatedCart.length === 0) {
-            throw new Error('Failed to update the product in the cart.');
+            throw new Error('Failed to update the product in the cart. No matching cart item found.');
         }
 
         const cartId = updatedCart[0].cart_id;
 
         const updatedProduct = await sql`
-          SELECT p.*, ci.quantity,
-          (
-              SELECT jsonb_agg(
-                  jsonb_build_object(
-                      'variant_id', pv.variant_id,
-                      'variant_name', pv.variant_name,
-                      'variant_value', pv.variant_value
-                  )
-              )
-              FROM ProductVariant pv
-              WHERE pv.variant_id = ANY(ci.variant_ids)
-          ) AS selected_variants
-          FROM ShoppingCart sc
-          JOIN CartItems ci ON sc.cart_id = ci.cart_id
-          JOIN Products p ON ci.product_id = p.product_id
-          WHERE ci.cart_item_id = ${requestData.cartItemId} AND sc.cart_id = ${cartId}
-      `;
+
+            SELECT 
+                ci.cart_item_id,
+                ci.cart_id,
+                ci.quantity,
+                p.product_id,
+                p.product_name,
+                p.product_type,
+                p.price,
+                p.image_url,
+                (
+                    SELECT jsonb_agg(
+                        jsonb_build_object(
+                            'variant_id', pv.variant_id,
+                            'color', split_part(pv.variant_attributes, ', ', 1),
+                            'denier', split_part(pv.variant_attributes, ', ', 2),
+                            'quantity', pv.quantity
+                        )
+                    )
+                    FROM ProductVariant pv
+                    WHERE pv.variant_id = p.product_id
+                ) AS selected_variants
+            FROM 
+                CartItems ci
+                JOIN Products p ON ci.product_id = p.product_id
+                JOIN ShoppingCart sc ON ci.cart_id = sc.cart_id
+            WHERE ci.cart_item_id = ${requestData.cartItemId} AND sc.cart_id = ${cartId}
+        `;
+
 
         if (updatedProduct.length === 0) {
             throw new Error('Failed to get updated product of the product in the cart.');
@@ -112,6 +126,7 @@ export async function PUT(request, { params }) {
             headers: { 'Content-Type': 'application/json' }
         });
     } catch (error) {
+        console.error('PUT request error:', error);
         return new Response(JSON.stringify({
             status: 500,
             body: {
@@ -120,6 +135,7 @@ export async function PUT(request, { params }) {
         }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }
+
 export async function DELETE(req, { params }) {
     try {
         const id = params.id;

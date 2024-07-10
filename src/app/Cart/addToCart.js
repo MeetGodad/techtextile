@@ -138,17 +138,20 @@ export default function Cart({ children }) {
                   <div className="mb-4">
                     <label className="block text-black-300 mb-2">Variants:</label>
                     {item.selected_variants.map(variant => (
-                      <div key={variant.variant_id} className="text-black-600 mb-2">
-                        <span className="font-semibold">{variant.variant_name.toUpperCase()}: </span>
-                        {variant.variant_name.toLowerCase() === 'color' ? (
-                          <span style={{ display: 'inline-block', backgroundColor: variant.variant_value, width: '20px', height: '20px', borderRadius: '50%' }}></span>
-                        ) : (
-                          <span>{variant.variant_value}</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                        <div key={variant.variant_id} className="text-black-600 mb-2">
+                          <span className="font-semibold">{variant.color.split(':')[0].toUpperCase()}: </span>
+                          <span style={{ display: 'inline-block', backgroundColor: variant.color.split(':')[1], width: '20px', height: '20px', borderRadius: '50%' }}></span>
+                          <br />
+                         {item.product_type === 'yarn' && (
+                            <>
+                              <span className="font-semibold">{variant.denier.split(':')[0].toUpperCase()}: </span>
+                              <span>{variant.denier.split(':')[1]}</span>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <div className="mb-6">
                     <label className="block text-black-300 mb-2">Quantity</label>
                     <input
