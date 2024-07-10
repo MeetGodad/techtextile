@@ -1,7 +1,6 @@
-import { useEffect, useState , useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
-
 
 export default function ProductDetail({ productId }) {
   const { user } = useUserAuth();
@@ -9,11 +8,15 @@ export default function ProductDetail({ productId }) {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(null);
-  const [quantity, setQuantity] = useState(1); // State for quantity
-  const [selectedVariant, setSelectedVariant] = useState({}); // Initialize with an empty object
-  const [showSellerDetails, setShowSellerDetails] = useState(false); // State for seller details dropdown
-  const [currentImageIndex, setCurrentImageIndex] = useState(0); // State for current image index
-  
+  const [quantity, setQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedDenier, setSelectedDenier] = useState(null);
+  const [availableDeniers, setAvailableDeniers] = useState([]);
+  const [selectedVariantId, setSelectedVariantId] = useState(null);
+  const [showSellerDetails, setShowSellerDetails] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       if (!productId) return;
@@ -55,50 +58,120 @@ export default function ProductDetail({ productId }) {
     fetchRelatedProducts();
   }, [product]);
 
-  const addToCart = async () => {
-    if (!user) {
-      alert('Please sign up or log in first.');
-      return;
+useEffect(() => {
+    if (selectedColor && product) {
+      const deniers = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => v.denier.split(': ')[1]);
+      setAvailableDeniers(deniers);
+    } else {
+      setAvailableDeniers([]);
     }
-  
-    try {
-      const response = await fetch('/api/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.uid,
-          productId: product.product_id,
-          quantity: quantity,
-          variantIds: Object.values(selectedVariant).map(v => v.id),
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to add product to cart');
-      }
-  
-      const event = new Event('cartUpdated');
-      window.dispatchEvent(event);
-  
-      alert('Product added to cart successfully');
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-  
+    setSelectedDenier(null);
+    setSelectedVariantId(null);
+  }, [selectedColor, product]);
 
-  const handleQuantityChange = (event) => { 
+useEffect(() => {
+    if (selectedColor && selectedDenier && product) {
+      const variant = product.variants.find(
+        v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
+      );
+      setSelectedVariantId(variant ? variant.variant_id : null);
+    } else {
+      setSelectedVariantId(null);
+    }
+  }, [selectedColor, selectedDenier, product]);
+
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product) return;
+      try {
+        const response = await fetch(`/api/products?material=${product.fabric_material}`);
+        const data = await response.json();
+        if (response.ok) {
+          setRelatedProducts(data);
+        } else {
+          console.error('Error fetching related products:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching related products:', error);
+      }
+    };
+
+    fetchRelatedProducts();
+  }, [product]);
+
+  const addToCart = async () => {
+  if (!user) {
+    alert('Please sign up or log in first.');
+    return;
+  }
+
+  let variantId = null;
+  
+  switch (product.product_type) {
+    case 'yarn':
+      if (selectedColor && selectedDenier) {
+        // Assuming selectedColor and selectedDenier have variant_id properties
+        variantId = selectedDenier.variant_id;
+      } else {
+        alert('Please select both color and denier for yarn products.');
+        return;
+      }
+      break;
+    case 'fabric':
+      if (selectedColor) {
+        // Assuming selectedColor has variant_id property
+        variantId = selectedColor.variant_id;
+      } else {
+        alert('Please select a color for fabric products.');
+        return;
+      }
+      break;
+    default:
+      alert('Product type not supported.');
+      return;
+  }
+
+  try {
+    const response = await fetch('/api/cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: user.uid,
+        productId: product.product_id,
+        quantity: quantity,
+        variantId: variantId,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to add product to cart');
+    }
+
+    const eventData = { productId: product.product_id, quantity: quantity };
+    const event = new CustomEvent('cartUpdated', { detail: eventData });
+    window.dispatchEvent(event);
+
+    alert('Product added to cart successfully');
+  } catch (error) {
+    alert(error.message);
+  }
+};
+
+  const handleQuantityChange = (event) => {
     setQuantity(parseInt(event.target.value));
   };
 
-  const handleVariantSelection = (variantName, variantValue, variantId) => {
-    setSelectedVariant((prev) => ({
-      ...prev,
-      [variantName]: { value: variantValue, id: variantId },
-    }));
-    console.log(selectedVariant);
+  const handleColorSelection = (color) => {
+    setSelectedColor(color);
+    setSelectedDenier(null); // Reset selected denier when color changes
+  };
+
+  const handleDenierSelection = (denier) => {
+    setSelectedDenier(denier);
   };
 
   const handleNextImage = () => {
@@ -131,6 +204,9 @@ export default function ProductDetail({ productId }) {
 
   const imageUrls = product.image_url.split(',');
 
+  
+  const uniqueColors = [...new Set(product.variants.map(v => v.color.split(': ')[1]))];
+
   return (
     <div className="w-full min-h-screen text-black bg-white p-8 overflow-x-auto overflow-hidden">
       <div className="max-w-screen-xl mx-auto">
@@ -162,6 +238,7 @@ export default function ProductDetail({ productId }) {
                   style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
                   &darr;
                 </button>
+
               </div>
               <div className="border-2 border-gray-500 ml-10 w-full max-w-lg h-96 flex items-center justify-center p-2 rounded-lg" style={{ borderRadius: '20px' }}>
                 <img
@@ -182,96 +259,80 @@ export default function ProductDetail({ productId }) {
                 <div className="p-4 border border-gray-300 rounded-lg ml-28">
                   <p className="text-lg mb-2"><strong>Seller Company:</strong> {product.seller_business_name}</p>
                   <p className="text-lg mb-2"><strong>Phone :</strong>{product.seller_phone_num}</p>
-                  <p className="text-lg mb-2"><strong>
-                    Address:</strong> {`${product.seller_address.street}, ${product.seller_address.city}, ${product.seller_address.state}, ${product.seller_address.postal_code}`}
-                  </p>
+                  <p className="text-lg mb-2"><strong>Address:</strong> {`${product.seller_address.street}, ${product.seller_address.city}, ${product.seller_address.state}, ${product.seller_address.postal_code}`}</p>
                 </div>
               )}
             </div>
           </div>
           <div className="md:w-1/2 md:pl-8">
             <h1 className="text-3xl font-semibold mb-4">{product.product_name}</h1>
-            <p className="text-lg mb-4">{product.product_description}</p>
-            <p className="text-2xl font-semibold mb-4">${product.price}</p>
-            {product.variants && (
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-4">Variants</h3>
-                {Object.keys(product.variants).map((variantName, index) => (
-                  <div key={index} className="mb-4">
-                    <p className="font-medium text-xlg mb-2">{variantName.charAt(0).toUpperCase() + variantName.slice(1)}</p>
-                    <div className="flex flex-wrap gap-4">
-                      {product.variants[variantName].map((variant, variantIndex) => (
-                        <div
-                          key={variantIndex}
-                          className={`cursor-pointer p-2 border-4 rounded-md transition-colors duration-200 ease-in-out ${
-                            selectedVariant[variantName]?.value === variant.variant_value
-                              ? 'bg-black text-white border-black ring-4 ring-white'
-                              : 'bg-white text-black border-gray-300'
-                          }`}
-                          style={
-                            variantName === 'color'
-                              ? { backgroundColor: variant.variant_value, width: '60px', height: '60px' }
-                              : { padding: '10px 16px' }
-                          }
-                          onClick={() => handleVariantSelection(variantName, variant.variant_value, variant.variant_id)}
-                        >
-                          {variantName === 'color' ? '' : variant.variant_value}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">${product.price}</h2>
             <div className="mb-4">
-              <label htmlFor="quantity" className="mr-2">Quantity:</label>
+                        <h3 className="font-semibold mb-2">Color:</h3>
+                        <div className="flex space-x-2">
+                          {uniqueColors.map(color => (
+                            <button
+                              key={color}
+                              onClick={() => setSelectedColor(color)}
+                              className={`w-8 h-8 rounded-full ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                          ))}
+                        </div>
+                      </div>
+            {product.product_type === 'yarn' && (
+              <div className="mb-4">
+                <h3 className="font-semibold mb-2">Denier:</h3>
+                <select
+                  value={selectedDenier || ''}
+                  onChange={(e) => setSelectedDenier(e.target.value)}
+                  disabled={!selectedColor}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Select Denier</option>
+                  {availableDeniers.map(denier => (
+                    <option key={denier} value={denier}>{denier}</option>
+                  ))}
+                </select>
+              </div>)}
+            <div className="mt-4">
+              <label htmlFor="quantity" className="block font-medium mb-2">Quantity</label>
               <input
-                type="number"
                 id="quantity"
-                className="border border-gray-300 rounded w-16"
+                type="number"
                 min="1"
                 value={quantity}
                 onChange={handleQuantityChange}
+                className="w-20 p-2 border border-gray-300 rounded-md"
               />
             </div>
             <button
-              className="px-4 py-2 bg-black text-white rounded-lg"
-              onClick={() => addToCart(product)}
-            >
-              Add to cart
+              onClick={addToCart}
+              className="mt-4 w-full px-4 py-2 bg-black text-white font-semibold rounded-md transition-colors duration-200 ease-in-out hover:bg-gray-800">
+              Add to Cart
             </button>
-  
-            {/* Display additional product details */}
-            {product.yarn_material && (
-              <p className="text-lg mb-4">Yarn Material: {product.yarn_material}</p>
-            )}
-            {product.fabric_print_tech && (
-              <p className="text-lg mb-4">Fabric Print Technology: {product.fabric_print_tech}</p>
-            )}
-            {product.fabric_material && (
-              <p className="text-lg mb-4">Fabric Material: {product.fabric_material}</p>
-            )}
-
-            <div className="mb-4">
-              <button
-                className="px-4 py-2 bg-white border-2 border-black text-black rounded-lg mb-2 h-11"
-                onClick={() => setShowSellerDetails(!showSellerDetails)}
-              >
-                Seller Details {showSellerDetails ? '▲' : '▼'}
-              </button>
-              {showSellerDetails && (
-                <div className="p-4 border border-gray-300 rounded-lg w-full md:w-3/4 lg:w-1/2">
-                  <p className="text-lg mb-2">Seller Company: {product.seller_business_name}</p>
-                  <p className="text-lg mb-2">Phone: {product.seller_phone_num}</p>
-                  <p className="text-lg mb-2">
-                    Address: {`${product.seller_address.street}, ${product.seller_address.city}, ${product.seller_address.state}, ${product.seller_address.postal_code}`}
-                  </p>
-                </div>
-              )}
-            </div>
           </div>
         </div>
+        {relatedProducts.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-2xl font-semibold mb-4">Related Products</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {relatedProducts.map((relatedProduct) => (
+                <div key={relatedProduct.product_id} className="p-4 border border-gray-300 rounded-md">
+                  <img
+                    src={relatedProduct.image_url.split(',')[0].trim()}
+                    alt={relatedProduct.product_name}
+                    className="w-full h-48 object-cover object-center mb-4"
+                  />
+                  <h4 className="font-medium">{relatedProduct.product_name}</h4>
+                  <p className="text-gray-600">${relatedProduct.price}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
-  );  
+  );
 }

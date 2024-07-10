@@ -1,3 +1,4 @@
+
 GET http://localhost:3000/api/products/21 HTTP/1.1
 
 
@@ -34,8 +35,8 @@ Content-Type: application/json
     "expiryDate": "12/24",
     "cvv": "123"
   }
-}
-####
+
+
 
 
 
@@ -97,29 +98,18 @@ Content-Type: application/json
 # #####4
 
 
-# POST http://localhost:3000//api/cart/fedexApi HTTP/1.1
-# content-type: application/json
-
-# {
- 
-# }
 
 
-###
+#####3
 
 
-DELETE http://localhost:3000//api/cart/24 HTTP/1.1
+GET  http://localhost:3000/api/cart/RUHSDGwCDoXoGZMGM2i1X7pybMn1 HTTP/1.1
 
 
-###
+####
+
+GET http://localhost:3000/api/searc?searchTerm=dewefgh HTTP/1.1
 
 
-POST http://localhost:3000//api/cart HTTP/1.1
-content-type: application/json
-
-{
-  "userId": "e7vVMBprlRYB7PHuaJgv2u2RAVb2",
-  "productId": "11",
-  "quantity": 1,
-  "variantIds": []
-}
+####
+GET http://localhost:3000/api/products/21 HTTP/1.1

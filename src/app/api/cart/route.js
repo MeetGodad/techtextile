@@ -79,12 +79,12 @@ export async function POST(request) {
         SELECT * FROM CartItems 
         WHERE cart_id = ${cart[0].cart_id} 
         AND product_id = ${requestData.productId}
-        AND variant_ids = ${requestData.variantIds}::int[]`;
+        AND variant_id = ${requestData.variantId}`;
   
       if (cartItem.length === 0) {
         cartItem = await sql`
-          INSERT INTO CartItems (cart_id, product_id, quantity, variant_ids) 
-          VALUES (${cart[0].cart_id}, ${requestData.productId}, ${requestData.quantity}, ${requestData.variantIds}::int[]) 
+          INSERT INTO CartItems (cart_id, product_id, quantity, variant_id) 
+          VALUES (${cart[0].cart_id}, ${requestData.productId}, ${requestData.quantity}, ${requestData.variantId}) 
           RETURNING *`;
       } else {
         cartItem = await sql`
@@ -92,7 +92,7 @@ export async function POST(request) {
           SET quantity = quantity + ${requestData.quantity} 
           WHERE cart_id = ${cart[0].cart_id} 
           AND product_id = ${requestData.productId}
-          AND variant_ids = ${requestData.variantIds}::int[]
+          AND variant_id = ${requestData.variantId}
           RETURNING *`;
       }
   
@@ -105,6 +105,7 @@ export async function POST(request) {
         headers: { 'Content-Type': 'application/json' }
       });
     } catch (error) {
+      console.error('Error adding product to cart:', error); 
       return new Response(JSON.stringify({
         status: 500,
         body: {
