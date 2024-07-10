@@ -60,7 +60,31 @@ export async function POST(request) {
       throw new Error("Failed to insert order items.");
     }
 
-    return new Response(JSON.stringify({ orderId }), { 
+    // Fetch product details
+    let productDetails;
+    try {
+      const productIds = cart.map(item => item.product_id);
+      productDetails = await sql`
+        SELECT product_id, product_name AS name, image_url
+        FROM products
+        WHERE product_id = ANY(${productIds});
+      `;
+      console.log("Product Details:", productDetails);
+    } catch (err) {
+      console.error("Error fetching product details:", err);
+      throw new Error("Failed to fetch product details.");
+    }
+
+    const detailedCart = cart.map(item => {
+      const product = productDetails.find(p => p.product_id === item.product_id);
+      return {
+        ...item,
+        name: product ? product.name : "Unknown Product",
+        image_url: product ? product.image_url : null,
+      };
+    });
+
+    return new Response(JSON.stringify({ orderId, detailedCart, orderTotalPrice }), { 
       status: 200, 
       headers: { 'Content-Type': 'application/json' } 
     });
