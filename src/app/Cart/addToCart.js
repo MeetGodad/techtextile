@@ -31,6 +31,9 @@ export default function Cart({ children }) {
 
   const updateQuantity = async (cart_item_id, quantity, variantIds) => {
     try {
+      console.log('Updating quantity for item:', cart_item_id);
+      console.log('New quantity:', quantity);
+      console.log('Variant IDs:', variantIds);
       const parsedQuantity = parseInt(quantity);
       if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
         setErrorMessages('Please enter a valid quantity');
@@ -43,6 +46,8 @@ export default function Cart({ children }) {
           quantity: parsedQuantity,
           variantIds: variantIds,
         };
+
+
         const response = await fetch(`/api/cart/${user.uid}`, {
           method: 'PUT',
           headers: {
@@ -113,7 +118,6 @@ export default function Cart({ children }) {
       <div className="max-w-6xl mx-auto bg-white bg-opacity-5 backdrop-filter backdrop-blur-xl rounded-3xl shadow-2xl p-8 animate-fade-in-up relative z-10">
         <h1 className="text-5xl font-extrabold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-gray-300 to-gray-100 text-center animate-pulse">
           Your Shopping Cart
-
         </h1>
         {cart.length > 0 ? (
           <>

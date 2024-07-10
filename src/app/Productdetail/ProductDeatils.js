@@ -37,7 +37,26 @@ export default function ProductDetail({ productId }) {
     };
 
     fetchProductDetails();
-  }, [productId, user]);
+  }, [currentProductId, user]);
+
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product) return;
+      try {
+        const response = await fetch(`/api/products?material=${product.fabric_material}`);
+        const data = await response.json();
+        if (response.ok) {
+          setRelatedProducts(data);
+        } else {
+          console.error('Error fetching related products:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching related products:', error);
+      }
+    };
+
+    fetchRelatedProducts();
+  }, [product]);
 
 useEffect(() => {
     if (selectedColor && product) {
@@ -219,6 +238,7 @@ useEffect(() => {
                   style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
                   &darr;
                 </button>
+
               </div>
               <div className="border-2 border-gray-500 ml-10 w-full max-w-lg h-96 flex items-center justify-center p-2 rounded-lg" style={{ borderRadius: '20px' }}>
                 <img
