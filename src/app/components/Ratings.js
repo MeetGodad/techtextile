@@ -1,10 +1,11 @@
+// https://chatgpt.com/c/1e6ac25a-b670-43dc-b935-9e97e2674510 for this full page
 import { useState } from 'react';
 
 export default function Ratings({ productId,userId, onClose }) {
   const [headline, setHeadline] = useState('');
   const [review, setReview] = useState('');
   const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0); // For hover effect
+  const [hoverRating, setHoverRating] = useState(0);
   const  handleReviewSubmit = async () => {
 
     const response = await fetch('/api/review', {
@@ -27,7 +28,6 @@ export default function Ratings({ productId,userId, onClose }) {
       onClose();
     }
   };
-
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

@@ -6,7 +6,7 @@ export async function GET() {
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
         const products = await sql`
-            SELECT p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material,STRING_AGG(DISTINCT pv.variant_name || ': ' || pv.variant_value, ', ') AS variants
+            SELECT p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material
             FROM Products p LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id
             LEFT JOIN ProductVariant pv ON p.product_id = pv.product_id
             GROUP BY p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material;`;
@@ -21,6 +21,7 @@ export async function GET() {
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
 }
+
 
 export async function POST(req) {
     try {
@@ -44,38 +45,39 @@ export async function POST(req) {
             RETURNING product_id;
         `;
         const productId = product_details[0].product_id;
-        console.log("ProductVariant inserted with ID:", productId);
+        console.log("Product inserted with ID:", productId);
 
-    if (requestData.product_type === 'yarn'){const Yarn = await sql`
-            INSERT INTO YarnProducts (product_id, yarn_material)
-            VALUES (${productId}, 
-                 ${requestData.yarn_material})
-            RETURNING yarn_id; `;
-            
-        
-        for (let color of requestData.yarn_color) {
-            await sql`
-                INSERT INTO ProductVariant (product_id, variant_name , variant_value)
-                VALUES (${productId}, 'color', ${color});`;
-        }
+        if (requestData.product_type === 'yarn') {
+            const Yarn = await sql`
+                INSERT INTO YarnProducts (product_id, yarn_material)
+                VALUES (${productId}, ${requestData.yarn_material})
+                RETURNING yarn_id;
+            `;
 
-        for (let denier of requestData.yarn_denier) {
-            await sql`
-                INSERT INTO ProductVariant (product_id, variant_name , variant_value)
-                VALUES (${productId}, 'denier', ${denier});`;
-        }
-    }
-    else if (requestData.product_type === 'fabric'){const Fabric = await sql`
-            INSERT INTO FabricProducts (product_id, fabric_print_tech, fabric_material)
-            VALUES (${productId}, ${requestData.fabric_print_tech}, ${requestData.fabric_material})
-            RETURNING fabric_id;`;   
+            for (let variant of requestData.yarn_variants) {
+                for (let denier of variant.deniers) {
+                    const variantAttributes = `Color: ${variant.color}, Denier: ${denier.denier}`;
+                    await sql`
+                        INSERT INTO ProductVariant (product_id, variant_attributes, quantity)
+                        VALUES (${productId}, ${variantAttributes}, ${denier.quantity});
+                    `;
+                }
+            }
+        } else if (requestData.product_type === 'fabric') {
+            const Fabric = await sql`
+                INSERT INTO FabricProducts (product_id, fabric_print_tech, fabric_material)
+                VALUES (${productId}, ${requestData.fabric_print_tech}, ${requestData.fabric_material})
+                RETURNING fabric_id;
+            `;
 
-        for (let color of requestData.fabric_color) {
-            await sql`
-                INSERT INTO ProductVariant (product_id, variant_name , variant_value)
-                VALUES (${productId}, 'color', ${color});`;
+            for (let variant of requestData.fabric_variants) {
+                const variantAttributes = `Color: ${variant.color}`;
+                await sql`
+                    INSERT INTO ProductVariant (product_id, variant_attributes, quantity)
+                    VALUES (${productId}, ${variantAttributes}, ${variant.quantity});
+                `;
+            }
         }
-    }
 
         return new Response(JSON.stringify({ message: "Data inserted successfully" }), { status: 200 });
     } catch (error) {

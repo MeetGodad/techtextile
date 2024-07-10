@@ -15,7 +15,7 @@ export default function ProductDetail({ productId }) {
   const [showSellerDetails, setShowSellerDetails] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [currentProductId, setCurrentProductId] = useState(productId); // Add currentProductId state
+  const [currentProductId, setCurrentProductId] = useState(productId); 
   const [isRatingsOpen, setIsRatingsOpen] = useState(false);
   const [reviews, setReviews] = useState([]); 
 
@@ -55,13 +55,13 @@ export default function ProductDetail({ productId }) {
 
     fetchProductDetails();
     fetchProductReviews();
-  }, [currentProductId, user]); // Update dependencies to currentProductId
+  }, [currentProductId, user]);
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       if (!product) return;
       try {
-        const response = await fetch(`/api/products?material=${product.fabric_material}`);
+        const response = await fetch(`/api/products?material=${product.fabric_material}&handmade=${product.handmade}&printing_machine=${product.printing_machine}`);
         const data = await response.json();
         if (response.ok) {
           setRelatedProducts(data);
@@ -72,7 +72,6 @@ export default function ProductDetail({ productId }) {
         console.error('Error fetching related products:', error);
       }
     };
-
     fetchRelatedProducts();
   }, [product]);
 
@@ -107,8 +106,6 @@ export default function ProductDetail({ productId }) {
       alert(error.message);
     }
   };
-  
-
   const handleQuantityChange = (event) => { 
     setQuantity(parseInt(event.target.value));
   };
@@ -136,8 +133,6 @@ export default function ProductDetail({ productId }) {
       setCurrentImage(imageUrls[(currentImageIndex - 1 + imageUrls.length) % imageUrls.length].trim());
     }
   };
-
-
   const handleReviewAdd = () => {
     setIsRatingsOpen(true);
   };
@@ -305,7 +300,7 @@ export default function ProductDetail({ productId }) {
                 <h3 className="text-lg font-semibold">{relatedProduct.product_name}</h3>
                 <p className="text-gray-700 mb-2">${relatedProduct.price}</p>
                 <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                  className="px-4 py-2 bg-black text-white rounded-lg"
                   onClick={() => {
                     // Update the currentProductId state to the related product's ID
                     setCurrentProductId(relatedProduct.product_id);

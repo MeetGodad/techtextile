@@ -1,7 +1,5 @@
 // https://chatgpt.com/c/22e9babf-91d6-4e67-8e17-d8393610f4f2 for this database taken a help 
 import { neon } from '@neondatabase/serverless';
-
-
 export async function POST(req) {
 
     try {

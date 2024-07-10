@@ -1,6 +1,5 @@
 import { neon } from "@neondatabase/serverless";
 
-
 export async function GET(req, { params }) {  
     const id = params.id;
     console.log("User ID:", id);
