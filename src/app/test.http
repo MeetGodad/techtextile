@@ -1,5 +1,5 @@
 
-GET http://localhost:3000/api/products/21 HTTP/1.1
+GET http://localhost:3000/api/cart/SViBwXcHpCbaqUbyXLwJqDdDWnK2  HTTP/1.1
 
 
 
@@ -38,7 +38,7 @@ Content-Type: application/json
 
 
 
-
+#####
 
 
 
@@ -100,7 +100,18 @@ Content-Type: application/json
 
 
 
-#####3
+#####
+
+POST http://localhost:3000//api/review  HTTP/1.1
+content-type: application/json
+
+{
+  "": "e7vVMBprlRYB7PHuaJgv2u2RAVb2",
+  "rating": 5,
+  "review": "This is a good product"
+}
+
+
 
 
 GET  http://localhost:3000/api/cart/RUHSDGwCDoXoGZMGM2i1X7pybMn1 HTTP/1.1

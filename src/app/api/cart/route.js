@@ -55,7 +55,7 @@ export async function POST(request) {
       const sql = neon(databaseUrl);
 
     
-  
+      console.log(requestData)
       // Check if the user has an existing cart
       let cart = await sql`
         SELECT * FROM ShoppingCart WHERE user_id = ${requestData.userId}`;

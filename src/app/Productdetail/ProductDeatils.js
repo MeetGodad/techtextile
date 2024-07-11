@@ -1,6 +1,8 @@
+//https://chatgpt.com/c/1594564d-c434-4e44-8cd9-e0efa34f4736 apart from the color variants i have taken a help from this webiste to make the code perfect and working
 import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
+import Ratings from '../components/Ratings';
 
 export default function ProductDetail({ productId }) {
   const { user } = useUserAuth();
@@ -16,6 +18,8 @@ export default function ProductDetail({ productId }) {
   const [showSellerDetails, setShowSellerDetails] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [isRatingsOpen, setIsRatingsOpen] = useState(false);
+  const [reviews, setReviews] = useState([]); 
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -36,14 +40,30 @@ export default function ProductDetail({ productId }) {
       }
     };
 
+    const fetchProductReviews = async () => {
+      if (!productId) return;
+      try {
+        const response = await fetch(`/api/review?product_id=${productId}`);
+        const data = await response.json();
+        if (response.ok) {
+          setReviews(data);
+        } else {
+          console.error('Error fetching reviews:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+      }
+    };
+
     fetchProductDetails();
-  }, [currentProductId, user]);
+    fetchProductReviews();
+  }, [productId, user]);
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       if (!product) return;
       try {
-        const response = await fetch(`/api/products?material=${product.fabric_material}`);
+        const response = await fetch(`/api/products?material=${product.fabric_material}&handmade=${product.handmade}&printing_machine=${product.printing_machine}`);
         const data = await response.json();
         if (response.ok) {
           setRelatedProducts(data);
@@ -54,7 +74,6 @@ export default function ProductDetail({ productId }) {
         console.error('Error fetching related products:', error);
       }
     };
-
     fetchRelatedProducts();
   }, [product]);
 
@@ -82,24 +101,7 @@ useEffect(() => {
     }
   }, [selectedColor, selectedDenier, product]);
 
-  useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      if (!product) return;
-      try {
-        const response = await fetch(`/api/products?material=${product.fabric_material}`);
-        const data = await response.json();
-        if (response.ok) {
-          setRelatedProducts(data);
-        } else {
-          console.error('Error fetching related products:', data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching related products:', error);
-      }
-    };
 
-    fetchRelatedProducts();
-  }, [product]);
 
   const addToCart = async () => {
   if (!user) {
@@ -143,7 +145,7 @@ useEffect(() => {
         userId: user.uid,
         productId: product.product_id,
         quantity: quantity,
-        variantId: variantId,
+        variantId: selectedVariantId,
       }),
     });
 
@@ -151,12 +153,13 @@ useEffect(() => {
       throw new Error('Failed to add product to cart');
     }
 
+    const cartItem = await response.json();
+    setCart([...cart, cartItem]);
     const eventData = { productId: product.product_id, quantity: quantity };
     const event = new CustomEvent('cartUpdated', { detail: eventData });
     window.dispatchEvent(event);
 
-    alert('Product added to cart successfully');
-  } catch (error) {
+    } catch (error) {
     alert(error.message);
   }
 };
@@ -189,6 +192,13 @@ useEffect(() => {
       setCurrentImage(imageUrls[(currentImageIndex - 1 + imageUrls.length) % imageUrls.length].trim());
     }
   };
+  const handleReviewAdd = () => {
+    setIsRatingsOpen(true);
+  };
+
+  const handleCloseRatings = () => {
+    setIsRatingsOpen(false);
+  };
 
   if (loading) {
     return (
@@ -203,9 +213,11 @@ useEffect(() => {
   }
 
   const imageUrls = product.image_url.split(',');
-
   
-  const uniqueColors = [...new Set(product.variants.map(v => v.color.split(': ')[1]))];
+
+  const uniqueColors = product.variants
+  ? [...new Set(product.variants.map(v => v.color.split(': ')[1]))]
+  : [];
 
   return (
     <div className="w-full min-h-screen text-black bg-white p-8 overflow-x-auto overflow-hidden">
@@ -242,7 +254,7 @@ useEffect(() => {
               </div>
               <div className="border-2 border-gray-500 ml-10 w-full max-w-lg h-96 flex items-center justify-center p-2 rounded-lg" style={{ borderRadius: '20px' }}>
                 <img
-                  className="max-w-full h-full object-cover object-center"
+                  className="w-screen h-[365px] object-cover object-center"
                   style={{ borderRadius: '20px' }}
                   src={currentImage}
                   alt={`${product.product_name} current`}
@@ -281,58 +293,115 @@ useEffect(() => {
                           ))}
                         </div>
                       </div>
-            {product.product_type === 'yarn' && (
+              {product.product_type === 'yarn' && (
               <div className="mb-4">
                 <h3 className="font-semibold mb-2">Denier:</h3>
                 <select
                   value={selectedDenier || ''}
                   onChange={(e) => setSelectedDenier(e.target.value)}
                   disabled={!selectedColor}
-                  className="w-full p-2 border rounded"
-                >
+                  className="w-full p-2 border rounded">
                   <option value="">Select Denier</option>
                   {availableDeniers.map(denier => (
                     <option key={denier} value={denier}>{denier}</option>
                   ))}
                 </select>
               </div>)}
-            <div className="mt-4">
-              <label htmlFor="quantity" className="block font-medium mb-2">Quantity</label>
-              <input
-                id="quantity"
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={handleQuantityChange}
-                className="w-20 p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            <button
-              onClick={addToCart}
-              className="mt-4 w-full px-4 py-2 bg-black text-white font-semibold rounded-md transition-colors duration-200 ease-in-out hover:bg-gray-800">
-              Add to Cart
-            </button>
+                  <div className="ml-4 flex flex-col">
+                    <div className="flex items-center mb-4">
+                      <label htmlFor="quantity" className="mr-2"><strong>Quantity:</strong></label>
+                      <input
+                        type="number"
+                        id="quantity"
+                        className="border border-gray-300 rounded w-16"
+                        min="1"
+                        value={quantity}
+                        onChange={handleQuantityChange}
+                      />
+                    </div>
+                    <button
+                      className="px-4 py-2 bg-black text-white rounded-lg"
+                      onClick={() => addToCart(product)}>
+                      Add to cart
+                    </button>
+                    <button 
+                      className="px-4 py-2 bg-black text-white rounded-lg mt-4"
+                      onClick={handleReviewAdd}>
+                      Add Review
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            
+            {/* Display additional product details */}
+            {product.yarn_material && (
+              <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
+            )}
+            {product.fabric_print_tech && (
+              <p className="text-lg mb-4"> <strong>Fabric Print Technology: </strong>  {product.fabric_print_tech}</p>
+            )}
+            {product.fabric_material && (
+              <p className="text-lg mb-4"> <strong>Fabric Material: </strong> {product.fabric_material}</p>
+            )}
+          </div>
+        {/* Related Products Section */}
+        <div className="mt-8">
+          <h2 className="w-auto text-3xl text-center italic font-bold font-inherit mb-5">Related Products</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {relatedProducts.map((relatedProduct) => (
+              <div key={relatedProduct.product_id} className="border p-4 rounded-lg">
+                <img
+                  src={relatedProduct.image_url.split(',')[0].trim()}
+                  alt={relatedProduct.product_name}
+                  className="w-full h-48 object-cover mb-2 rounded-lg"
+                />
+                <h3 className="text-lg font-semibold">{relatedProduct.product_name}</h3>
+                <p className="text-gray-700 mb-2">${relatedProduct.price}</p>
+                <button
+                  className="px-4 py-2 bg-black text-white rounded-lg"
+                  onClick={() => {
+                    // Update the productId state to the related product's ID
+                    setproductId(relatedProduct.product_id);
+                  }}>
+                  View Details
+                </button>
+              </div>
+            ))}
           </div>
         </div>
-        {relatedProducts.length > 0 && (
-          <div className="mt-8">
-            <h3 className="text-2xl font-semibold mb-4">Related Products</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {relatedProducts.map((relatedProduct) => (
-                <div key={relatedProduct.product_id} className="p-4 border border-gray-300 rounded-md">
-                  <img
-                    src={relatedProduct.image_url.split(',')[0].trim()}
-                    alt={relatedProduct.product_name}
-                    className="w-full h-48 object-cover object-center mb-4"
-                  />
-                  <h4 className="font-medium">{relatedProduct.product_name}</h4>
-                  <p className="text-gray-600">${relatedProduct.price}</p>
-                </div>
-              ))}
-            </div>
+      {isRatingsOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={handleCloseRatings}>
+              &times;
+            </button>
+            <Ratings productId={productId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
           </div>
-        )}
+        </div>
+      )}
+        {/* Display reviews */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Reviews</h2>
+          {reviews.length > 0 ? (
+            reviews.map((review, index) => (
+              <div key={index} className="border-b border-gray-200 pb-4 mb-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold">{review.feedback_heading}</h3>
+                  <div className="text-yellow-400 text-4xl">
+                    {'★'.repeat(review.feedback_rating)}{'☆'.repeat(5 - review.feedback_rating)}
+                  </div>
+                </div>
+                <p>{review.feedback_text}</p>
+                <p className="text-gray-500">Reviewed by: {review.first_name} {review.last_name}</p>
+              </div>
+            ))
+          ) : (
+            <p>No reviews yet. Be the first to review this product!</p>
+          )}
+        </div>
       </div>
-    </div>
   );
 }
