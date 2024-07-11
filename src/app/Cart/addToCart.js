@@ -138,24 +138,33 @@ export default function Cart({ children }) {
                     </div>
                   </div>
                   <div className="text-black font-bold text-2xl mb-4">${parseFloat(item.price).toFixed(2)}</div>
-                  {item.selected_variants && item.selected_variants.length > 0 && (
-                  <div className="mb-4">
-                    <label className="block text-black-300 mb-2">Variants:</label>
-                    {item.selected_variants.map(variant => (
-                        <div key={variant.variant_id} className="text-black-600 mb-2">
-                          <span className="font-semibold">{variant.color.split(':')[0].toUpperCase()}: </span>
-                          <span style={{ display: 'inline-block', backgroundColor: variant.color.split(':')[1], width: '20px', height: '20px', borderRadius: '50%' }}></span>
-                          <br />
-                         {item.product_type === 'yarn' && (
-                            <>
-                              <span className="font-semibold">{variant.denier.split(':')[0].toUpperCase()}: </span>
-                              <span>{variant.denier.split(':')[1]}</span>
-                            </>
+                  {console.log(item.selected_variant)}
+                  {item.selected_variant && (
+                      <div className="mb-4">
+                        <label className="block text-black-300 mb-2">Variant:</label>
+                        <div className="text-black-600 mb-2">
+                          {item.selected_variant.color && (
+                            <div>
+                              <span className="font-semibold">Color: </span>
+                              <span style={{ 
+                                display: 'inline-block', 
+                                backgroundColor: item.selected_variant.color.split(':')[1]?.trim() || item.selected_variant.color,
+                                width: '20px', 
+                                height: '20px', 
+                                borderRadius: '50%',
+                                marginLeft: '5px'
+                              }}></span>
+                            </div>
+                          )}
+                          {item.selected_variant.denier && (
+                            <div>
+                              <span className="font-semibold">Denier: </span>
+                              <span>{item.selected_variant.denier.split(':')[1]?.trim() || item.selected_variant.denier}</span>
+                            </div>
                           )}
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    )}
                   <div className="mb-6">
                     <label className="block text-black-300 mb-2">Quantity</label>
                     <input

@@ -1,7 +1,4 @@
 import emailjs from '@emailjs/browser';
-
-// Initialize EmailJS
-// Send Email to Customer
 emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_USER_ID);
 
 export const sendOrderConfirmationEmails = async (orderDetails) => {

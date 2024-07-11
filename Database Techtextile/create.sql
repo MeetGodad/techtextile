@@ -161,8 +161,8 @@ CREATE TABLE Payments (
 CREATE TABLE Feedback (
     feedback_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
-    order_id INT REFERENCES Orders(order_id),
-    Feedback_heading VARCHAR(100),
+    product_id INT REFERENCES Products(product_id),
+    feedback_heading VARCHAR(100),
     feedback_text TEXT,
     feedback_rating INT CHECK (feedback_rating >= 1 AND feedback_rating <= 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
