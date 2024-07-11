@@ -228,7 +228,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Correctly import useRouter from next/router
 import SellerViewItem from '../seller/SellerViewItem';
 import ListProduct from '../seller/ListProduct';
 import UpdateUserInfo from './UpdateUserInfo';
@@ -303,12 +303,13 @@ export default function Profile() {
   }, [user, router]);
 
   const handleAddProduct = () => {
+
     setShowAddProduct(true);
     setShowListedItems(false);
     setShowUpdateUser(false);
     setShowPurchaseHistory(false);
     setShowAdminDashboard(false);
-  };
+
 
   const handleViewListedItems = () => {
     const event = new Event('sellerDataUpdated');
