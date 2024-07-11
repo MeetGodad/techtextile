@@ -334,7 +334,7 @@ const renderStep = () => {
                   value={shippingInfo.firstName}
                   onChange={handleShippingChange}
 
-                  className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 />
                 <span className="absolute left-3 top-4 text-gray-400">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -350,7 +350,7 @@ const renderStep = () => {
                   value={shippingInfo.lastName}
                   onChange={handleShippingChange}
 
-                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                  className="w-full p-3 border text-black border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 />
               </div>
               <AddressInput
@@ -374,7 +374,7 @@ const renderStep = () => {
                 placeholder="Email"
                 value={shippingInfo.email}
                 onChange={handleShippingChange}
-                className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
               />
               <input 
                 type="tel"
@@ -383,7 +383,7 @@ const renderStep = () => {
                 pattern="[0-9]{10}"
                 value={shippingInfo.phone}
                 onChange={handleShippingChange}
-                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                className="w-full p-3 border text-black border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
               />
             </div>
             </form>
@@ -481,7 +481,7 @@ const renderStep = () => {
                     lastName: shippingInfo.lastName,
                     address: shippingInfo.street,
                     city: shippingInfo.city,
-                    state: shippingInfo.state,
+                    state: shippingInfo.stateCode,
                     zip: shippingInfo.zip,
                     country: shippingInfo.countryCode,
                     email: shippingInfo.email,

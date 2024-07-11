@@ -10,7 +10,8 @@ export async function shippingRates(sellerAddress, buyerAddress, packages) {
       city_locality: sellerAddress.city,
       state_province: sellerAddress.state,
       postal_code: sellerAddress.zipCode,
-      country_code: sellerAddress.country
+      country_code: sellerAddress.country,
+      address_residential_indicator: "no"
     },
     ship_to: {
       name: "Buyer Name",
@@ -19,7 +20,8 @@ export async function shippingRates(sellerAddress, buyerAddress, packages) {
       city_locality: buyerAddress.city,
       state_province: buyerAddress.state,
       postal_code: buyerAddress.zipCode,
-      country_code: buyerAddress.country
+      country_code: buyerAddress.country,
+      address_residential_indicator: "no"
     },
     packages: packages.map(pkg => ({
       weight: {

@@ -77,7 +77,7 @@ export default function ProductSection({
           alt={name}
           src={firstImageUrl}/> 
           
-        <h2 className=" text-2xl ml-2 font-bold">{name}</h2>
+        <h2 className=" text-2xl ml-2 text-black font-bold">{name}</h2>
         <div className="text-red-600 font-semibold ml-2 mb-2">${price}</div>
       </div>
       </Link>

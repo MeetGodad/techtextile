@@ -178,15 +178,24 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
           throw new Error(rateData.error);
         }
 
-        if (!rateData.rate_response || !rateData.rate_response.rates || rateData.rate_response.rates.length === 0) {
-          console.warn('No shipping rates available from central warehouse. Full response:', rateData);
-          throw new Error('No shipping rates available');
-        }
+        let ratesToUse = [];
+      if (rateData.rate_response && rateData.rate_response.rates && rateData.rate_response.rates.length > 0) {
+        ratesToUse = rateData.rate_response.rates;
+      } else if (rateData.rate_response && rateData.rate_response.invalid_rates && rateData.rate_response.invalid_rates.length > 0) {
+        ratesToUse = rateData.rate_response.invalid_rates;
+        console.warn(`Using invalid rates for seller. These rates may not be accurate.`);
+      } else {
+        console.log(`No shipping rates available for seller. Full response:`, rateData);
+        throw new Error('No shipping rates available');
+      }
 
-        const cheapestRate = findCheapestRate(rateData.rate_response.rates);
-        if (cheapestRate) {
-          // Convert the rate to CAD if it is in INR
-          const amountInCAD = cheapestRate.shipping_amount.currency === 'inr' ? cheapestRate.shipping_amount.amount * exchangeRate : cheapestRate.shipping_amount.amount;
+      const cheapestRate = findCheapestRate(ratesToUse);
+      if (cheapestRate) {
+        // Convert the rate to CAD if it is in INR
+        const amountInCAD = cheapestRate.shipping_amount.currency === 'inr'
+          ? cheapestRate.shipping_amount.amount * exchangeRate
+          : cheapestRate.shipping_amount.amount;
+
           newShippingRates['centralWarehouse'] = {
             ...cheapestRate,
             shipping_amount: {
@@ -196,9 +205,15 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
             }
           };
           totalCost += amountInCAD;
-        } else {
+    
+          // Log warnings if using invalid rates
+          if (cheapestRate.validation_status === 'invalid') {
+            console.warn(`Warning for central warehouse:`, cheapestRate.warning_messages);
+            console.error(`Errors for central warehouse:`, cheapestRate.error_messages);
+          }
+      } else {
           throw new Error('Unable to find a valid shipping rate');
-        }
+      }
       } catch (error) {
         console.error('Error calculating shipping from central warehouse:', error);
         newErrors['centralWarehouse'] = error.message;
