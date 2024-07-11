@@ -8,6 +8,7 @@ export async function GET(req, { params }) {
 
         const cart = await sql`
             WITH UserCart AS (
+            
             SELECT cart_id 
             FROM ShoppingCart 
             WHERE user_id = ${id}
@@ -57,15 +58,8 @@ export async function GET(req, { params }) {
             },
         }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
-}
-export async function PUT(request, { params }) {
-    try {
-        const userId = params.id;
-        const requestData = await request.json();
-        const databaseUrl = process.env.DATABASE_URL || "";
-        const sql = neon(databaseUrl);
+} 
 
-        console.log('Received data:', requestData, userId);
 
         const updatedCart = await sql`
         
@@ -131,7 +125,6 @@ export async function PUT(request, { params }) {
             headers: { 'Content-Type': 'application/json' }
         });
     } catch (error) {
-        console.error('PUT request error:', error);
         return new Response(JSON.stringify({
             status: 500,
             body: {
@@ -141,7 +134,9 @@ export async function PUT(request, { params }) {
     }
 }
 
+
 export async function DELETE(req, { params }) {
+
     try {
         const id = params.id;
         const databaseUrl = process.env.DATABASE_URL || "";
