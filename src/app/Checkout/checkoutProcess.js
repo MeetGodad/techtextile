@@ -120,41 +120,6 @@ const Checkout = () => {
           userId: user.uid,
           firstName: shippingInfo.firstName,
           lastName: shippingInfo.lastName,
-          address: shippingInfo.address,
-          city: shippingInfo.city,
-          state: shippingInfo.state,
-          zip: shippingInfo.zip,
-          email: shippingInfo.email,
-          selectedPaymentMethod,
-          cart,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        alert('Order Submitted');
-        return data.orderId;
-      } else {
-        console.error('Failed to submit order:', data.error);
-        return null;
-      }
-    } catch (error) {
-      console.error('Error submitting order:', error);
-      return null;
-    }
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch('/api/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.uid,
-          firstName: shippingInfo.firstName,
-          lastName: shippingInfo.lastName,
           address: shippingInfo.street,
           city: shippingInfo.city,
           state: shippingInfo.state,
@@ -401,7 +366,7 @@ const renderStep = () => {
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
                 setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
                 setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
-    />
+              />
 
               <input
                 type="email"
@@ -420,6 +385,7 @@ const renderStep = () => {
                 onChange={handleShippingChange}
                 className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
               />
+            </div>
             </form>
           </div>
         );

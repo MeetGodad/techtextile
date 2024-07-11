@@ -117,6 +117,7 @@ export default function SignUp() {
                                                 city,
                                                 state,
                                                 postalCode,
+                                                country,
                                             },
                                         }
 

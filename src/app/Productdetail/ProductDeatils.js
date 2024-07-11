@@ -145,11 +145,7 @@ useEffect(() => {
         userId: user.uid,
         productId: product.product_id,
         quantity: quantity,
-        variantId: variantId,
-        selected_variants: { // Send selected variants to the backend
-          color: selectedColor,
-          denier: selectedDenier,
-        },
+        variantId: selectedVariantId,
       }),
     });
 
