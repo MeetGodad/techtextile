@@ -1,8 +1,37 @@
 
 GET http://localhost:3000/api/cart/SViBwXcHpCbaqUbyXLwJqDdDWnK2  HTTP/1.1
 
+###
+//for SellerViewItem.js
+GET http://localhost:3000/api/seller/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+###
+// for deletelisteditem.js
+DELETE http://localhost:3000/api/e7vVMBprlRYB7PHuaJgv2u2RAVb2/1 HTTP/1.1
+###
+// for updateproduct.js
+PUT http://localhost:3000/api/seller/{productId} HTTP/1.1
+Content-Type: application/json
 
-
+{
+    "product_type": "yarn",
+    "product_name": "New Yarn Product",
+    "product_description": "Updated description",
+    "price": "25.99",
+    "image_url": "new_image_url",
+    "yarn_material": "Cotton",
+    "yarn_variants": [
+        {
+            "color": "#ffffff",
+            "deniers": [
+                {
+                    "denier": "200D",
+                    "quantity": 10
+                }
+            ]
+        }
+    ]
+}
+###
 
 POST http://localhost:3000/api/email HTTP/1.1
 Content-Type: application/json
@@ -35,10 +64,7 @@ Content-Type: application/json
     "expiryDate": "12/24",
     "cvv": "123"
   }
-
-
-
-#####
+###
 
 
 
@@ -124,3 +150,5 @@ GET http://localhost:3000/api/searc?searchTerm=dewefgh HTTP/1.1
 
 ####
 GET http://localhost:3000/api/products/21 HTTP/1.1
+
+

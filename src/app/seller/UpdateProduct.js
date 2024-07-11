@@ -4,6 +4,7 @@ import { storage } from '../auth/firebase';
 import { useUserAuth } from '../auth/auth-context';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
+import { MdDeleteForever } from "react-icons/md";
 
 export default function UpdateProduct({ product, onUpdateSuccess, onClose, position }) {
     const { user } = useUserAuth();
@@ -11,6 +12,8 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
     const [productData, setProductData] = useState({
         ...product,
         userId: user ? user.uid : '',
+        yarn_variants: product.yarn_variants || [{ color: '', deniers: [{ denier: '', quantity: 0 }] }],
+        fabric_variants: product.fabric_variants || [{ color: '', quantity: 0 }],
     });
     const [error, setError] = useState(null);
 
@@ -83,6 +86,56 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
         return urls;
     };
 
+    const handleYarnVariantChange = (index, field, value) => {
+        const newVariants = [...productData.yarn_variants];
+        newVariants[index][field] = value;
+        setProductData({ ...productData, yarn_variants: newVariants });
+    };
+
+    const handleDeniersChange = (variantIndex, denierIndex, field, value) => {
+        const newVariants = [...productData.yarn_variants];
+        newVariants[variantIndex].deniers[denierIndex][field] = value;
+        setProductData({ ...productData, yarn_variants: newVariants });
+    };
+
+    const handleFabricVariantChange = (index, field, value) => {
+        const newVariants = [...productData.fabric_variants];
+        newVariants[index][field] = value;
+        setProductData({ ...productData, fabric_variants: newVariants });
+    };
+
+    const addYarnVariant = () => {
+        setProductData({ ...productData, yarn_variants: [...productData.yarn_variants, { color: '', deniers: [{ denier: '', quantity: 0 }] }] });
+    };
+
+    const addDenier = (variantIndex) => {
+        const newVariants = [...productData.yarn_variants];
+        newVariants[variantIndex].deniers.push({ denier: '', quantity: 0 });
+        setProductData({ ...productData, yarn_variants: newVariants });
+    };
+
+    const removeYarnVariant = (index) => {
+        const newVariants = [...productData.yarn_variants];
+        newVariants.splice(index, 1);
+        setProductData({ ...productData, yarn_variants: newVariants });
+    };
+
+    const removeDenier = (variantIndex, denierIndex) => {
+        const newVariants = [...productData.yarn_variants];
+        newVariants[variantIndex].deniers.splice(denierIndex, 1);
+        setProductData({ ...productData, yarn_variants: newVariants });
+    };
+
+    const addFabricVariant = () => {
+        setProductData({ ...productData, fabric_variants: [...productData.fabric_variants, { color: '', quantity: 0 }] });
+    };
+
+    const removeFabricVariant = (index) => {
+        const newVariants = [...productData.fabric_variants];
+        newVariants.splice(index, 1);
+        setProductData({ ...productData, fabric_variants: newVariants });
+    };
+
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="fixed inset-0 bg-black bg-opacity-50"></div>
@@ -151,36 +204,78 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                         <div className="space-y-2">
                             <div>
                                 <label className="block font-semibold">Yarn Material</label>
-                                <input
-                                    type="text"
-                                    required
-                                    name="yarn_material"
-                                    value={productData.yarn_material}
-                                    onChange={handleChange}
+                                <select 
+                                    type="text" 
+                                    required 
+                                    name="yarn_material" 
+                                    value={productData.yarn_material}  
+                                    onChange={handleChange} 
                                     className="w-full p-3 border border-gray-300 rounded-lg"
-                                />
+                                >
+                                    <option value="" disabled>Select Yarn Material</option>
+                                    <option value="Cotton">Cotton</option>
+                                    <option value="Polyester">Polyester</option>
+                                    <option value="Silk">Silk</option>
+                                    <option value="Wool">Wool</option>
+                                    <option value="Nylon">Nylon</option>    
+                                    <option value="Linen">Linen</option>
+                                </select>
                             </div>
                             <div>
-                                <label className="block font-semibold">Yarn Denier</label>
-                                <input
-                                    type="text"
-                                    required
-                                    name="yarn_denier"
-                                    value={productData.yarn_denier}
-                                    onChange={handleChange}
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-semibold">Yarn Color</label>
-                                <input
-                                    type="text"
-                                    required
-                                    name="yarn_color"
-                                    value={productData.yarn_color}
-                                    onChange={handleChange}
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                />
+                                <label className="block font-semibold">Yarn Variants</label>
+                                {productData.yarn_variants.map((variant, index) => (
+                                    <div key={index} className="relative w-80 mr-2">
+                                        <label className="block font-semibold">Color</label>
+                                        <input
+                                            type="color"
+                                            placeholder="Color"
+                                            value={variant.color}
+                                            onChange={(e) => handleYarnVariantChange(index, 'color', e.target.value)}
+                                            className="w-1/3 h-12 my-2 p-1 border border-black rounded-lg" 
+                                        />
+                                        {variant.deniers.map((denier, denierIndex) => (
+                                            <div key={denierIndex} className="flex items-center mb-4">
+                                                <div className="flex-1 mr-2">
+                                                    <label className="block font-semibold">Denier</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Denier"
+                                                        value={denier.denier}
+                                                        onChange={(e) => handleDeniersChange(index, denierIndex, 'denier', e.target.value)}
+                                                        className="w-full p-3 border border-gray-300 rounded-lg"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 mr-2">
+                                                    <label className="block font-semibold">Quantity</label>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="Quantity"
+                                                        value={denier.quantity}
+                                                        onChange={(e) => handleDeniersChange(index, denierIndex, 'quantity', e.target.value)}
+                                                        className="w-full p-3 border border-gray-300 rounded-lg"
+                                                    />
+                                                </div>
+                                                {variant.deniers.length > 1 && (
+                                                    <button type="button" onClick={() => removeDenier(index, denierIndex)} className="text-red-500">
+                                                        <MdDeleteForever size={24} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                            <button
+                                                    type="button"
+                                                    onClick={() => addDenier(index)}
+                                                    className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">
+                                                    Add Denier
+                                                </button>
+                                            {productData.yarn_variants.length > 1 && (
+                                            <button type="button" onClick={() => removeYarnVariant(index)} className="text-red-500">
+                                                <MdDeleteForever size={24} />
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                <button type="button" onClick={addYarnVariant} className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">Add Yarn Variant</button>
                             </div>
                         </div>
                     )}
@@ -209,15 +304,37 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                                 />
                             </div>
                             <div>
-                                <label className="block font-semibold">Fabric Color</label>
-                                <input
-                                    type="text"
-                                    required
-                                    name="fabric_color"
-                                    value={productData.fabric_color}
-                                    onChange={handleChange}
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                />
+                                <label className="block font-semibold">Fabric Variants</label>
+                                {productData.fabric_variants.map((variant, index) => (
+                                    <div key={index} className="relative w-80 mr-2">
+                                        <label className="block font-semibold">Color</label>
+                                        <input
+                                            type="color"
+                                            placeholder="Color"
+                                            value={variant.color}
+                                            onChange={(e) => handleFabricVariantChange(index, 'color', e.target.value)}
+                                            className="w-1/3 h-12 my-2 p-1 border border-black rounded-lg"
+                                        />
+                                        <div className="flex items-center mb-4">
+                                            <div className="flex-1 mr-2">
+                                                <label className="block font-semibold">Quantity</label>
+                                                <input
+                                                    type="number"
+                                                    placeholder="Quantity"
+                                                    value={variant.quantity}
+                                                    onChange={(e) => handleFabricVariantChange(index, 'quantity', e.target.value)}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg"
+                                                />
+                                            </div>
+                                            {productData.fabric_variants.length > 1 && (
+                                                <button type="button" onClick={() => removeFabricVariant(index)} className="text-red-500">
+                                                    <MdDeleteForever size={24} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                                <button type="button" onClick={addFabricVariant} className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">Add Fabric Variant</button>
                             </div>
                         </div>
                     )}
