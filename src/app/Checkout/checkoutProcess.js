@@ -357,6 +357,7 @@ const renderStep = () => {
                 />
               </div>
               <AddressInput
+                supportedCountries={['CA']}
                 role="shipping"
                 street={shippingInfo.street}
                 city={shippingInfo.city}
