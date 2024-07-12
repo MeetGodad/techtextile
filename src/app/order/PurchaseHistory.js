@@ -1,14 +1,12 @@
 // Refrence - From SellerViewItem.js file
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
 import OrderDetails from './OrderDetails';
 
 const PurchaseHistory = ({ userId, onClose }) => {
   const [purchases, setPurchases] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const router = useRouter();
 
   useEffect(() => {
     if (userId) {
@@ -85,3 +83,4 @@ const PurchaseHistory = ({ userId, onClose }) => {
 };
 
 export default PurchaseHistory;
+
