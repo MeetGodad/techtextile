@@ -300,6 +300,7 @@ export default function SignUp() {
                                 <div className="mb-4">
                                     <label className="block text-sm font-semibold mb-2 text-black" for="address">ADDRESS</label>
                                     <AddressInput
+                                        supportedCountries={['CA']}
                                         role={role}
                                         street={street}
                                         city={city}
@@ -364,6 +365,7 @@ export default function SignUp() {
                             <div className="mb-4">
                                 <label className="block text-sm font-semibold mb-2 text-black" for="company-address">Company Address</label>
                                 <AddressInput
+                                        supportedCountries={['CA' , 'IN']}
                                         role={role}
                                         street={street}
                                         city={city}

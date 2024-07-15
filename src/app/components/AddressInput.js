@@ -1,16 +1,15 @@
 // This component is used to get the address details from the user using the Google Maps Autocomplete API.
 // Reference: https://react-google-maps-api-docs.netlify.app/#autocomplete
-// Reference: https://developers.google.com/maps/documentation/javascript/places-autocomplete
-// Reference : Perplexity AI
+// Reference: https://developers.google.com/maps/documentation/javascript/places-autocompleteimport 
+// References  : GitHub Copilot
 
-
-import React, { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLoadScript, Autocomplete } from '@react-google-maps/api';
 
 const libraries = ['places'];
-const SUPPORTED_COUNTRIES = ['IN', 'CA']; // Add the country codes you want to support
 
 const AddressInput = ({ 
+  supportedCountries,
   role, 
   street, 
   city, 
@@ -22,9 +21,13 @@ const AddressInput = ({
   setState, 
   setPostalCode, 
   setStateCode, 
-  setCountryCode 
+  setCountryCode
 }) => {
   const autocompleteRef = useRef(null);
+  const inputRef = useRef(null);
+  const SUPPORTED_COUNTRIES = supportedCountries;
+  const [error, setError] = useState('');
+  const [isManualEntry, setIsManualEntry] = useState(false);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -33,7 +36,26 @@ const AddressInput = ({
     useJsApiLoader: true,
   });
 
-  const handlePlaceSelect = (place) => {
+  useEffect(() => {
+    if (isLoaded && inputRef.current) {
+      const autocompleteInstance = new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ['address'],
+        componentRestrictions: { country: SUPPORTED_COUNTRIES },
+      });
+      autocompleteRef.current = autocompleteInstance;
+      autocompleteInstance.addListener('place_changed', handlePlaceSelect);
+    }
+  }, [isLoaded]);
+
+  const handlePlaceSelect = () => {
+    const place = autocompleteRef.current.getPlace();
+    if (!place || !place.address_components) {
+      setError("Note: Please select an address from the dropdown list after typing at least 3 characters. We don't support manual address entry at this time");
+      setIsManualEntry(true);
+      return;
+    }
+
+    setIsManualEntry(false);
     let newStreet = '', newCity = '', newState = '', newStateCode = '', newPostalCode = '', newCountry = '', newCountryCode = '';
   
     for (const component of place.address_components) {
@@ -74,7 +96,15 @@ const AddressInput = ({
     if (!newStreet) {
       newStreet = place.formatted_address.split(',')[0];
     }
-  
+
+    // Check if the country is supported
+    if (!SUPPORTED_COUNTRIES.includes(newCountryCode)) {
+      setError(`We do not support addresses in ${newCountry}.`);
+
+      return;
+    }
+
+    setError('');
     setStreet(newStreet);
     setCity(newCity);
     setState(newState);
@@ -83,35 +113,35 @@ const AddressInput = ({
     setCountryCode(newCountryCode);
   };
 
+  const handleManualInput = (e) => {
+    setStreet(e.target.value);
+    if (e.target.value.length > 10) {
+      setIsManualEntry(false);
+    } else {
+      setIsManualEntry(true);
+      setError("Note: Please select an address from the dropdown list. We don't support manual address entry at this time");
+    }
+  };
+
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <div>
-      <Autocomplete
-        onLoad={(autocomplete) => {
-          autocompleteRef.current = autocomplete;
-          // Set the component restrictions here
-          autocomplete.setComponentRestrictions({ country: SUPPORTED_COUNTRIES });
-        }}
-        onPlaceChanged={() => {
-          const place = autocompleteRef.current.getPlace();
-          handlePlaceSelect(place);
-        }}
-      >
-        <div className="w-full mb-4">
-          <label className="block text-sm font-semibold mb-2 text-black" htmlFor="street">Street</label>
-          <input 
-            type="text" 
-            required
-            placeholder="Search for your address"
-            value={street}
-            disabled={role === ""}
-            onChange={(e) => setStreet(e.target.value)}
-            className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-          />
-        </div>
-      </Autocomplete>
+      {(error || isManualEntry) && <div className="text-red-500">{error}</div>}
+      <div className="w-full mb-4">
+        <label className="block text-sm font-semibold mb-2 text-black" htmlFor="street">Street</label>
+        <input 
+          ref={inputRef}
+          type="text" 
+          required
+          placeholder="Start typing your address"
+          value={street}
+          disabled={role === ""}
+          onChange={handleManualInput}
+          className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+        />
+      </div>
       <div className="flex flex-wrap mb-4">
         <div className="w-1/2 pr-2">
           <label className="block text-sm font-semibold mb-2 text-black" htmlFor="city">City</label>
@@ -119,8 +149,8 @@ const AddressInput = ({
             type="text" 
             required
             value={city}
-            disabled={role === ""}
-            onChange={(e) => setCity(e.target.value)}
+            disabled={role === "" || !isManualEntry}
+            readOnly
             className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
           />
         </div>
@@ -130,8 +160,8 @@ const AddressInput = ({
             type="text" 
             required
             value={state}
-            disabled={role === ""}
-            onChange={(e) => setState(e.target.value)}
+            disabled={role === "" || !isManualEntry}
+            readOnly
             className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
           />
         </div>
@@ -143,8 +173,8 @@ const AddressInput = ({
             type="text" 
             required
             value={postalCode}
-            disabled={role === ""}
-            onChange={(e) => setPostalCode(e.target.value)}
+            disabled={role === "" || !isManualEntry}
+            readOnly
             className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
           />
         </div>
@@ -154,8 +184,8 @@ const AddressInput = ({
             type="text" 
             required
             value={country}
-            disabled={role === ""}
-            onChange={(e) => setCountryCode(e.target.value)}
+            disabled={role === "" || !isManualEntry}
+            readOnly
             className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
           />
         </div>
