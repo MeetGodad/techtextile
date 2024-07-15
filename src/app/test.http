@@ -7,3 +7,7 @@ GET http://localhost:3000/api/seller/7zeC86eh3TWLiIEDXKdwW0K3ta63 HTTP/1.1
 //for order detail in buyer purchased history
 GET http://localhost:3000/api/orderDetails/H90xcnH1O5SkFhvlm539dK8NgBR2/127/2 HTTP/1.1
 ###
+//for testing purchased item for seller to see
+GET http://localhost:3000/api/admin/1 HTTP/1.1
+###
+
