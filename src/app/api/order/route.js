@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 export async function POST(request) {
   try {
     const requestData = await request.json();
-    const { userId, firstName, lastName, address, city, state, zip, email, selectedPaymentMethod, cart } = requestData;
+    const { userId, shippingAddressId, selectedPaymentMethod, cart } = requestData;
 
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
@@ -13,37 +13,20 @@ export async function POST(request) {
     // Calculate total price of the order
     const orderTotalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
-    // Insert shipping address
-    let shippingAddress;
-    try {
-      shippingAddress = await sql`
-        INSERT INTO addresses (user_id, address_type, address_first_name, address_last_name, address_email, street, city, state, postal_code)
-        VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${address}, ${city}, ${state}, ${zip})
-        RETURNING address_id;
-      `;
-      console.log("Shipping Address:", shippingAddress);
-    } catch (err) {
-      console.error("Error inserting shipping address:", err);
-      throw new Error("Failed to insert shipping address.");
-    }
-
-    const shippingAddressId = shippingAddress[0].address_id;
-
     // Insert order
-    let order;
+    let orderId;
     try {
-      order = await sql`
+      const result = await sql`
         INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status, order_total_price)
         VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${orderTotalPrice})
         RETURNING order_id;
       `;
-      console.log("Order:", order);
+      orderId = result[0].order_id;
+      console.log("Order inserted:", result);
     } catch (err) {
       console.error("Error inserting order:", err);
       throw new Error("Failed to insert order.");
     }
-
-    const orderId = order[0].order_id;
 
     // Insert order items
     try {
@@ -60,31 +43,8 @@ export async function POST(request) {
       throw new Error("Failed to insert order items.");
     }
 
-    // Fetch product details
-    let productDetails;
-    try {
-      const productIds = cart.map(item => item.product_id);
-      productDetails = await sql`
-        SELECT product_id, product_name AS name, image_url
-        FROM products
-        WHERE product_id = ANY(${productIds});
-      `;
-      console.log("Product Details:", productDetails);
-    } catch (err) {
-      console.error("Error fetching product details:", err);
-      throw new Error("Failed to fetch product details.");
-    }
-
-    const detailedCart = cart.map(item => {
-      const product = productDetails.find(p => p.product_id === item.product_id);
-      return {
-        ...item,
-        name: product ? product.name : "Unknown Product",
-        image_url: product ? product.image_url : null,
-      };
-    });
-
-    return new Response(JSON.stringify({ orderId, detailedCart, orderTotalPrice }), { 
+    // Return response with order details
+    return new Response(JSON.stringify({ orderId, orderTotalPrice }), { 
       status: 200, 
       headers: { 'Content-Type': 'application/json' } 
     });
