@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
 import ShippingRateCalculator from '../ShippingRatesCalculation/ShippinhRates';
 import AddressInput from '../components/AddressInput';
-import { count } from 'firebase/firestore';
 import { sendOrderConfirmationEmails } from './emailService';
 
 
@@ -35,6 +34,11 @@ const Checkout = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Visa');
   const [isStepValid, setIsStepValid] = useState(false);
   const [totalShippingCost, setTotalShippingCost] = useState(0);
+  const [shippingDetails, setShippingDetails] = useState([]);
+
+  const handleShippingDetailsChange = (details) => {
+    setShippingDetails(details);
+  };
 
   const handleTotalShippingCostChange = (cost) => {
     setTotalShippingCost(cost);
@@ -120,7 +124,6 @@ const Checkout = () => {
           userId: user.uid,
           firstName: shippingInfo.firstName,
           lastName: shippingInfo.lastName,
-
           address: shippingInfo.street,
           city: shippingInfo.city,
           state: shippingInfo.state,
@@ -129,6 +132,9 @@ const Checkout = () => {
           email: shippingInfo.email,
           selectedPaymentMethod,
           cart,
+          shippingDetails,
+          totalShippingCost: totalShippingCost.toFixed(2),
+          totalPrice: totalPrice.toFixed(2),
         }),
       });
 
@@ -189,7 +195,8 @@ const handlePayAndSubmit = async () => {
       shippingInfo,
       cart,
       selectedPaymentMethod,
-      totalPrice: cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0).toFixed(2),
+      totalShippingCost: totalShippingCost.toFixed(2),
+      totalPrice: totalPrice.toFixed(2),
       paymentInfo: selectedPaymentMethod === 'PayPal' ? paymentInfo.paypalEmail : `${paymentInfo.cardNumber.slice(0, 4)} **** **** ${paymentInfo.cardNumber.slice(-4)}`,
     };
     const emailsSent = await sendOrderConfirmationEmails(orderDetails);
@@ -201,6 +208,9 @@ const handlePayAndSubmit = async () => {
       console.error('Failed to send order confirmation emails');
       // Handle email sending failure (e.g., show an error message)
     }
+
+    alert('Order Submitted');
+
 
   } else {
     alert('Failed to create order. Please try again.');
@@ -478,6 +488,7 @@ const renderStep = () => {
                 )}
               </div>
               <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
+                {console.log("Shipping Details" , shippingDetails)}
               <ShippingRateCalculator 
                   cartItems={cart} 
                   buyerAddress={{
@@ -492,6 +503,7 @@ const renderStep = () => {
                     phone: shippingInfo.phone,
                   }}
                   onTotalShippingCostChange={handleTotalShippingCostChange}
+                  onShippingDetailsChange={handleShippingDetailsChange}
                 />
               </div>
               <div className="flex justify-between font-bold text-lg border-t pt-4">

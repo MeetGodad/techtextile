@@ -38,171 +38,164 @@ export default function SignUp() {
       }, [confirmPassword]); // Add other dependencies if necessary
       
 
-    const handleSubmit = async (event) => {
-            event.preventDefault();
-
-
-
-            try {
-                const userId = await emailSignUp(email, password);
-
-                const checkUserAvailable = async () => {
-                    if (user) {
-                        return Promise.resolve(user);
-                    } else {
-                        // Check again after 1 second
-                        return new Promise((resolve, reject) => {
-                            setTimeout(() => {
-                                if (user) {
-                                    resolve(user);
-                                } else {
-                                    reject(new Error('User not available'));
-                                }
-                            }, 1000);
+      const handleSubmit = async (event) => {
+        event.preventDefault();
+    
+        try {
+            const userId = await emailSignUp(email, password);
+    
+            const checkUserAvailable = async () => {
+                return new Promise((resolve, reject) => {
+                    const intervalId = setInterval(() => {
+                        if (user) {
+                            clearInterval(intervalId);
+                            resolve(user);
+                        }
+                    }, 1000);
+    
+                    setTimeout(() => {
+                        clearInterval(intervalId);
+                        reject(new Error('User not available'));
+                    }, 10000); // Timeout for user availability check
+                });
+            };
+    
+            await checkUserAvailable();
+    
+            if (user) {
+                try {
+                    await sendEmailVerification(auth.currentUser);
+                    Swal.fire({
+                        title: 'Verification Email Sent',
+                        text: 'Please verify your email to complete the sign-up process',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+    
+                    // Function to check if the email is verified
+                    const checkEmailVerified = async () => {
+                        let timeoutId;
+                        const timeoutPromise = new Promise((_, reject) => {
+                            timeoutId = setTimeout(() => reject(new Error('Email verification timeout')), 60000); // 1 minute timeout
                         });
-                    }
-                };
-                checkUserAvailable();
-
-                if (user) {
-                    try {
-                        await sendEmailVerification(auth.currentUser);
-                        Swal.fire({
-                            title: 'Verification Email Sent',
-                            text: 'Please verify your email to complete the sign up process',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        });
-                
-                        // Function to check if the email is verified
-                        const checkEmailVerified = async () => {
-                            let timeoutId;
-                            const timeoutPromise = new Promise((_, reject) => {
-                            timeoutId = setTimeout(() => reject(new Error('Email verification timeout')), 30000);
-                            });
-                        
-                            const checkPromise = new Promise((resolve, reject) => {
+    
+                        const checkPromise = new Promise((resolve, reject) => {
                             const check = async () => {
                                 await auth.currentUser.reload();
-                                const user = auth.currentUser; 
+                                const user = auth.currentUser;
                                 if (user.emailVerified) {
-                                clearTimeout(timeoutId); // Clear the timeout if the email is verified
-                                resolve();
+                                    clearTimeout(timeoutId); // Clear the timeout if the email is verified
+                                    resolve();
                                 } else {
-                                // Check again after 5 seconds
-                                setTimeout(check, 2000);
+                                    setTimeout(check, 2000);
                                 }
                             };
                             check();
+                        });
+    
+                        // Wait for either the checkPromise or timeoutPromise to settle
+                        return Promise.race([checkPromise, timeoutPromise]);
+                    };
+    
+                    // Wait for the email to be verified
+                    try {
+                        await checkEmailVerified();
+    
+                        // Register user in the database
+                        try {
+                            let data = {
+                                userId,
+                                role,
+                                firstName,
+                                LastName,
+                                email,
+                                phone,
+                                address: {
+                                    street,
+                                    city,
+                                    state,
+                                    postalCode,
+                                    country,
+                                },
+                            };
+    
+                            if (role === "seller") {
+                                data = {
+                                    ...data,
+                                    companyName,
+                                };
+                            }
+    
+                            const response = await fetch('/api/auth', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(data),
                             });
-                        
-                            // Wait for either the checkPromise or timeoutPromise to settle
-                            return Promise.race([checkPromise, timeoutPromise]);
-                        };
-                        
-                        // Wait for the email to be verified
-                                try {
-                                    await checkEmailVerified();
-
-                                    try {
-                                        let data = {   
-                                            userId,
-                                            role,
-                                            firstName,
-                                            LastName,
-                                            email,
-                                            phone,
-                                            address: {
-                                                street,
-                                                city,
-                                                state,
-                                                postalCode,
-                                                country,
-                                            },
-                                        }
-
-                                        if (role === "seller") {
-                                            data = {
-                                                ...data,
-                                                companyName,
-                                            }
-                                        } 
-                                        
-                                        const response = await fetch('/api/auth', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                            },
-                                            body: JSON.stringify(data),
-                                        });
-                                
-                                        if (!response.ok) {
-                                            const errorData = await response.json();
-                                            Swal.fire({
-                                                title: 'DataBase Error',
-                                                text: errorData.message,
-                                                icon: 'error',
-                                                confirmButtonText: 'OK'
-                                            });
-                                            deleteUser(auth.currentUser);
-                                        } else {
-                                            router.push('/Home');
-                                        }
-                                    } catch (error) {
-                                        console.error("Failed to create user", error);
-                                        deleteUser(auth.currentUser);
-                                        event.preventDefault();
-                                        location.reload();
-                                        return;
-                                    }
-                                } catch (error) {   
-                                    await deleteUser(auth.currentUser);
-                                    event.preventDefault();
-                                    location.reload();
-                                    Swal.fire({
-                                        title: 'Email verification timeout',
-                                        text: 'You did not verify your email in time. Please sign up again.',
-                                        icon: 'error',
-                                        confirmButtonText: 'OK'
-                                    });
-                                }
-                           
-                    } catch (error) {
-                            console.error("verification Failed:", error);
+    
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                Swal.fire({
+                                    title: 'Database Error',
+                                    text: errorData.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                                await deleteUser(auth.currentUser);
+                            } else {
+                                router.push('/Home');
+                            }
+                        } catch (error) {
+                            console.error("Failed to create user", error);
+                            await deleteUser(auth.currentUser);
                             Swal.fire({
-                                title: 'Failed to send verification email',
-                                text: 'Please sign up again with a valid email address.',
+                                title: 'Failed to create user',
+                                text: 'Please try again.',
                                 icon: 'error',
                                 confirmButtonText: 'OK'
                             });
-                            deleteUser(auth.currentUser);
-                            event.preventDefault();
-                            return;
+                        }
+                    } catch (error) {
+                        await deleteUser(auth.currentUser);
+                        Swal.fire({
+                            title: 'Email verification timeout',
+                            text: 'You did not verify your email in time. Please sign up again.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
                     }
-                }
-
-            } catch (error) {
-                if (error.code === "auth/email-already-in-use") {
-                   Swal.fire({
-                        title: 'Email already in use',
-                        text: 'Please sign up with a different email address.',
+                } catch (error) {
+                    console.error("Verification Failed:", error);
+                    Swal.fire({
+                        title: 'Failed to send verification email',
+                        text: 'Please sign up again with a valid email address.',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
-                } else {
+                    await deleteUser(auth.currentUser);
+                }
+            }
+        } catch (error) {
+            if (error.code === "auth/email-already-in-use") {
+                Swal.fire({
+                    title: 'Email already in use',
+                    text: 'Please sign up with a different email address.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            } else {
                 console.error("Failed to sign up:", error);
-                deleteUser(auth.currentUser);
-                event.preventDefault();
-                location.reload();
                 Swal.fire({
                     title: 'Failed to sign up',
-                    text: 'Please sign up again with correct Credentials Something Went Unexpected .',
+                    text: 'Please sign up again with correct credentials. Something went unexpected.',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
             }
         }
     };
+    
     
 
     const renderStep = () => { 

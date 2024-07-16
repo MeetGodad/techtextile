@@ -36,6 +36,12 @@ Content-Type: application/json
     "cvv": "123"
   }
 
+}
+
+######
+
+
+
 
 
 #####
@@ -47,11 +53,11 @@ Content-Type: application/json
 
 {
   "sellerAddress": {
-    "street": "No 4 Shubhlaxmi Bunglows",
-    "city": "Surat",
-    "state": "GJ",
-    "zipCode": "395017",
-    "country": "IN"
+    "street": "912 6 Avenue Southwest",
+    "city": "Calgary",
+    "state": "AB",
+    "zipCode": "T2P0V6",
+    "country": "CA"
   },
   "buyerAddress": {
    "street": "1919 University Dr NW",
@@ -110,11 +116,11 @@ content-type: application/json
   "rating": 5,
   "review": "This is a good product"
 }
+####
 
 
 
-
-GET  http://localhost:3000/api/cart/RUHSDGwCDoXoGZMGM2i1X7pybMn1 HTTP/1.1
+GET  http://localhost:3000/api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 
 
 ####

@@ -4,14 +4,12 @@ export async function POST(request) {
   try {
     const requestData = await request.json();
     const { userId, firstName, lastName, address, city, state, zip, email, selectedPaymentMethod, cart } = requestData;
-
+    const shippingDetails = requestData.shippingDetails;
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
 
     console.log("Request Data:", requestData);
 
-    // Calculate total price of the order
-    const orderTotalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
     // Insert shipping address
     let shippingAddress;
@@ -33,8 +31,8 @@ export async function POST(request) {
     let order;
     try {
       order = await sql`
-        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status, order_total_price)
-        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${orderTotalPrice})
+        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status,order_shhipping_cost , order_total_price)
+        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice})
         RETURNING order_id;
       `;
       console.log("Order:", order);
@@ -60,31 +58,39 @@ export async function POST(request) {
       throw new Error("Failed to insert order items.");
     }
 
-    // Fetch product details
-    let productDetails;
+
     try {
-      const productIds = cart.map(item => item.product_id);
-      productDetails = await sql`
-        SELECT product_id, product_name AS name, image_url
-        FROM products
-        WHERE product_id = ANY(${productIds});
-      `;
-      console.log("Product Details:", productDetails);
+      const shippingDetailsPromises = shippingDetails.map(detail => {
+        const sellerIds = detail.sellerId === 'centralWarehouse' ? detail.indianSellers : [detail.sellerId];
+        return sql`
+          INSERT INTO ShippingDetails (
+        order_id, 
+        seller_ids, 
+        carrier_id, 
+        service_code, 
+        shipping_cost, 
+        is_central_warehouse
+      )
+      VALUES (
+        ${orderId}, 
+        ${sellerIds}, 
+        ${detail.carrierId}, 
+        ${detail.serviceCode}, 
+        ${detail.amount}, 
+        ${detail.sellerId === 'centralWarehouse'}
+      );
+    `;
+      });
+      await Promise.all(shippingDetailsPromises);
+      console.log("Shipping Details inserted successfully");
     } catch (err) {
-      console.error("Error fetching product details:", err);
-      throw new Error("Failed to fetch product details.");
+      console.error("Error inserting shipping details:", err);
+      throw new Error("Failed to insert shipping details.");
     }
 
-    const detailedCart = cart.map(item => {
-      const product = productDetails.find(p => p.product_id === item.product_id);
-      return {
-        ...item,
-        name: product ? product.name : "Unknown Product",
-        image_url: product ? product.image_url : null,
-      };
-    });
+  
 
-    return new Response(JSON.stringify({ orderId, detailedCart, orderTotalPrice }), { 
+    return new Response(JSON.stringify({ orderId }), { 
       status: 200, 
       headers: { 'Content-Type': 'application/json' } 
     });
