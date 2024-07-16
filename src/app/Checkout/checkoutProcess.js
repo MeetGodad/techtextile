@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
 import ShippingRateCalculator from '../ShippingRatesCalculation/ShippinhRates';
 import AddressInput from '../components/AddressInput';
-
 import { count } from 'firebase/firestore';
 import { sendOrderConfirmationEmails } from './emailService';
 
@@ -30,8 +29,12 @@ const Checkout = () => {
   });
   const [isStepValid, setIsStepValid] = useState(false);
   const [totalShippingCost, setTotalShippingCost] = useState(0);
+  const [shippingDetails, setShippingDetails] = useState([]);
   const [existingAddresses, setExistingAddresses] = useState([]);
-
+  const handleShippingDetailsChange = (details) => {
+    setShippingDetails(details);
+  };
+  
 
   const handleTotalShippingCostChange = (cost) => {
     setTotalShippingCost(cost);
@@ -183,6 +186,9 @@ const Checkout = () => {
           country: shippingInfo.country,
           email: shippingInfo.email,
           cart,
+          shippingDetails,
+          totalShippingCost: totalShippingCost.toFixed(2),
+          totalPrice: totalPrice.toFixed(2),
         }),
       });
       const data = await response.json();
@@ -228,6 +234,7 @@ const Checkout = () => {
     }
   };
 
+
   // Function to handle complete checkout process
   const handleCompleteCheckout = async () => {
     const orderId = await handleSubmitOrder();
@@ -240,7 +247,8 @@ const Checkout = () => {
           shippingInfo,
           cart,
           selectedPaymentMethod,
-          totalPrice: cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0).toFixed(2),
+          totalShippingCost: totalShippingCost.toFixed(2),
+          totalPrice: totalPrice.toFixed(2),
           paymentInfo: selectedPaymentMethod === 'PayPal' ? paymentInfo.paypalEmail : `${paymentInfo.cardNumber.slice(0, 4)} **** **** ${paymentInfo.cardNumber.slice(-4)}`,
         };
         const emailsSent = await sendOrderConfirmationEmails(orderDetails);
@@ -263,6 +271,7 @@ const Checkout = () => {
       alert('Failed to create order. Please try again.');
     }
   };
+
   
   const handleAddressChange = (address) => {
     setShippingInfo(address);
@@ -571,7 +580,8 @@ const renderStep = () => {
                 )}
               </div>
               <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
-          <ShippingRateCalculator 
+
+            <ShippingRateCalculator 
                   cartItems={cart} 
                   buyerAddress={{
                     firstName: shippingInfo.firstName,
@@ -585,6 +595,7 @@ const renderStep = () => {
                     phone: shippingInfo.phone,
                   }}
                   onTotalShippingCostChange={handleTotalShippingCostChange}
+                  onShippingDetailsChange={handleShippingDetailsChange}
                 />
               </div>
               <div className="flex justify-between font-bold text-lg border-t pt-4">

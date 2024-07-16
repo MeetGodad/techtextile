@@ -3,15 +3,13 @@ import { neon } from "@neondatabase/serverless";
 export async function POST(request) {
   try {
     const requestData = await request.json();
+    const shippingDetails = requestData.shippingDetails;
     const { userId, firstName, lastName, street, city, state, zip, email, selectedPaymentMethod, cart } = requestData;
-
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
 
     console.log("Request Data:", requestData);
 
-    // Calculate total price of the order
-    const orderTotalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
     // Insert shipping address
     let shippingAddressId;
@@ -52,9 +50,10 @@ export async function POST(request) {
     // Insert order
     let orderId;
     try {
-      const result = await sql`
-        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status, order_total_price)
-        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${orderTotalPrice})
+      order = await sql`
+        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status,order_shhipping_cost , order_total_price)
+        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice})
+
         RETURNING order_id;
       `;
       orderId = result[0].order_id;
@@ -79,8 +78,39 @@ export async function POST(request) {
       throw new Error("Failed to insert order items.");
     }
 
-    // Return response with order details
-    return new Response(JSON.stringify({ orderId, orderTotalPrice }), { 
+
+    try {
+      const shippingDetailsPromises = shippingDetails.map(detail => {
+        const sellerIds = detail.sellerId === 'centralWarehouse' ? detail.indianSellers : [detail.sellerId];
+        return sql`
+          INSERT INTO ShippingDetails (
+        order_id, 
+        seller_ids, 
+        carrier_id, 
+        service_code, 
+        shipping_cost, 
+        is_central_warehouse
+      )
+      VALUES (
+        ${orderId}, 
+        ${sellerIds}, 
+        ${detail.carrierId}, 
+        ${detail.serviceCode}, 
+        ${detail.amount}, 
+        ${detail.sellerId === 'centralWarehouse'}
+      );
+    `;
+      });
+      await Promise.all(shippingDetailsPromises);
+      console.log("Shipping Details inserted successfully");
+    } catch (err) {
+      console.error("Error inserting shipping details:", err);
+      throw new Error("Failed to insert shipping details.");
+    }
+
+  
+
+    return new Response(JSON.stringify({ orderId }), { 
       status: 200, 
       headers: { 'Content-Type': 'application/json' } 
     });
