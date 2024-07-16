@@ -55,15 +55,6 @@ export default function Profile() {
               business_address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`,
               phone_num: data.user.phone_num
             });
-          } else if (data.user.user_type === 'buyer') {
-            setBuyerInfo({
-              phone_num: data.user.phone_num,
-              address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`
-            });
-
-          }
-           else {
-            setSellerInfo(null);
           }
         })
         .catch(error => {
@@ -207,6 +198,7 @@ export default function Profile() {
             )}
           </div>
         </div>
+      </div>
     )
   );
 }
