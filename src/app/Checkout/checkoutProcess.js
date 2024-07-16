@@ -4,6 +4,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
+import ShippingRateCalculator from '../ShippingRatesCalculation/ShippinhRates';
+import AddressInput from '../components/AddressInput';
+import { sendOrderConfirmationEmails } from './emailService';
 
 const Checkout = () => {
   const router = useRouter();
@@ -591,31 +594,24 @@ const renderStep = () => {
   };
 
   return (
-    <div className="checkout-container">
-      {step === 1 && (
-        <div>
-          <h2>Shipping Details</h2>
-          <form>
-            <input type="text" name="firstName" placeholder="First Name" onChange={handleShippingChange} />
-            <input type="text" name="lastName" placeholder="Last Name" onChange={handleShippingChange} />
-            <input type="text" name="address" placeholder="Address" onChange={handleShippingChange} />
-            <input type="text" name="city" placeholder="City" onChange={handleShippingChange} />
-            <input type="text" name="state" placeholder="State" onChange={handleShippingChange} />
-            <input type="text" name="zip" placeholder="ZIP" onChange={handleShippingChange} />
-            <input type="email" name="email" placeholder="Email" onChange={handleShippingChange} />
-            <button type="button" onClick={() => setStep(2)} disabled={!isStepValid}>Review Order</button>
-          </form>
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl w-full space-y-12 bg-white p-10 rounded-2xl shadow-2xl transform transition-all duration-500 ease-in-out hover:scale-105">
+        <div className="relative">
+          <div className="flex mb-4 items-center justify-between">
+            <span className="text-sm font-extrabold inline-block py-2 px-4 rounded-full text-white bg-black uppercase tracking-wider shadow-lg">
+              Step {step} of 3
+            </span>
+          </div>
+          <div className="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-gray-200">
+            <div
+              style={{ width: `${(step / 3) * 100}%` }}
+              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 ease-in-out"
+            ></div>
+          </div>
         </div>
-      )}
-      {step === 2 && (
-        <div>
-          <h2>Review Your Order</h2>
-          <div>
-            <h3>Shipping Information</h3>
-            <p>{shippingInfo.firstName} {shippingInfo.lastName}</p>
-            <p>{shippingInfo.address}</p>
-            <p>{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zip}</p>
-            <p>{shippingInfo.email}</p>
+        <div className="space-y-10">
+          <div className="animate-fade-in transform transition-all duration-500 ease-in-out">
+            {renderStep()}
           </div>
           <div className="flex items-center justify-between pt-8 border-t border-gray-300">
             <button
@@ -647,17 +643,15 @@ const renderStep = () => {
               {step === 3 && (
                 <button
                   onClick={handleCompleteCheckout}
-                  className="bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition-all duration-300 transform hover:scale-105 animate-pulse"
+                  className="bg-gradient-to-r from-green-400 to-green-600 text-white px-8 py-3 rounded-full hover:from-green-500 hover:to-green-700 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 shadow-lg animate-pulse"
                 >
-                  Pay ${totalPrice.toFixed(2)}
+                  Pay ${cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0).toFixed(2)}
                 </button>
               )}
             </div>
           </div>
-          <button type="button" onClick={() => setStep(1)}>Back</button>
-          <button type="button" onClick={handlePayAndSubmit}>Submit and Pay</button>
         </div>
-      )}
+      </div>
     </div>
   );
 };
