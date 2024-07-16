@@ -52,16 +52,25 @@
 import { neon } from '@neondatabase/serverless';
 
 export async function GET(req, { params }) {
-  const sellerId = params.id;
+  const userId = params.id;  // This is the string user ID
   const databaseUrl = process.env.DATABASE_URL || "";
   const sql = neon(databaseUrl);
 
-  // Validate the sellerId is a valid integer
-  if (isNaN(sellerId)) {
-    return new Response(JSON.stringify({ message: "Invalid seller ID" }), { status: 400 });
-  }
-
   try {
+    // First, find the seller_id using the user_id
+    const seller = await sql`
+      SELECT seller_id
+      FROM Sellers
+      WHERE user_id = ${userId};
+    `;
+
+    if (seller.length === 0) {
+      return new Response(JSON.stringify({ message: "Seller not found" }), { status: 404 });
+    }
+
+    const sellerId = seller[0].seller_id;
+
+    // Now, fetch the purchased items using the seller_id
     const items = await sql`
       SELECT o.order_id, o.order_total_price, o.order_status, o.created_at,
              oi.product_id, oi.quantity, oi.item_price,
@@ -77,7 +86,7 @@ export async function GET(req, { params }) {
       JOIN Buyers b ON o.user_id = b.user_id
       JOIN UserAccounts u ON b.user_id = u.user_id
       JOIN Addresses a ON b.user_address = a.address_id
-      WHERE p.seller_id = CAST(${sellerId} AS INTEGER);`;  // Ensure sellerId is cast to integer
+      WHERE p.seller_id = ${sellerId};`;
 
     if (!Array.isArray(items)) {
       return new Response(JSON.stringify([]), { status: 200 });
