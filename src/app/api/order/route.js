@@ -3,8 +3,8 @@ import { neon } from "@neondatabase/serverless";
 export async function POST(request) {
   try {
     const requestData = await request.json();
-    const { userId, firstName, lastName, address, city, state, zip, email, selectedPaymentMethod, cart } = requestData;
     const shippingDetails = requestData.shippingDetails;
+    const { userId, firstName, lastName, street, city, state, zip, email, selectedPaymentMethod, cart } = requestData;
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
 
@@ -12,36 +12,56 @@ export async function POST(request) {
 
 
     // Insert shipping address
-    let shippingAddress;
+    let shippingAddressId;
     try {
-      shippingAddress = await sql`
-        INSERT INTO addresses (user_id, address_type, address_first_name, address_last_name, address_email, street, city, state, postal_code)
-        VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${address}, ${city}, ${state}, ${zip})
-        RETURNING address_id;
+      const existingAddress = await sql`
+        SELECT address_id FROM addresses
+        WHERE user_id = ${userId}
+        AND address_first_name = ${firstName}
+        AND address_last_name = ${lastName}
+        AND address_email = ${email}
+        AND street = ${street}
+        AND city = ${city}
+        AND state = ${state}
+        AND postal_code = ${zip}
+        AND country = ${country}
+        AND address_type = 'shipping'
       `;
-      console.log("Shipping Address:", shippingAddress);
+
+      if (existingAddress.length > 0) {
+        // Address already exists, use the existing address_id
+        shippingAddressId = existingAddress[0].address_id;
+        console.log("Using existing shipping address:", shippingAddressId);
+      } else {
+        // Address doesn't exist, insert a new shipping address
+        const newAddress = await sql`
+          INSERT INTO addresses (user_id, address_type, address_first_name, address_last_name, address_email, street, city, state, postal_code)
+          VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${street}, ${city}, ${state}, ${zip})
+          RETURNING address_id;
+        `;
+        shippingAddressId = newAddress[0].address_id;
+        console.log("New shipping address inserted:", shippingAddressId);
+      }
     } catch (err) {
-      console.error("Error inserting shipping address:", err);
-      throw new Error("Failed to insert shipping address.");
+      console.error("Error handling shipping address:", err);
+      throw new Error("Failed to handle shipping address.");
     }
 
-    const shippingAddressId = shippingAddress[0].address_id;
-
     // Insert order
-    let order;
+    let orderId;
     try {
       order = await sql`
         INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status,order_shhipping_cost , order_total_price)
         VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice})
+
         RETURNING order_id;
       `;
-      console.log("Order:", order);
+      orderId = result[0].order_id;
+      console.log("Order inserted:", result);
     } catch (err) {
       console.error("Error inserting order:", err);
       throw new Error("Failed to insert order.");
     }
-
-    const orderId = order[0].order_id;
 
     // Insert order items
     try {

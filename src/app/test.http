@@ -1,5 +1,5 @@
 
-GET http://localhost:3000/api/cart/SViBwXcHpCbaqUbyXLwJqDdDWnK2  HTTP/1.1
+GET http://localhost:3000/api/cart/Hi8AE6SxwMOATGMH2jrC8dfnxf43  HTTP/1.1
 
 
 
@@ -36,17 +36,6 @@ Content-Type: application/json
     "cvv": "123"
   }
 
-}
-
-######
-
-
-
-
-
-#####
-
-
 
 POST http://localhost:3000/api/fedexApi HTTP/1.1
 Content-Type: application/json
@@ -80,16 +69,11 @@ Content-Type: application/json
 
 
 
+####
 
+GET http://localhost:3000/api/address/Hi8AE6SxwMOATGMH2jrC8dfnxf43 HTTP/1.1
+content-type: application/json
 
-# PUT http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
-# content-type: application/json
-
-# {
-#   "quantity": 3,
-#   "cartItemId": "70",
-#   "variantId": [70,78]
-# }
 
 
 
@@ -101,32 +85,22 @@ Content-Type: application/json
 
 
 
-# #####4
-
-
-
-
-#####
-
-POST http://localhost:3000//api/review  HTTP/1.1
+PUT http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 content-type: application/json
 
 {
-  "": "e7vVMBprlRYB7PHuaJgv2u2RAVb2",
-  "rating": 5,
-  "review": "This is a good product"
+  "quantity": 3,
+  "cartItemId": "21"
 }
 ####
+
 
 
 
 GET  http://localhost:3000/api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 
 
-####
 
-GET http://localhost:3000/api/searc?searchTerm=dewefgh HTTP/1.1
+GET  http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 
 
-####
-GET http://localhost:3000/api/products/21 HTTP/1.1
