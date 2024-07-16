@@ -13,6 +13,7 @@ export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
   const [userDetails, setUserDetails] = useState(null);
   const [sellerInfo, setSellerInfo] = useState(null);
+  const [buyerInfo, setBuyerInfo] = useState(null);
   const [showListedItems, setShowListedItems] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showUpdateUser, setShowUpdateUser] = useState(false);
@@ -167,7 +168,7 @@ export default function Profile() {
           </section>
         </main>
 
-        {userDetails.user_type === 'seller' && listedItemsVisible && (
+        {userDetails.user_type === 'seller' && showListedItems && (
           <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showListedItems ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
             <SellerViewItem userId={user.uid} />
           </aside>

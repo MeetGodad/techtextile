@@ -10,6 +10,27 @@ content-type: application/json
     "phone": "4033612541",
     "role": "buyer"
 }
+//new product
+POST http://localhost:3000/api/products HTTP/1.1
+content-type: application/json
+    
+    {
+    "product_name": "Product1",
+    "product_details": "Details1",
+    "product_image": "Image1",
+    "product_price": 100.00,
+    "categoryName": "Category1",
+    "parentCategory_id": null,
+    "yarnBrand": "Brand1",
+    "yarnDanier": "Danier1",
+    "fabricMaterial": "Material1",
+    "fabricPrintTech": "PrintTech1",
+    "color": "Color1",
+    "userId": "6789"
+    }
+
+
+
 ###
 //new product
 POST http://localhost:3000/api/products HTTP/1.1
@@ -30,3 +51,4 @@ content-type: application/json
     "userId": "6789"
     }
 
+GET http://localhost:3000/api/history/ftTlS3bbXnbha2zG5Sd68FLA3IF2 HTTP/1.1
