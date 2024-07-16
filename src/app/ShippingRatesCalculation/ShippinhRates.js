@@ -1,18 +1,23 @@
 // Perplexity AI
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useMemo , useCallback , useRef} from 'react';
 import { exchangeRates } from 'exchange-rates-api';
+import { isEqual, debounce } from 'lodash';
 
-const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostChange }) => {
+const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostChange , onShippingDetailsChange }) => {
   const [shippingRates, setShippingRates] = useState({});
   const [totalShippingCost, setTotalShippingCost] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [hasInternationalShipping, setHasInternationalShipping] = useState(false);
+  const hasInternationalShippingRef = useRef(false);
+  const [selectedShippingDetails, setSelectedShippingDetails] = useState([]);
+  const memoizedCartItems = useMemo(() => cartItems, [JSON.stringify(cartItems)]);
+  const memoizedBuyerAddress = useMemo(() => buyerAddress, [JSON.stringify(buyerAddress)]);
 
   useEffect(() => {
     onTotalShippingCostChange(totalShippingCost);
-  }, [totalShippingCost , onTotalShippingCostChange]);
+    onShippingDetailsChange(selectedShippingDetails);
+  }, [totalShippingCost, selectedShippingDetails, onTotalShippingCostChange, onShippingDetailsChange]);
 
   const CENTRAL_WAREHOUSE_ADDRESS = {
     street: 'No 4 Shubhlaxmi Bunglows',
@@ -22,114 +27,148 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
     country: 'IN',
     phone_num: '4039510992',
   };
-  const AVERAGE_FABRIC_WEIGHT = 0.15; // kg/m²
 
+  const AVERAGE_FABRIC_WEIGHT = 0.15;
 
-  const calculateProductWeight = (item) => {
+  const calculateProductWeight = useCallback((item) => {
     if (item.type === 'fabric') {
       return parseFloat((item.quantity * AVERAGE_FABRIC_WEIGHT).toFixed(2));
     } else {
-      // Assume it's yarn or any other product type
       return parseFloat(item.quantity.toFixed(2));
     }
-  };
+  }, []);
 
-  useEffect(() => {
-    calculateShippingRates();
-  }, [cartItems, buyerAddress]);
+  const groupShipmentsBySeller = useCallback((cartItems) => {
+    return cartItems.reduce((acc, item) => {
+      if (!acc[item.seller_id]) {
+        acc[item.seller_id] = {
+          sellerAddress: {
+            street: item.street,
+            city: item.city,
+            state: item.state,
+            zipCode: item.postal_code,
+            country: item.country,
+            phone_num: item.phone_num,
+          },
+          items: [],
+          isIndianSeller: item.country === 'IN'
+        };
+      }
+      acc[item.seller_id].items.push(item);
+      return acc;
+    }, {});
+  }, []);
 
-  const calculateShippingRates = async () => {
+  const calculatePackages = useCallback((items) => {
+    return items.map(item => ({
+      weight: calculateProductWeight(item),
+      length: 10,
+      width: 10,
+      height: 10,
+    }));
+  }, [calculateProductWeight]);
+
+  const findCheapestRate = useCallback((rates) => {
+    if (!rates || rates.length === 0) return null;
+    return rates.reduce((cheapest, rate) => 
+      (!cheapest || rate.shipping_amount.amount < cheapest.shipping_amount.amount) ? rate : cheapest
+    );
+  }, []);
+
+  const calculateShippingRates = useCallback(async () => {
     setIsLoading(true);
     setErrors({});
-    const shipmentsBySeller = groupShipmentsBySeller(cartItems);
-
+    const shipmentsBySeller = groupShipmentsBySeller(memoizedCartItems);
     let totalCost = 0;
     const newShippingRates = {};
     const newErrors = {};
     let totalIndiaWeight = 0;
+    const indianSellers = [];
 
-    // Fetch the exchange rate from INR to CAD
     let exchangeRate = 0.016;
     try {
       const rateData = await exchangeRates().latest().base('INR').symbols('CAD').fetch();
       exchangeRate = rateData.rates.CAD;
-      console.log('Exchange rate:', exchangeRate);
     } catch (error) {
       console.error('Error fetching exchange rate:', error);
     }
 
     for (const [sellerId, shipment] of Object.entries(shipmentsBySeller)) {
-      console.log(`Processing seller ${sellerId}:`, shipment);
       const sellerAddress = shipment.sellerAddress;
       const packages = calculatePackages(shipment.items);
-
-      console.log('Seller Address :', sellerAddress , 'Buyer Address :', buyerAddress );
-
+      console.log(`Calculating shipping for seller ${sellerId} with packages: Seller Address:`, sellerAddress);
       if (sellerAddress.country === 'IN') {
         totalIndiaWeight += packages.reduce((acc, pkg) => acc + pkg.weight, 0);
-        setHasInternationalShipping(true);
+        hasInternationalShippingRef.current = true;
+        indianSellers.push(sellerId);
       } else {
         try {
           const response = await fetch('/api/fedexApi', {
-            cache: 'force-cache',
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Expires': '0'
-            },
+            headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
-              sellerAddress: {
-                street: sellerAddress.street,
-                city: sellerAddress.city,
-                state: sellerAddress.state,
-                zipCode: sellerAddress.postal_code,
-                country: sellerAddress.country,
-                phone: sellerAddress.phone_num,
-              },
+              sellerAddress,
               buyerAddress: {
-                street: buyerAddress.address,
+                street: buyerAddress.street,
                 city: buyerAddress.city,
                 state: buyerAddress.state,
                 zipCode: buyerAddress.zip,
                 country: buyerAddress.country,
-                phone: buyerAddress.phone || '',
+                phone: buyerAddress.phone || '1234567890',
               },
               packages,
             }),
           });
 
           const rateData = await response.json();
-          console.log(`ShipEngine API Response for seller ${sellerId}:`, rateData);
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+          console.log(`API Response for seller ${sellerId}:`, rateData);
+
+          if (!response.ok || rateData.error) {
+            throw new Error(rateData.error || `HTTP error! status: ${response.status}`);
           }
 
-          if (rateData.error) {
-            throw new Error(rateData.error);
-          }
-
-          if (!rateData.rate_response || !rateData.rate_response.rates || rateData.rate_response.rates.length === 0) {
-            console.log(`No shipping rates available for seller ${sellerId}. Full response:`, rateData);
+          let ratesToUse = [];
+          if (rateData.rate_response && rateData.rate_response.rates && rateData.rate_response.rates.length > 0) {
+            ratesToUse = rateData.rate_response.rates;
+          } else if (rateData.rate_response && rateData.rate_response.invalid_rates && rateData.rate_response.invalid_rates.length > 0) {
+            ratesToUse = rateData.rate_response.invalid_rates;
+            console.warn(`Using invalid rates for seller. These rates may not be accurate.`);
+          } else {
+            console.log(`No shipping rates available for seller. Full response:`, rateData);
             throw new Error('No shipping rates available');
           }
 
-          console.log("Response from ShipEngine API", rateData);
-
-          const cheapestRate = findCheapestRate(rateData.rate_response.rates);
+          const cheapestRate = findCheapestRate(ratesToUse);
           if (cheapestRate) {
-            // Convert the rate to CAD if it is in INR
-            const amountInCAD = cheapestRate.shipping_amount.currency === 'inr' ? cheapestRate.shipping_amount.amount * exchangeRate : cheapestRate.shipping_amount.amount;
+            const amountInCAD = cheapestRate.shipping_amount.currency === 'inr'
+              ? cheapestRate.shipping_amount.amount * exchangeRate
+              : cheapestRate.shipping_amount.amount;
+      
             newShippingRates[sellerId] = {
               ...cheapestRate,
               shipping_amount: {
                 ...cheapestRate.shipping_amount,
                 amount: amountInCAD,
-                currency: 'cad', // Set the currency to CAD after conversion
+                currency: 'cad',
               }
             };
+      
+            setSelectedShippingDetails(prevDetails => [
+              ...prevDetails,
+              {
+                sellerId,
+                rateId: cheapestRate.rate_id,
+                carrierId: cheapestRate.carrier_id,
+                serviceCode: cheapestRate.service_code,
+                shipmentId: rateData.shipment_id,
+                amount: amountInCAD,
+                currency: 'cad',
+                deliveryDays: cheapestRate.delivery_days,
+                items: shipment.items  // Include the items for this seller
+              }
+            ]);
+      
             totalCost += amountInCAD;
           } else {
             throw new Error('Unable to find a valid shipping rate');
@@ -156,7 +195,7 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
           body: JSON.stringify({
             sellerAddress: CENTRAL_WAREHOUSE_ADDRESS,
             buyerAddress: {
-              street: buyerAddress.address,
+              street: buyerAddress.street,
               city: buyerAddress.city,
               state: buyerAddress.state,
               zipCode: buyerAddress.zip,
@@ -191,20 +230,32 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
 
       const cheapestRate = findCheapestRate(ratesToUse);
       if (cheapestRate) {
-        // Convert the rate to CAD if it is in INR
         const amountInCAD = cheapestRate.shipping_amount.currency === 'inr'
           ? cheapestRate.shipping_amount.amount * exchangeRate
           : cheapestRate.shipping_amount.amount;
-
-          newShippingRates['centralWarehouse'] = {
-            ...cheapestRate,
-            shipping_amount: {
-              ...cheapestRate.shipping_amount,
-              amount: amountInCAD,
-              currency: 'cad', // Set the currency to CAD after conversion
-            }
-          };
-          totalCost += amountInCAD;
+  
+        newShippingRates['centralWarehouse'] = {
+          ...cheapestRate,
+          shipping_amount: {...cheapestRate.shipping_amount, amount: amountInCAD, currency: 'cad'},
+          indianSellers: indianSellers
+        };
+  
+        setSelectedShippingDetails(prevDetails => [
+          ...prevDetails,
+          {
+            sellerId: 'centralWarehouse',
+            rateId: cheapestRate.rate_id,
+            carrierId: cheapestRate.carrier_id,
+            serviceCode: cheapestRate.service_code,
+            shipmentId: rateData.shipment_id,
+            amount: amountInCAD,
+            currency: 'cad',
+            deliveryDays: cheapestRate.delivery_days,
+            indianSellers: indianSellers
+          }
+        ]);
+  
+        totalCost += amountInCAD;
     
           // Log warnings if using invalid rates
           if (cheapestRate.validation_status === 'invalid') {
@@ -220,51 +271,28 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
       }
     }
 
-    console.log('Final shipping rates:', newShippingRates);
-    console.log('Final errors:', newErrors);
-    console.log('Total shipping cost:', totalCost);
-
-    setShippingRates(newShippingRates);
-    setTotalShippingCost(totalCost);
-    setErrors(newErrors);
+    if (!isEqual(newShippingRates, shippingRates)) {
+      setShippingRates(newShippingRates);
+    }
+    if (totalCost !== totalShippingCost) {
+      setTotalShippingCost(totalCost);
+    }
+    if (!isEqual(newErrors, errors)) {
+      setErrors(newErrors);
+    }
     setIsLoading(false);
-  };
+  }, [memoizedCartItems, memoizedBuyerAddress, calculatePackages, findCheapestRate , groupShipmentsBySeller]);
 
-  const groupShipmentsBySeller = (cartItems) => {
-    return cartItems.reduce((acc, item) => {
-      if (!acc[item.seller_id]) {
-        acc[item.seller_id] = {
-          sellerAddress: {
-            street: item.street,
-            city: item.city,
-            state: item.state,
-            postal_code: item.postal_code,
-            country: item.country,
-            phone_num: item.phone_num,
-          },
-          items: [],
-        };
-      }
-      acc[item.seller_id].items.push(item);
-      return acc;
-    }, {});
-  };
+  const debouncedCalculateShippingRates = useMemo(
+    () => debounce(calculateShippingRates, 300),
+    [calculateShippingRates]
+  );
+  
+  useEffect(() => {
+    debouncedCalculateShippingRates();
+    return () => debouncedCalculateShippingRates.cancel();
+  }, [memoizedCartItems, memoizedBuyerAddress, debouncedCalculateShippingRates]);
 
-  const calculatePackages = (items) => {
-    return items.map(item => ({
-      weight: calculateProductWeight(item),
-      length: 10,
-      width: 10,
-      height: 10,
-    }));
-  };
-
-  const findCheapestRate = (rates) => {
-    if (!rates || rates.length === 0) return null;
-    return rates.reduce((cheapest, rate) => 
-      (!cheapest || rate.shipping_amount.amount < cheapest.shipping_amount.amount) ? rate : cheapest
-    );
-  };
 
   if (isLoading) {
     return <div>Loading shipping rates...</div>;
@@ -281,8 +309,8 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
         <p className="text-gray-800">Estimated Shipping Rate:</p>
         <p className="text-blue-700"> ${totalShippingCost.toFixed(2)}</p> 
       </div>
-      {hasInternationalShipping && (
-        <div className= "    text-red-500">
+      {hasInternationalShippingRef.current &&  (
+        <div className= "text-red-500">
           <p>Due to International shipping from India, the cost is higher.</p>
         </div>
       )}
@@ -291,3 +319,4 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
 };
 
 export default ShippingRateCalculator;
+

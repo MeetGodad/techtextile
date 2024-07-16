@@ -1,15 +1,16 @@
 import { neon } from '@neondatabase/serverless';
 
 
+
 export async function GET() {
     try {
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
         const products = await sql`
-            SELECT p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material
+            SELECT p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material,  COALESCE(pr.average_rating, 0) AS average_rating
             FROM Products p LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id
-            LEFT JOIN ProductVariant pv ON p.product_id = pv.product_id
-            GROUP BY p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material;`;
+            LEFT JOIN ProductVariant pv ON p.product_id = pv.product_id LEFT JOIN product_ratings pr ON p.product_id = pr.product_id
+            GROUP BY p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material, pr.average_rating;`;
 
         if (products.length === 0) {
             return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
@@ -27,7 +28,8 @@ export async function POST(req) {
     try {
         console.log("Parsing request data");
         const requestData = await req.json();
-        console.log("Requested Data2:", requestData);
+
+        console.log("Requested Data:", requestData);
 
         const databaseUrl = process.env.DATABASE_URL || "";
         console.log("Database URL:", databaseUrl);
@@ -35,53 +37,36 @@ export async function POST(req) {
         const sql = neon(databaseUrl);
         console.log("Executing SQL queries");
 
-        const seller_id = await sql`
-        SELECT seller_id FROM sellers WHERE user_id = ${requestData.userId};`;
-
-        const product_details = await sql`
-            INSERT INTO Products (product_name, product_description, price, image_url, seller_id, product_type)
-            VALUES (${requestData.product_name}, ${requestData.description}, ${requestData.price}, ${requestData.image_url},             
-                 ${seller_id[0].seller_id}, ${requestData.product_type})
-            RETURNING product_id;
+        const productVariantResult = await sql`
+            INSERT INTO ProductVariant (yarnBrand, yarnDanier, fabricMaterial, fabricPrintTech, color)
+            VALUES (${requestData.yarnBrand}, ${requestData.yarnDanier}, ${requestData.fabricMaterial}, ${requestData.fabricPrintTech}, ${requestData.color})
+            RETURNING variantid;
         `;
-        const productId = product_details[0].product_id;
-        console.log("Product inserted with ID:", productId);
+        const variantId = productVariantResult[0].variantid;
+        console.log("ProductVariant inserted with ID:", variantId);
 
-        if (requestData.product_type === 'yarn') {
-            const Yarn = await sql`
-                INSERT INTO YarnProducts (product_id, yarn_material)
-                VALUES (${productId}, ${requestData.yarn_material})
-                RETURNING yarn_id;
-            `;
+      
+        const categoryResult = await sql`
+            INSERT INTO Category (categoryName, parentCategory_id)
+            VALUES (${requestData.categoryName}, ${requestData.parentCategory_id})
+            RETURNING category_id;
+        `;
+        const categoryId = categoryResult[0].category_id;
+        console.log("Category inserted with ID:", categoryId);
 
-            for (let variant of requestData.yarn_variants) {
-                for (let denier of variant.deniers) {
-                    const variantAttributes = `Color: ${variant.color}, Denier: ${denier.denier}`;
-                    await sql`
-                        INSERT INTO ProductVariant (product_id, variant_attributes, quantity)
-                        VALUES (${productId}, ${variantAttributes}, ${denier.quantity});
-                    `;
-                }
-            }
-        } else if (requestData.product_type === 'fabric') {
-            const Fabric = await sql`
-                INSERT INTO FabricProducts (product_id, fabric_print_tech, fabric_material)
-                VALUES (${productId}, ${requestData.fabric_print_tech}, ${requestData.fabric_material})
-                RETURNING fabric_id;
-            `;
+        const marketplaceResult = await sql`
+            INSERT INTO Marketplace (product_name, product_details, product_image, product_price, category_id, variantId, userId)
+            VALUES (${requestData.product_name}, ${requestData.product_details}, ${requestData.product_image}, ${requestData.product_price}, ${categoryId}, ${variantId}, ${requestData.userId})
+            RETURNING *;
+        `;
+        console.log("Marketplace data inserted successfully", marketplaceResult);
 
-            for (let variant of requestData.fabric_variants) {
-                const variantAttributes = `Color: ${variant.color}`;
-                await sql`
-                    INSERT INTO ProductVariant (product_id, variant_attributes, quantity)
-                    VALUES (${productId}, ${variantAttributes}, ${variant.quantity});
-                `;
-            }
-        }
 
         return new Response(JSON.stringify({ message: "Data inserted successfully" }), { status: 200 });
     } catch (error) {
         console.error('An error occurred: Internal server error', error);
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
+
 }
+

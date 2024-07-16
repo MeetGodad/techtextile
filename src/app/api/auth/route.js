@@ -7,6 +7,7 @@ export async function POST(req) {
         const requestData = await req.json();
         console.log("Requested Data:", requestData);
 
+
         const databaseUrl = process.env.DATABASE_URL || "";
 
         const sql = neon(databaseUrl);
@@ -18,8 +19,8 @@ export async function POST(req) {
             if (requestData.role === "buyer" || requestData.role === "seller") {
                 // Insert address data into Addresses
                 const addressResponse = await sql`
-                    INSERT INTO addresses (user_id, address_type,address_first_name, address_last_name, address_email, street, city, state, postal_code, country)
-                    VALUES (${requestData.userId}, ${'billing'},${requestData.firstName}, ${requestData.LastName}, ${requestData.email}, ${requestData.address.street}, ${requestData.address.city}, ${requestData.address.state}, ${requestData.address.postalCode} , ${requestData.address.country}) RETURNING *;`;
+                    INSERT INTO addresses (user_id, address_type,address_first_name, address_last_name, address_email,phone_num, street, city, state, postal_code, country)
+                    VALUES (${requestData.userId}, ${'billing'},${requestData.firstName}, ${requestData.LastName}, ${requestData.email}, ${requestData.phone} , ${requestData.address.street}, ${requestData.address.city}, ${requestData.address.state}, ${requestData.address.postalCode} , ${requestData.address.country}) RETURNING *;`;
     
                 if (requestData.role === "buyer") {
                     // Insert buyer data into Buyers

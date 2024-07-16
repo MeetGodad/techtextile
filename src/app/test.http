@@ -1,5 +1,12 @@
 
-GET http://localhost:3000/api/cart/SViBwXcHpCbaqUbyXLwJqDdDWnK2  HTTP/1.1
+GET http://localhost:3000/api/  HTTP/1.1
+
+#######
+
+GET http://localhost:3000//api/products/25
+
+
+
 
 
 
@@ -35,10 +42,10 @@ Content-Type: application/json
     "expiryDate": "12/24",
     "cvv": "123"
   }
+}
 
 
 
-#####
 
 
 
