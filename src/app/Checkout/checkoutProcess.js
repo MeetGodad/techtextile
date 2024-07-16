@@ -121,20 +121,7 @@ const Checkout = () => {
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
     setShippingInfo((prev) => ({ ...prev, [name]: value }));
-    validateStep();
-  };
-
-  // Handler for payment info change
-  const handlePaymentChange = (e) => {
-    const { name, value } = e.target;
-    setPaymentInfo((prev) => ({ ...prev, [name]: value }));
-    validateStep2();
-  };
-
-  // Handler for expiration date change
-  const handleExpirationDateChange = (value) => {
-    setPaymentInfo((prev) => ({ ...prev, expirationDate: value }));
-    validateStep2();
+    validateStep1();
   };
 
   // Function to validate step 1 (shipping details)
@@ -143,17 +130,6 @@ const Checkout = () => {
     setIsStepValid(firstName && lastName && street && city && state && zip && email);
   };
   
-  
-
-  // Function to validate step 2 (payment details)
-  const validateStep2 = () => {
-    if (selectedPaymentMethod === 'PayPal') {
-      setIsStepValid(paymentInfo.paypalEmail !== '');
-    } else {
-      const { cardName, cardNumber, expirationDate, cvv } = paymentInfo;
-      setIsStepValid(cardName && cardNumber && expirationDate && cvv);
-    }
-  };
 
   // Handler to move to previous step
   const handlePreviousStep = () => {
@@ -204,190 +180,39 @@ const Checkout = () => {
     }
   };
 
-  // Function to handle payment submission
-  const handlePayment = async (orderId) => {
-    const orderTotalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  
-    try {
-      const response = await fetch('/api/payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          orderId: orderId,
-          paymentMethod: selectedPaymentMethod,
-          paymentAmount: orderTotalPrice,
-        }),
-      });
+// Function to handle complete checkout process
+const handleCompleteCheckout = async () => {
+  const orderId = await handleSubmitOrder();
+  if (orderId) {
+    const orderDetails = {
+      userId: user.uid,
+      orderId: orderId,
+      shippingInfo,
+      cart,
+      selectedPaymentMethod,
+      totalShippingCost: totalShippingCost.toFixed(2),
+      totalPrice: totalPrice.toFixed(2),
+    };
 
-      const data = await response.json();
-      if (response.ok) {
-        return { orderId, detailedCart: cart, orderTotalPrice }; // Return detailed response
-      } else {
-        console.error('Failed to submit payment:', data.error);
-        return null; // Indicate payment failure
-      }
-    } catch (error) {
-      console.error('Error submitting payment:', error);
-      return null; // Indicate payment failure
-    }
-  };
+    const emailsSent = await sendOrderConfirmationEmails(orderDetails);
 
-
-  // Function to handle complete checkout process
-  const handleCompleteCheckout = async () => {
-    const orderId = await handleSubmitOrder();
-    if (orderId) {
-      const paymentResult = await handlePayment(orderId);
-      if (paymentResult) {
-        const orderDetails = {
-          userId: user.uid,
-          orderId: orderId,
-          shippingInfo,
-          cart,
-          selectedPaymentMethod,
-          totalShippingCost: totalShippingCost.toFixed(2),
-          totalPrice: totalPrice.toFixed(2),
-          paymentInfo: selectedPaymentMethod === 'PayPal' ? paymentInfo.paypalEmail : `${paymentInfo.cardNumber.slice(0, 4)} **** **** ${paymentInfo.cardNumber.slice(-4)}`,
-        };
-        const emailsSent = await sendOrderConfirmationEmails(orderDetails);
-
-        if (emailsSent) {
-          console.log('Order confirmation emails sent successfully');
-          alert('Order and payment submitted successfully');
-          // Handle successful email sending (e.g., show a success message, redirect to a success page)
-        } else {
-          console.error('Failed to send order confirmation emails');
-          alert('Order submitted, but failed to send confirmation emails');
-          // Handle email sending failure (e.g., show an error message)
-        }
-
-        alert("Order confirmation emails sent successfully");
-      } else {
-        alert('Payment failed. Please try again.');
-      }
+    if (emailsSent) {
+      console.log('Order confirmation emails sent successfully');
+      alert('Order submitted successfully');
+      // Handle successful email sending (e.g., show a success message, redirect to a success page)
     } else {
-      alert('Failed to create order. Please try again.');
+      console.error('Failed to send order confirmation emails');
+      alert('Order submitted, but failed to send confirmation emails');
+      // Handle email sending failure (e.g., show an error message)
     }
-  };
+  } else {
+    alert('Failed to create order. Please try again.');
+  }
+};
 
-  
   const handleAddressChange = (address) => {
     setShippingInfo(address);
   };
-
-const renderPaymentForm = () => {
-  const inputClass = "w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white text-gray-800 placeholder-gray-400";
-  const labelClass = "block text-sm font-medium text-gray-700 mb-1";
-
-  switch (selectedPaymentMethod) {
-    case 'Visa':
-    case 'Mastercard':
-      return (
-        <div className="space-y-6 animate-fade-in-up">
-          <div className="relative">
-            <label htmlFor="cardName" className={labelClass}>Name on Card</label>
-            <input
-              type="text"
-              id="cardName"
-              name="cardName"
-              placeholder="John Doe"
-              value={paymentInfo.cardName}
-              onChange={handlePaymentChange}
-              className={`${inputClass} pl-10`}
-            />
-            <span className="absolute left-3 top-9 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-              </svg>
-            </span>
-          </div>
-          <div className="relative">
-            <label htmlFor="cardNumber" className={labelClass}>Card Number</label>
-            <input
-              type="text"
-              id="cardNumber"
-              name="cardNumber"
-              placeholder="1234 5678 9012 3456"
-              value={paymentInfo.cardNumber}
-              onChange={handlePaymentChange}
-              className={`${inputClass} pl-10`}
-            />
-            <span className="absolute left-3 top-9 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-                <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
-              </svg>
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="relative">
-              <label htmlFor="expirationDate" className={labelClass}>Expiration Date</label>
-              <input
-                type="text"
-                id="expirationDate"
-                name="expirationDate"
-                pattern="[0-9]{2}/[0-9]{2}"
-                placeholder="MM/YY"
-                value={paymentInfo.expirationDate}
-                onChange={(e) => handleExpirationDateChange(e.target.value)}
-                className={`${inputClass} pl-10`}
-              />
-              <span className="absolute left-3 top-9 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                </svg>
-              </span>
-            </div>
-            <div className="relative">
-              <label htmlFor="cvv" className={labelClass}>CVV</label>
-              <input
-                type="text"
-                id="cvv"
-                name="cvv"
-                placeholder="123"
-                value={paymentInfo.cvv}
-                onChange={handlePaymentChange}
-                className={`${inputClass} pl-10`}
-              />
-              <span className="absolute left-3 top-9 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                </svg>
-              </span>
-            </div>
-          </div>
-        </div>
-      );
-    case 'PayPal':
-      return (
-        <div className="space-y-6 animate-fade-in-up">
-          <div className="relative">
-            <label htmlFor="paypalEmail" className={labelClass}>PayPal Email</label>
-            <input
-              type="email"
-              id="paypalEmail"
-              name="paypalEmail"
-              placeholder="you@example.com"
-              value={paymentInfo.paypalEmail}
-              onChange={handlePaymentChange}
-              className={`${inputClass} pl-10`}
-            />
-            <span className="absolute left-3 top-9 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
-            </span>
-          </div>
-
-        </div>
-      );
-    default:
-      return null;
-  }
-};
   
 const renderStep = () => {
   switch (step) {
@@ -495,41 +320,7 @@ const renderStep = () => {
           </form>
         </div>
       );
-        case 2:
-          return (
-            <div className="animate-fade-in-down">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800">Choose Payment Method</h2>
-              <div className="flex flex-wrap gap-4 mb-8">
-                {['Visa', 'Mastercard', 'PayPal'].map((method) => (
-                  <button
-                    key={method}
-                    type="button"
-                    onClick={() => setSelectedPaymentMethod(method)}
-                    className={`p-4 border-2 rounded-lg transition-all duration-300 transform hover:scale-105 ${
-                      selectedPaymentMethod === method
-                        ? 'border-black bg-gray-100 shadow-md'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                  >
-                    <img
-                      src={`/Images/${method.toLowerCase()}.png`}
-                      alt={method}
-                      className="w-12 h-12 object-contain"
-                      onError={() => console.log(`Failed to load image: /Images/${method.toLowerCase()}.png`)}
-                    />
-                    <p className="mt-2 text-sm font-semibold text-gray-700">{method}</p>
-                  </button>
-                ))}
-              </div>
-
-              <form className="space-y-6 bg-white  text-gray-800 p-6 rounded-lg shadow-md animate-fade-in">
-                {renderPaymentForm()}
-              </form>
-            </div>
-          );
-      case 3:
-        const maskedCardNumber = `${paymentInfo.cardNumber.slice(0, 4)} **** **** ${paymentInfo.cardNumber.slice(-4)}`;
-        const paymentEmail = paymentInfo.paypalEmail;
+      case 2:
         return (
           <div className="animate-fade-in-down">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Review Your Order</h2>
@@ -541,18 +332,6 @@ const renderStep = () => {
                   <p className="text-gray-700 break-words">{shippingInfo.address}</p>
                   <p className="text-gray-700 break-words">{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zip}</p>
                   <p className="text-gray-700 break-words">{shippingInfo.email}</p>
-                </div>
-                <div className="bg-gray-100 p-4 rounded-md transition-all duration-300 hover:shadow-md">
-                  <h3 className="font-bold text-lg mb-2 text-gray-800">Payment Information</h3>
-                  {selectedPaymentMethod === 'Visa' && (
-                    <p className="text-gray-700">Visa Card: {maskedCardNumber}</p>
-                  )}
-                  {selectedPaymentMethod === 'Mastercard' && (
-                    <p className="text-gray-700">Mastercard: {maskedCardNumber}</p>
-                  )}
-                  {selectedPaymentMethod === 'PayPal' && (
-                    <p className="text-gray-700 break-words">PayPal Email: {paymentEmail}</p>
-                  )}
                 </div>
               </div>
               <div>
@@ -612,23 +391,22 @@ const renderStep = () => {
   };
 
   return (
-
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-12 bg-white p-10 rounded-2xl shadow-2xl transform transition-all duration-500 ease-in-out hover:scale-105">
         <div className="relative">
           <div className="flex mb-4 items-center justify-between">
             <span className="text-sm font-extrabold inline-block py-2 px-4 rounded-full text-white bg-black uppercase tracking-wider shadow-lg">
-              Step {step} of 3
+              Step {step} of 2
             </span>
           </div>
           <div className="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-gray-200">
             <div
-              style={{ width: `${(step / 3) * 100}%` }}
+              style={{ width: `${(step / 2) * 100}%` }}
               className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 ease-in-out"
             ></div>
           </div>
         </div>
-
+  
         <div className="space-y-10">
           <div className="animate-fade-in transform transition-all duration-500 ease-in-out">
             {renderStep()}
@@ -649,7 +427,7 @@ const renderStep = () => {
                   Previous
                 </button>
               )}
-              {step < 3 && (
+              {step < 2 && (
                 <button
                   onClick={handleNextStep}
                   className={`bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 shadow-lg ${
@@ -660,7 +438,7 @@ const renderStep = () => {
                   Next
                 </button>
               )}
-              {step === 3 && (
+              {step === 2 && (
                 <button
                   onClick={handleCompleteCheckout}
                   className="bg-gradient-to-r from-green-400 to-green-600 text-white px-8 py-3 rounded-full hover:from-green-500 hover:to-green-700 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 shadow-lg animate-pulse"
@@ -674,6 +452,6 @@ const renderStep = () => {
       </div>
     </div>
   );
-};
+  };
 
 export default Checkout;
