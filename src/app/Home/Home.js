@@ -9,37 +9,6 @@ import Loder from '../components/Loder';
 import { useRouter } from 'next/navigation';
 import styled, { keyframes } from 'styled-components';
 
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-`;
-
-const fadeOut = keyframes`
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-`;
-
-const SlideShowContainer = styled.div`
-  width: 300px;
-  height: 250px; // adjust as necessary
-  overflow: hidden;
-  margin-bottom: 20px; // space between slideshow and products
-`;
-
-const Slide = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  animation: ${({ fadeType }) => (fadeType === 'in' ? fadeIn : fadeOut)} 1s ease-in-out;
-`;
 
 export default function Home({ category, subCategory, subSubCategory, searchResults }) {
   const { user } = useUserAuth();
@@ -53,24 +22,25 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
     "/Images/Choosing clothes.gif"
   ];
 
+
   useEffect(() => {
     if (!searchResults || searchResults.length === 0) {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('/api/products', {
-          headers: {
-            'Cache-Control': 'no-cache',
-        }});
-        const data = await response.json();
-        setProducts(data);
-         console.log("Data", data);
-      } catch (error) {
-        console.error('Error fetching the products:', error);
-      }
-    };
+      const fetchProducts = async () => {
+        try {
+          const response = await fetch('/api/products', {
+            headers: {
+              'Cache-Control': 'no-cache',
+          }});
+          const data = await response.json();
+          setProducts(data);
+          console.log("Data", data);
+        } catch (error) {
+          console.error('Error fetching the products:', error);
+        }
+      };
 
-    fetchProducts();
-  } else {
+      fetchProducts();
+    } else {
       setProducts(searchResults);
     }
   }, [user, searchResults]);
@@ -120,41 +90,36 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   };
 
   const filteredProducts = Array.isArray(products) ? products.filter(product => {
-  // Filter by category unless it's 'all'
-  if (category !== 'all' && product.product_type !== category) return false;
+    // Filter by category unless it's 'all'
+    if (category !== 'all' && product.product_type !== category) return false;
 
-  // Additional filtering based on category
-  switch (category) {
-    case 'fabric':
-      // For 'fabric', check both 'fabricProducts' for 'subCategory' match in 'fabric_print_tech' or 'fabric_material'
-      return subCategory ? (product.fabric_print_tech === subSubCategory || product.fabric_material === subSubCategory) : true;
-    case 'yarn':
-      // For 'yarn', match 'yarn_material' with 'subCategory'
-      return subCategory ? product.yarn_material === subCategory : true;
-    default:
-      // If no specific category logic is needed, return true to include the product
-      return true;
-  }
-}) : [];
+    // Additional filtering based on category
+    switch (category) {
+      case 'fabric':
+        // For 'fabric', check both 'fabricProducts' for 'subCategory' match in 'fabric_print_tech' or 'fabric_material'
+        return subCategory ? (product.fabric_print_tech === subSubCategory || product.fabric_material === subSubCategory) : true;
+      case 'yarn':
+        // For 'yarn', match 'yarn_material' with 'subCategory'
+        return subCategory ? product.yarn_material === subCategory : true;
+      default:
+        // If no specific category logic is needed, return true to include the product
+        return true;
+    }
+  }) : [];
 
-const handleProductClick = (productId) => {
-  router.push(`/productdetail?productId=${productId}`);
-};
+  const handleProductClick = (productId) => {
+    router.push(`/productdetail?productId=${productId}`);
+  };
 
   return (
     <div className="flex flex-col w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden">
       <div className="bg-gray-400 box-content">
-      {/* Animated slideshow */}
-        <SlideShowContainer>
-          {images.map((image, index) => (
-            <Slide
-              key={index}
-              src={image}
-              alt={`Textile Image ${index + 1}`}
-              fadeType={index === currentImageIndex ? 'in' : 'out'}
-            />
-          ))}
-        </SlideShowContainer>
+          {/*{images.map((image, index) => (
+              key={index},
+              src={image},
+              alt={${index + 1}}
+              fadeType={index === currentImageIndex ? 'in' : 'out'}          
+          ))}*/}
       </div>
       <main className="max-w-screen-xl mx-auto mt-20"> {/* Add margin-top to move products down */}
         {products.length > 0 ? (
@@ -167,7 +132,7 @@ const handleProductClick = (productId) => {
                   price={product.price}
                   image={product.image_url}
                   product={product}
-                  onAddToCart={addToCart}
+                  averageRating={product.average_rating}
                   onProductClick={() => handleProductClick(product.product_id)} />
               ))}
             </section>
@@ -188,4 +153,3 @@ const handleProductClick = (productId) => {
     </div>
   );
 }
-

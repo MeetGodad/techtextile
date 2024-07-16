@@ -10,7 +10,7 @@ export async function GET(req, { params }) {
             WITH UserCart AS (
             SELECT cart_id 
             FROM ShoppingCart 
-            WHERE user_id = 'SViBwXcHpCbaqUbyXLwJqDdDWnK2'
+            WHERE user_id = ${id}
         )
         SELECT 
             ci.cart_item_id,
