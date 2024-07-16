@@ -71,25 +71,25 @@ export async function PUT(req, { params }) {
     try {
 
         const updatedCart = await sql`
-         WITH user_cart AS (
-          SELECT cart_id 
-          FROM ShoppingCart 
-          WHERE user_id = ${userId}
-        )
-        UPDATE CartItems 
-        SET quantity = ${requestData.quantity} 
-        WHERE cart_item_id = ${requestData.cartItemId} 
-        AND cart_id = (SELECT cart_id FROM user_cart)
-        AND (
-            (${requestData.variantIds}::int[] IS NULL AND variant_ids IS NULL)
-            OR
-            (${requestData.variantIds}::int[] IS NOT NULL AND variant_ids = ${requestData.variantIds}::int[])
-        )
-        RETURNING *, (SELECT cart_id FROM user_cart) as cart_id
-      `;
+        
+            WITH user_cart AS (
+                SELECT cart_id 
+                FROM ShoppingCart 
+                WHERE user_id = ${userId}
+            )
+            UPDATE CartItems 
+            SET quantity = ${requestData.quantity} 
+            WHERE cart_item_id = ${requestData.cartItemId} 
+                AND cart_id = (SELECT cart_id FROM user_cart)
+                AND (
+                    ${requestData.variantId ? `variant_id = ${requestData.variantId}` : 'TRUE'}
+                )
+            RETURNING *
+        `;
+
 
         if (updatedCart.length === 0) {
-            throw new Error('Failed to update the product in the cart.');
+            throw new Error('Failed to update the product in the cart. No matching cart item found.');
         }
 
         // const cartId = updatedCart[0].cart_id;

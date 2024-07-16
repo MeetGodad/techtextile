@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
 import ShippingRateCalculator from '../ShippingRatesCalculation/ShippinhRates';
 import AddressInput from '../components/AddressInput';
+
+import { count } from 'firebase/firestore';
 import { sendOrderConfirmationEmails } from './emailService';
 
 const Checkout = () => {
@@ -18,25 +20,26 @@ const Checkout = () => {
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
     lastName: '',
-    address: '',
+    street: '',
     city: '',
     state: '',
     zip: '',
     country: '',
     email: '',
+    phone: '',
   });
   const [isStepValid, setIsStepValid] = useState(false);
   const [totalShippingCost, setTotalShippingCost] = useState(0);
   const [existingAddresses, setExistingAddresses] = useState([]);
 
-  // Function to handle changes in total shipping cost
+
   const handleTotalShippingCostChange = (cost) => {
     setTotalShippingCost(cost);
   };
 
-  // Calculate subtotal price based on cart items
   const subTotalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   const totalPrice = subTotalPrice + totalShippingCost;
+
 
   // Fetch cart items and user's signup address on component mount
   useEffect(() => {
@@ -136,6 +139,8 @@ const Checkout = () => {
     const { firstName, lastName, street, city, state, zip, email } = shippingInfo;
     setIsStepValid(firstName && lastName && street && city && state && zip && email);
   };
+  
+  
 
   // Function to validate step 2 (payment details)
   const validateStep2 = () => {
@@ -196,7 +201,7 @@ const Checkout = () => {
   // Function to handle payment submission
   const handlePayment = async (orderId) => {
     const orderTotalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-
+  
     try {
       const response = await fetch('/api/payment', {
         method: 'POST',
@@ -418,7 +423,8 @@ const renderStep = () => {
                   placeholder="First Name"
                   value={useSignupAddress ? shippingInfo.firstName : ''}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 />
               </div>
               <div className="relative">
@@ -428,7 +434,8 @@ const renderStep = () => {
                   placeholder="Last Name"
                   value={useSignupAddress ? shippingInfo.lastName : ''}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+
+                  className="w-full p-3 border text-black border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 />
               </div>
             </div>
@@ -564,7 +571,7 @@ const renderStep = () => {
                 )}
               </div>
               <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
-              <ShippingRateCalculator 
+          <ShippingRateCalculator 
                   cartItems={cart} 
                   buyerAddress={{
                     firstName: shippingInfo.firstName,
@@ -594,6 +601,7 @@ const renderStep = () => {
   };
 
   return (
+
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-12 bg-white p-10 rounded-2xl shadow-2xl transform transition-all duration-500 ease-in-out hover:scale-105">
         <div className="relative">
@@ -609,6 +617,7 @@ const renderStep = () => {
             ></div>
           </div>
         </div>
+
         <div className="space-y-10">
           <div className="animate-fade-in transform transition-all duration-500 ease-in-out">
             {renderStep()}
@@ -645,7 +654,7 @@ const renderStep = () => {
                   onClick={handleCompleteCheckout}
                   className="bg-gradient-to-r from-green-400 to-green-600 text-white px-8 py-3 rounded-full hover:from-green-500 hover:to-green-700 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 shadow-lg animate-pulse"
                 >
-                  Pay ${cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0).toFixed(2)}
+                  Pay ${totalPrice.toFixed(2)}
                 </button>
               )}
             </div>

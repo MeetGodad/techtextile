@@ -2,7 +2,6 @@ import { useMemo, useState, useRef } from "react";
 import Link from "next/link";
 
 export default function ProductSection({
-  shoppingCart = "/shopping-cart.png",
   addToCartBackgroundColor = "black",
   frameDivBackgroundColor  = "#fcf1f1",
   propWidth = "100%",
@@ -19,7 +18,7 @@ export default function ProductSection({
   const imageUrls = image.split(',');
   const firstImageUrl = imageUrls[0];
 
-  const frameDivStyle = useMemo(() => {
+ const frameDivStyle = useMemo(() => {
     return {
       backgroundColor: addToCartBackgroundColor,
     };
@@ -38,7 +37,7 @@ export default function ProductSection({
     };
   }, [propWidth, propFlex]);
 
-  const addToCartHandler = () => {
+ /* const addToCartHandler = () => {
     const cartIcon = document.querySelector('#cart-icon');
     const productImage = productRef.current;
 
@@ -60,28 +59,37 @@ export default function ProductSection({
         onAddToCart(product);
       }, 600);
     }
-  };
+  };*/
 
   return (
-    <div 
-      className="relative mb-0 w-[243px] flex flex-col items-center justify-start p-4 border border-black rounded-lg bg-white">
+    <div>   
       <Link 
-                href={{ 
-                  pathname: '/Productdetail', 
-                  query: {productId : product.product_id} 
-                }} 
-                as={`/Productdetail?productId=${product.product_id}`}>
-      <div className="flex flex-col w-full h-48 items-center justify-center bg-lavenderblush-100" style={rectangleDivStyle}>
+        href={{ 
+          pathname: '/Productdetail', 
+          query: { productId: product.product_id } 
+        }} 
+        as={`/Productdetail?productId=${product.product_id}`}>
+      <div className="border p-4 rounded-lg">
         <img
           ref={productRef}
-          className={`h-40 w-48 object-cover ${isAnimating ? 'animate-fly' : ''}`}
+          className={`w-full h-48 object-cover mb-2 rounded-lg ${isAnimating ? 'animate-fly' : ''}`}
           style={flyStyle}
-          loading="lazy"
           alt={name}
           src={firstImageUrl}/> 
+          
+        <h2 className=" text-2xl ml-2 text-black font-bold">{name}</h2>
+        <div className="text-red-600 font-semibold ml-2 mb-2">${price}</div>
       </div>
       </Link>
-      <button
+
+
+
+
+
+    </div>
+  );
+}
+      /*<button
         onClick={(e) => {
           e.stopPropagation();
           addToCartHandler();
@@ -93,9 +101,4 @@ export default function ProductSection({
           alt="cart"
           src="/Images/white_cart.png"/>
         <span className="text-base font-bold">Add to cart</span>
-      </button>
-      <h2 className="text-lg font-semibold text-black text-center">{name}</h2>
-      <div className="text-center text-lg font-medium text-gray-800">${price}</div>
-    </div>
-  );
-}
+      </button>*/

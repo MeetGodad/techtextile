@@ -95,3 +95,21 @@ body {
 .hover-box:hover span {
   color: #fff; /* Change the color as needed */
 }
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust minmax as needed */
+  gap: 1rem; /* Adjust gap as needed */
+}
+
+/* Optional: Adjust padding dynamically based on screen size */
+@media (max-width: 1024px) {
+  .main-container {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    padding: 0 0.25rem;
+  }
+}

@@ -20,23 +20,16 @@ export async function GET(req, { params }) {
     fp.fabric_print_tech, 
     fp.fabric_material, 
     (
-        SELECT jsonb_object_agg(
-            variant_name,
-            variant_values
+        SELECT jsonb_agg(
+            jsonb_build_object(
+                'variant_id', pv.variant_id,
+                'color', split_part(pv.variant_attributes, ', ', 1),
+                'denier', split_part(pv.variant_attributes, ', ', 2),
+                'quantity', pv.quantity
+            )
         )
-        FROM (
-            SELECT 
-                pv.variant_name,
-                jsonb_agg(
-                    jsonb_build_object(
-                        'variant_id', pv.variant_id,
-                        'variant_value', pv.variant_value
-                    )
-                ) AS variant_values
-            FROM ProductVariant pv
-            WHERE pv.product_id = p.product_id
-            GROUP BY pv.variant_name
-        ) AS grouped_variants
+        FROM ProductVariant pv
+        WHERE pv.product_id = p.product_id
     ) AS variants,
     s.business_name AS seller_business_name, 
     s.phone_num AS seller_phone_num, 
@@ -71,6 +64,7 @@ GROUP BY
     a.city,
     a.state,
     a.postal_code;`;
+
     if (Products.length === 0) {
         return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
     }
