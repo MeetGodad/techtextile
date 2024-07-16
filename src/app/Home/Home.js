@@ -63,6 +63,8 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
         }});
         const data = await response.json();
         setProducts(data);
+         console.log("Data", data);
+
       } catch (error) {
         console.error('Error fetching the products:', error);
       }

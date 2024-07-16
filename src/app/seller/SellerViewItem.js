@@ -5,7 +5,7 @@ import DeleteListedItem from './DeleteListedItem';
 import UpdateProduct from './UpdateProduct';
 import ProductDetails from './ProductDetails';
 
-const SellerViewItem = () => {
+const SellerViewItem = ({ userId }) => {
   const [items, setItems] = useState([]);
   const { user } = useUserAuth();
   const [selectedItem, setSelectedItem] = useState(null);
@@ -32,7 +32,6 @@ const SellerViewItem = () => {
   const fetchProducts = async () => {
     try {
       if (user) {
-        const userId = user.uid;
         fetch(`/api/seller/${userId}`, {
           method: 'GET',
           headers: {
