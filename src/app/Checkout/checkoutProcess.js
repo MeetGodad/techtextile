@@ -31,6 +31,10 @@ const Checkout = () => {
   const [totalShippingCost, setTotalShippingCost] = useState(0);
   const [shippingDetails, setShippingDetails] = useState([]);
   const [existingAddresses, setExistingAddresses] = useState([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Visa');
+  const [paymentInfo, setPaymentInfo] = useState({ cardName: '', cardNumber: '', expirationDate: '', cvv: '', paypalEmail: '' });
+
+
   const handleShippingDetailsChange = (details) => {
     setShippingDetails(details);
   };
@@ -121,7 +125,7 @@ const Checkout = () => {
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
     setShippingInfo((prev) => ({ ...prev, [name]: value }));
-    validateStep();
+    validateStep1();
   };
 
   // Handler for payment info change
@@ -405,21 +409,27 @@ const renderStep = () => {
                 onChange={handleCheckboxChange}
                 className="form-checkbox h-5 w-5 text-blue-500"
               />
-              <label htmlFor="useSignupAddress" className="ml-2 text-gray-700">
+              <label htmlFor="useSignupAddress" className="ml-2 text-black">
                 Use the same address as signup address
               </label>
             </div> 
             <div>
-                      <h2>Existing Addresses</h2>
+                <h2>Existing Addresses</h2>
+
                 {existingAddresses.length > 0 ? (
-                  <ul>
-                    {existingAddresses.map((address) => (
-                      <li key={address.address_id} onClick={() => handleAddressChange(address)}>
-                       {address.address_id}, {address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country},
-                       
-                      </li>
-                    ))}
-                  </ul>
+                  <div className='text-black'>
+                    <ul>
+                      {existingAddresses.map((address) => (
+                        <li className='text-black'
+                         key={address.address_id} 
+                         onClick={() => handleAddressChange(address)}
+                         >
+                        {address.address_id}, {address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country},
+                        
+                        </li>
+                      ))}
+                    </ul>
+                </div>
                 ) : (
                   <p>No existing addresses found.</p>
                 )}
@@ -450,6 +460,7 @@ const renderStep = () => {
             </div>
             <div className="relative">
             <AddressInput
+                supportedCountries={['CA']}
                 role="shipping"
                 street={shippingInfo.street}
                 city={shippingInfo.city}
@@ -462,9 +473,9 @@ const renderStep = () => {
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
                 setStateCode={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
                 setCountry={(value) => setShippingInfo(prev => ({ ...prev, country: value }))}
-                inputClassName="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                inputClassName="w-full p-4 text-black  border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 containerClassName="relative mb-4"
-                iconClassName="absolute left-3 top-4 text-gray-400"
+                iconClassName="absolute  left-3 top-4 text-gray-400"
               />
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -475,7 +486,7 @@ const renderStep = () => {
                   placeholder="Email"
                   value={useSignupAddress ? shippingInfo.email : ''}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 />
               </div>
               <div className="relative">
@@ -486,11 +497,11 @@ const renderStep = () => {
                   pattern="[0-9]{10}"
                   value={useSignupAddress ? shippingInfo.phone : ''}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 />
               </div>
             </div>
-            {/* Checkbox to use signup address */}
+            {console.log("Buyer Address " , shippingInfo)}
 
           </form>
         </div>
@@ -580,7 +591,7 @@ const renderStep = () => {
                 )}
               </div>
               <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
-
+                {console.log("Buyer Address " , shippingInfo)}
             <ShippingRateCalculator 
                   cartItems={cart} 
                   buyerAddress={{
@@ -590,7 +601,7 @@ const renderStep = () => {
                     city: shippingInfo.city,
                     state: shippingInfo.state,
                     zip: shippingInfo.zip,
-                    country: shippingInfo.countryCode,
+                    country: shippingInfo.country,
                     email: shippingInfo.email,
                     phone: shippingInfo.phone,
                   }}
