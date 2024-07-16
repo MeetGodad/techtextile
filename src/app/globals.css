@@ -113,3 +113,17 @@ body {
     padding: 0 0.25rem;
   }
 }
+
+/* Add these styles to your stylesheet or within a <style> tag */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
