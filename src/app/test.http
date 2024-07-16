@@ -80,17 +80,17 @@ Content-Type: application/json
  
 
 
+####
 
 
+PUT http://localhost:3000/api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+content-type: application/json
 
-# PUT http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
-# content-type: application/json
-
-# {
-#   "quantity": 3,
-#   "cartItemId": "70",
-#   "variantId": [70,78]
-# }
+ {
+   "quantity": 3,
+   "cartItemId": "70",
+   "variantId": [70,78]
+ }
 
 
 
