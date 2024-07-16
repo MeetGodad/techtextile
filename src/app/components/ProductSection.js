@@ -76,6 +76,13 @@ export default function ProductSection({
           style={flyStyle}
           alt={name}
           src={firstImageUrl}/> 
+        <div className="overflow-hidden ">
+          <h2 className="text-2xl text-black ml-2 font-bold truncate">{name}</h2>
+          <div className="text-red-600 font-semibold ml-2">${price}</div>
+        </div>
+        <div className="absolute bottom-2 right-3">
+          {renderStars()}
+        </div>
           
         <h2 className=" text-2xl ml-2 text-black font-bold">{name}</h2>
         <div className="text-red-600 font-semibold ml-2 mb-2">${price}</div>
