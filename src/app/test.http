@@ -28,6 +28,33 @@ content-type: application/json
     "color": "Color1",
     "userId": "6789"
     }
+<<<<<<< Updated upstream
+=======
+
+
+
+###
+//new product
+POST http://localhost:3000/api/products HTTP/1.1
+content-type: application/json
+    
+    {
+    "product_name": "Product1",
+    "product_details": "Details1",
+    "product_image": "Image1",
+    "product_price": 100.00,
+    "categoryName": "Category1",
+    "parentCategory_id": null,
+    "yarnBrand": "Brand1",
+    "yarnDanier": "Danier1",
+    "fabricMaterial": "Material1",
+    "fabricPrintTech": "PrintTech1",
+    "color": "Color1",
+    "userId": "6789"
+    }
+
+######
+>>>>>>> Stashed changes
 
 
 

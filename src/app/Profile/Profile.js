@@ -197,7 +197,6 @@ export default function Profile() {
               </aside>
             )}
           </div>
-        </div>
       </div>
     )
   );
