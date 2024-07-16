@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Chango:wght@400&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -34,6 +35,7 @@ body {
     text-wrap: balance;
   }
 }
+
 .nav-link {
   position: relative;
   display: inline-flex;
@@ -61,6 +63,7 @@ body {
 .nav-link:hover {
   color: black; /* Optional: Change the text color on hover */
 }
+
 .hover-box {
   position: relative;
   display: inline-block;
@@ -91,4 +94,36 @@ body {
 
 .hover-box:hover span {
   color: #fff; /* Change the color as needed */
+}
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust minmax as needed */
+  gap: 1rem; /* Adjust gap as needed */
+}
+
+/* Optional: Adjust padding dynamically based on screen size */
+@media (max-width: 1024px) {
+  .main-container {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    padding: 0 0.25rem;
+  }
+}
+
+/* Add these styles to your stylesheet or within a <style> tag */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scroll-smooth {
+  scroll-behavior: smooth;
 }

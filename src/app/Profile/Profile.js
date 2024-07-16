@@ -200,7 +200,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Correctly import useRouter from next/router
 import SellerViewItem from '../seller/SellerViewItem';
 import ListProduct from '../seller/ListProduct';
 import UpdateUserInfo from './UpdateUserInfo';
@@ -295,7 +295,7 @@ export default function Profile() {
       setTimeout(() => setShowListedItems(true), 10);
     } else {
       setShowListedItems(false);
-      setTimeout(() => setListedItemsVisible(false), 1000); 
+      setTimeout(() => setListedItemsVisible(false), 1000);
     }
   };
 

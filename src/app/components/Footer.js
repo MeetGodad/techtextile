@@ -3,12 +3,7 @@ import PropTypes from 'prop-types';
 const Footer = ({ className = "" }) => {
   return (
     <footer className={`w-full bg-bg overflow-hidden flex flex-col items-start justify-start px-0 ${className}`}>
-      <img
-        className="self-stretch relative max-w-full overflow-hidden max-h-full"
-        loading="lazy"
-        alt=""
-        src="/line-3.svg"
-      />
+
       <section className="self-stretch flex flex-col items-start justify-start pt-10 px-10 pb-5 box-border relative gap-5 text-left text-lg text-bg font-poppins">
         <div className="w-full h-full absolute inset-0 bg-black" />
         <div className="w-full flex flex-col items-start justify-start gap-5 z-10">
