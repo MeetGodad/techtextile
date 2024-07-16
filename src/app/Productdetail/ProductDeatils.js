@@ -516,24 +516,6 @@ const uniqueColors = product.variants
             </button>
           </div>
         </div>)}
-        {relatedProducts.length > 0 && (
-          <div className="mt-8">
-            <h3 className="text-2xl font-semibold mb-4">Related Products</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {relatedProducts.map((relatedProduct) => (
-                <div key={relatedProduct.product_id} className="p-4 border border-gray-300 rounded-md">
-                  <img
-                    src={relatedProduct.image_url.split(',')[0].trim()}
-                    alt={relatedProduct.product_name}
-                    className="w-full h-48 object-cover object-center mb-4"
-                  />
-                  <h4 className="font-medium">{relatedProduct.product_name}</h4>
-                  <p className="text-gray-600">${relatedProduct.price}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
   );
 }
