@@ -38,13 +38,16 @@ export async function GET(req, { params }) {
         'city', a.city,
         'state', a.state,
         'postal_code', a.postal_code
-    ) AS seller_address
+    ) AS seller_address,
+    pr.average_rating,
+    pr.total_reviews
 FROM 
     Products p 
     LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id 
     LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id 
     LEFT JOIN Sellers s ON p.seller_id = s.seller_id
     LEFT JOIN Addresses a ON s.business_address = a.address_id
+    LEFT JOIN product_ratings pr ON p.product_id = pr.product_id
 WHERE 
     p.product_id = ${id}
 GROUP BY 
@@ -63,7 +66,9 @@ GROUP BY
     a.street,
     a.city,
     a.state,
-    a.postal_code;`;
+    a.postal_code,
+    pr.average_rating,
+    pr.total_reviews;`;
 
     if (Products.length === 0) {
         return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });

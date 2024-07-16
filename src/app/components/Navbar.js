@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useUserAuth } from '../auth/auth-context';
 import { usePathname } from 'next/navigation';
 import CategoryDropdown from '../components/Category';
-import { FaOpencart } from "react-icons/fa";
+import { RiShoppingBag4Fill } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
 
 
@@ -86,7 +86,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
   };
 
   return (
-    <div className="w-full bg-white overflow-visible flex flex-row items-center gap-80 px-3 box-border z-40 sticky leading-normal tracking-normal text-xl text-black font-sans" /*style={{ borderBottom: '2px solid black' }}*/>
+    <div className="w-full bg-white overflow-visible flex items-center gap-80 px-3 box-border z-40 sticky top-0 leading-normal tracking-normal text-xl text-black font-sans">
     <div className="flex flex-auto items-center">
       <div className="flex items-center justify-center w-20 h-20"></div>
       <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}><Link href="/Home">TECH TEXTILE</Link></h3>
@@ -124,7 +124,6 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
     </button>
   </div>
 
-        <Link className="nav-link font-semibold ml-4" href="/Home">Home</Link>
         {isHomePage && (
           <div className="flex items-center ml-4">
             <CategoryDropdown
@@ -140,9 +139,9 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
         <Link className="nav-link font-semibold ml-4" href="#">About</Link>
         <Link href="/Cart" className="flex items-center nav-link ml-4">
           <div id="cart-icon" className="relative flex items-center w-10 h-8">
-            <FaOpencart size={45} />
+            <RiShoppingBag4Fill size={45} />
             {user && cart.length > 0 && (
-              <div className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+              <div className="bg-red-600 text-white rounded-full text-xs w-7 h-5 flex items-center mb-4 justify-center">
                 {cart.length}
               </div>
             )}
