@@ -32,7 +32,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
-      fetch(`api/Profile/${userId}`, {
+      fetch(`/api/Profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -141,16 +141,6 @@ export default function Profile() {
                       Admin Dashboard
                     </button>
                   </li>
-                  {/* <li>
-                    <button onClick={handleViewListedItems} className={`block py-2.5 px-4 rounded transition duration-200 ${showListedItems ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
-                      View Listed Items
-                    </button>
-                  </li>
-                  <li>
-                    <button onClick={handleAddProduct} className={`block py-2.5 px-4 rounded transition duration-200 ${showAddProduct ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
-                      Add Product
-                    </button>
-                  </li> */}
                 </>
               )}
               {userDetails.user_type === 'buyer' && (
@@ -186,10 +176,10 @@ export default function Profile() {
                 <h2 className="text-3xl font-semibold border-b pb-2 mb-4">User Information</h2>
                 <p className="text-xl"><strong>Email:</strong> {userDetails.email}</p>
                 <p className="text-xl"><strong>Phone Number:</strong> {userDetails.phone_num}</p>
+                <p className="text-xl mt-4"><strong>Business Name:</strong> {sellerInfo.business_name}</p>
+                <p className="text-xl"><strong>Business Address:</strong> {`${userDetails.street}, ${userDetails.city}, ${userDetails.state} ${userDetails.postal_code}`}</p>
                 {userDetails.user_type === 'seller' && sellerInfo && (
                   <>
-                    <p className="text-xl mt-4"><strong>Business Name:</strong> {sellerInfo.business_name}</p>
-                    <p className="text-xl"><strong>Business Address:</strong> {sellerInfo.business_address}</p>
                     <div className="mt-8">
                       <div className="bg-gray-200 p-4 rounded-lg mb-4">
                         <h3 className="text-xl font-semibold">Business Stats (Coming Soon)</h3>
@@ -203,22 +193,6 @@ export default function Profile() {
               </main>
             )}
           </div>
-
-          {/* <div className={`transition-opacity duration-500 ${showListedItems ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showListedItems && userDetails.user_type === 'seller' && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <SellerViewItem userId={user.uid} />
-              </aside>
-            )}
-          </div> */}
-
-          {/* <div className={`transition-opacity duration-500 ${showAddProduct ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showAddProduct && userDetails.user_type === 'seller' && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <ListProduct userId={user.uid} />
-              </aside>
-            )}
-          </div> */}
 
           <div className={`transition-opacity duration-500 ${showUpdateUser ? 'opacity-100' : 'opacity-0 hidden'}`}>
             {showUpdateUser && (

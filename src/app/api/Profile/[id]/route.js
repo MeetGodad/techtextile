@@ -113,11 +113,37 @@
 //         return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
 //     }
 // }
+//*********************************************************** */
+// import { neon } from '@neondatabase/serverless';
+// import Swal from 'sweetalert2';
+// import withReactContent from 'sweetalert2-react-content';
+// const MySwal = withReactContent(Swal);
+
+// export async function GET(req, { params }) {
+//   const userId = params.id;
+//   const databaseUrl = process.env.DATABASE_URL || "";
+//   const sql = neon(databaseUrl);
+
+//   try {
+//     const user = await sql`
+//       SELECT ua.user_id, ua.email, ua.first_name, ua.last_name, ua.user_type, a.street, a.city, a.state, a.postal_code, s.business_name, s.phone_num
+//       FROM UserAccounts ua
+//       LEFT JOIN Addresses a ON ua.user_id = a.user_id
+//       LEFT JOIN Sellers s ON ua.user_id = s.user_id
+//       WHERE ua.user_id = ${userId};`;
+
+//     if (user.length === 0) {
+//       return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
+//     }
+
+//     return new Response(JSON.stringify({ user: user[0] }), { status: 200 });
+//   } catch (error) {
+//     console.error('An error occurred:', error);
+//     return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
+//   }
+// }
 
 import { neon } from '@neondatabase/serverless';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-const MySwal = withReactContent(Swal);
 
 export async function GET(req, { params }) {
   const userId = params.id;
@@ -125,18 +151,28 @@ export async function GET(req, { params }) {
   const sql = neon(databaseUrl);
 
   try {
-    const user = await sql`
-      SELECT ua.user_id, ua.email, ua.first_name, ua.last_name, ua.user_type, a.street, a.city, a.state, a.postal_code, s.business_name, s.phone_num
+    const userResponse = await sql`
+      SELECT ua.user_id, ua.email, ua.first_name, ua.last_name, ua.user_type,
+             a.street, a.city, a.state, a.postal_code,
+             b.phone_num as buyer_phone, s.business_name, s.phone_num as seller_phone
       FROM UserAccounts ua
       LEFT JOIN Addresses a ON ua.user_id = a.user_id
+      LEFT JOIN Buyers b ON ua.user_id = b.user_id
       LEFT JOIN Sellers s ON ua.user_id = s.user_id
-      WHERE ua.user_id = ${userId};`;
+      WHERE ua.user_id = ${userId};
+    `;
 
-    if (user.length === 0) {
+    if (userResponse.length === 0) {
       return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
     }
 
-    return new Response(JSON.stringify({ user: user[0] }), { status: 200 });
+    const user = userResponse[0];
+    const userInfo = {
+      ...user,
+      phone_num: user.user_type === 'buyer' ? user.buyer_phone : user.seller_phone,
+    };
+
+    return new Response(JSON.stringify({ user: userInfo }), { status: 200 });
   } catch (error) {
     console.error('An error occurred:', error);
     return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
