@@ -20,7 +20,8 @@ export default function ProductDetail({ productId }) {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [isRatingsOpen, setIsRatingsOpen] = useState(false);
   const [reviews, setReviews] = useState([]); 
-
+  const [availableQuantities, setAvailableQuantities] = useState([]);
+  const [Message, setMessage] = useState('');
   useEffect(() => {
     const fetchProductDetails = async () => {
       if (!productId) return;
@@ -59,11 +60,58 @@ export default function ProductDetail({ productId }) {
     fetchProductReviews();
   }, [productId, user]);
 
+useEffect(() => {
+  if (selectedColor && product) {
+    if (product.product_type === 'yarn') {
+      const deniers = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => v.denier.split(': ')[1]);
+      setAvailableDeniers(deniers);
+
+      const quantities = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => ({ denier: v.denier.split(': ')[1], quantity: v.quantity }));
+      setAvailableQuantities(quantities);
+    } else if (product.product_type === 'fabric') {
+      const quantities = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => ({ quantity: v.quantity }));
+      setAvailableQuantities(quantities);
+    }
+  } else {
+    setAvailableDeniers([]);
+    setAvailableQuantities([]);
+  }
+  setSelectedDenier(null);
+  setSelectedVariantId(null);
+}, [selectedColor, product]);
+
+
+useEffect(() => {
+  if (product) {
+    if (product.product_type === 'yarn' && selectedColor && selectedDenier) {
+      const variant = product.variants.find(
+        v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
+      );
+      console.log('Yarn variant:', variant);
+      setSelectedVariantId(variant ? variant.variant_id : null);
+    } else if (product.product_type === 'fabric' && selectedColor) {
+      const variant = product.variants.find(
+        v => v.color.split(': ')[1] === selectedColor
+      );
+      setSelectedVariantId(variant ? variant.variant_id : null);
+    } else {
+      setSelectedVariantId(null);
+    }
+  }
+}, [selectedColor, selectedDenier, product]);
+
+
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       if (!product) return;
       try {
-        const response = await fetch(`/api/products?material=${product.fabric_material}&handmade=${product.handmade}&printing_machine=${product.printing_machine}`);
+        const response = await fetch(`/api/products?material=${product.fabric_material}`);
         const data = await response.json();
         if (response.ok) {
           setRelatedProducts(data);
@@ -74,34 +122,9 @@ export default function ProductDetail({ productId }) {
         console.error('Error fetching related products:', error);
       }
     };
+
     fetchRelatedProducts();
   }, [product]);
-
-useEffect(() => {
-    if (selectedColor && product) {
-      const deniers = product.variants
-        .filter(v => v.color.split(': ')[1] === selectedColor)
-        .map(v => v.denier.split(': ')[1]);
-      setAvailableDeniers(deniers);
-    } else {
-      setAvailableDeniers([]);
-    }
-    setSelectedDenier(null);
-    setSelectedVariantId(null);
-  }, [selectedColor, product]);
-
-useEffect(() => {
-    if (selectedColor && selectedDenier && product) {
-      const variant = product.variants.find(
-        v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
-      );
-      setSelectedVariantId(variant ? variant.variant_id : null);
-    } else {
-      setSelectedVariantId(null);
-    }
-  }, [selectedColor, selectedDenier, product]);
-
-
 
   const addToCart = async () => {
   if (!user) {
@@ -164,9 +187,19 @@ useEffect(() => {
   }
 };
 
-  const handleQuantityChange = (event) => {
-    setQuantity(parseInt(event.target.value));
+ const handleQuantityChange = (event) => {
+    const maxQuantity = getSelectedVariantQuantity();
+    const newQuantity = parseInt(event.target.value);
+
+    if (newQuantity > maxQuantity) {
+      setMessage(`You can only select up to ${maxQuantity} units.`);
+      setQuantity(maxQuantity);
+    } else {
+      setMessage('');
+      setQuantity(newQuantity);
+    }
   };
+  
 
   const handleColorSelection = (color) => {
     setSelectedColor(color);
@@ -174,8 +207,10 @@ useEffect(() => {
   };
 
   const handleDenierSelection = (denier) => {
-    setSelectedDenier(denier);
-  };
+  setSelectedDenier(denier);
+  const selectedVariant = availableQuantities.find(v => v.denier === denier);
+  setSelectedVariantId(selectedVariant ? selectedVariant.variant_id : null);
+};
 
   const handleNextImage = () => {
     if (product) {
@@ -213,9 +248,16 @@ useEffect(() => {
   }
 
   const imageUrls = product.image_url.split(',');
-  
+const getSelectedVariantQuantity = () => {
+  if (product.product_type === 'yarn') {
+    const selectedVariant = availableQuantities.find(v => v.denier === selectedDenier);
+    return selectedVariant ? selectedVariant.quantity : null;
+  } else if (product.product_type === 'fabric') {
+    return availableQuantities.length > 0 ? availableQuantities[0].quantity : null;
+  }
+};
 
-  const uniqueColors = product.variants
+const uniqueColors = product.variants
   ? [...new Set(product.variants.map(v => v.color.split(': ')[1]))]
   : [];
 
@@ -292,13 +334,14 @@ useEffect(() => {
                             />
                           ))}
                         </div>
-                      </div>
+            </div>
+          <div>
               {product.product_type === 'yarn' && (
               <div className="mb-4">
                 <h3 className="font-semibold mb-2">Denier:</h3>
                 <select
                   value={selectedDenier || ''}
-                  onChange={(e) => setSelectedDenier(e.target.value)}
+                  onChange={(e) => handleDenierSelection(e.target.value)}
                   disabled={!selectedColor}
                   className="w-full p-2 border rounded">
                   <option value="">Select Denier</option>
@@ -306,7 +349,37 @@ useEffect(() => {
                     <option key={denier} value={denier}>{denier}</option>
                   ))}
                 </select>
-              </div>)}
+                </div>)}
+              {selectedDenier && product.product_type === 'yarn' && (
+        <div className="mb-4">
+          <h3 className="font-semibold mb-2">Available Quantity:</h3>
+          <p>
+            {getSelectedVariantQuantity() || 'N/A'}
+          </p>
+        </div>
+      )}
+
+      {selectedColor && product.product_type === 'fabric' && (
+        <div className="mb-4">
+          <h3 className="font-semibold mb-2">Available Quantity:</h3>
+          <p>
+            {getSelectedVariantQuantity() || 'N/A'}
+          </p>
+        </div>
+      )}
+
+      {selectedDenier && product.product_type === 'yarn' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
+        <div className="mb-4">
+          <p className="text-red-600">Warning: Low quantity available!</p>
+        </div>
+      )}
+
+      {selectedColor && product.product_type === 'fabric' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
+        <div className="mb-4">
+          <p className="text-red-600">Warning: Low quantity available!</p>
+        </div>
+              )}
+            </div>
                   <div className="ml-4 flex flex-col">
                     <div className="flex items-center mb-4">
                       <label htmlFor="quantity" className="mr-2"><strong>Quantity:</strong></label>
@@ -315,10 +388,12 @@ useEffect(() => {
                         id="quantity"
                         className="border border-gray-300 rounded w-16"
                         min="1"
+                        max={getSelectedVariantQuantity()}
                         value={quantity}
                         onChange={handleQuantityChange}
                       />
-                    </div>
+              </div>
+              <>{Message && <p className="text-red-600">{Message}</p>}</>
                     <button
                       className="px-4 py-2 bg-black text-white rounded-lg"
                       onClick={() => addToCart(product)}>
@@ -374,34 +449,30 @@ useEffect(() => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={handleCloseRatings}>
-              &times;
+              onClick={addToCart}
+              className="mt-4 w-full px-4 py-2 bg-black text-white font-semibold rounded-md transition-colors duration-200 ease-in-out hover:bg-gray-800">
+              Add to Cart
             </button>
-            <Ratings productId={productId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
           </div>
-        </div>
-      )}
-        {/* Display reviews */}
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Reviews</h2>
-          {reviews.length > 0 ? (
-            reviews.map((review, index) => (
-              <div key={index} className="border-b border-gray-200 pb-4 mb-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold">{review.feedback_heading}</h3>
-                  <div className="text-yellow-400 text-4xl">
-                    {'★'.repeat(review.feedback_rating)}{'☆'.repeat(5 - review.feedback_rating)}
-                  </div>
+        </div>)}
+        {relatedProducts.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-2xl font-semibold mb-4">Related Products</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {relatedProducts.map((relatedProduct) => (
+                <div key={relatedProduct.product_id} className="p-4 border border-gray-300 rounded-md">
+                  <img
+                    src={relatedProduct.image_url.split(',')[0].trim()}
+                    alt={relatedProduct.product_name}
+                    className="w-full h-48 object-cover object-center mb-4"
+                  />
+                  <h4 className="font-medium">{relatedProduct.product_name}</h4>
+                  <p className="text-gray-600">${relatedProduct.price}</p>
                 </div>
-                <p>{review.feedback_text}</p>
-                <p className="text-gray-500">Reviewed by: {review.first_name} {review.last_name}</p>
-              </div>
-            ))
-          ) : (
-            <p>No reviews yet. Be the first to review this product!</p>
-          )}
-        </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
   );
 }

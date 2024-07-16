@@ -21,7 +21,6 @@ export async function POST(request) {
         VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${address}, ${city}, ${state}, ${zip})
         RETURNING address_id;
       `;
-      console.log("Shipping Address:", shippingAddress);
     } catch (err) {
       console.error("Error inserting shipping address:", err);
       throw new Error("Failed to insert shipping address.");
@@ -31,29 +30,35 @@ export async function POST(request) {
 
     // Insert order
     let order;
+    
     try {
       order = await sql`
         INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status, order_total_price)
         VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${orderTotalPrice})
         RETURNING order_id;
       `;
-      console.log("Order:", order);
     } catch (err) {
       console.error("Error inserting order:", err);
       throw new Error("Failed to insert order.");
     }
 
     const orderId = order[0].order_id;
-
     // Insert order items
     try {
-      const orderItemsPromises = cart.map(item => 
-        sql`
-          INSERT INTO orderitems (order_id, product_id, quantity, item_price)
-          VALUES (${orderId}, ${item.product_id}, ${item.quantity}, ${item.price});
-        `
-      );
+       const orderItemsPromises = cart.map(async (item) => {
+    await sql`
+      INSERT INTO orderitems (order_id, product_id, quantity, item_price, variant_id)
+      VALUES (${orderId}, ${item.product_id}, ${item.quantity}, ${item.price}, ${item.selected_variant.variant_id});
+    `;
+
+    await sql`
+      UPDATE productvariant
+      SET quantity = quantity - ${item.quantity}
+      WHERE variant_id = ${item.selected_variant.variant_id};
+    `;
+  });
       await Promise.all(orderItemsPromises);
+      console.log(orderItemsPromises);
       console.log("Order Items inserted successfully");
     } catch (err) {
       console.error("Error inserting order items:", err);
@@ -69,7 +74,6 @@ export async function POST(request) {
         FROM products
         WHERE product_id = ANY(${productIds});
       `;
-      console.log("Product Details:", productDetails);
     } catch (err) {
       console.error("Error fetching product details:", err);
       throw new Error("Failed to fetch product details.");

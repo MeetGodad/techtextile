@@ -111,6 +111,7 @@ const Checkout = () => {
 
   const handleSubmit = async () => {
     try {
+      console.log(cart);
       const response = await fetch('/api/order', {
         method: 'POST',
         headers: {
@@ -120,7 +121,6 @@ const Checkout = () => {
           userId: user.uid,
           firstName: shippingInfo.firstName,
           lastName: shippingInfo.lastName,
-
           address: shippingInfo.street,
           city: shippingInfo.city,
           state: shippingInfo.state,
@@ -130,6 +130,7 @@ const Checkout = () => {
           selectedPaymentMethod,
           cart,
         }),
+        
       });
 
       const data = await response.json();
