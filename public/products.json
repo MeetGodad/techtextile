@@ -1,0 +1,184 @@
+
+[
+    {
+      "product_id": 1,
+      "product_name": "Cotton Yarn",
+      "description": "High quality cotton yarn suitable for all kinds of knitting projects.",
+      "price": 15.99,
+      "image_url": "/images/cotton-yarn.jpg",
+      "seller_id": 101,
+      "product_type": "yarn"
+    },
+    {
+      "product_id": 2,
+      "product_name": "Silk Fabric",
+      "description": "Luxurious silk fabric perfect for making elegant dresses and garments.",
+      "price": 35.50,
+      "image_url": "/images/silk-fabric.jpg",
+      "seller_id": 102,
+      "product_type": "fabric"
+    },
+    {
+      "product_id": 3,
+      "product_name": "Wool Yarn",
+      "description": "Warm and soft wool yarn ideal for winter clothing and accessories.",
+      "price": 25.00,
+      "image_url": "/images/wool-yarn.jpg",
+      "seller_id": 103,
+      "product_type": "yarn"
+    },
+    {
+      "product_id": 4,
+      "product_name": "Linen Fabric",
+      "description": "Durable and breathable linen fabric suitable for summer wear and home textiles.",
+      "price": 22.75,
+      "image_url": "/images/linen-fabric.jpg",
+      "seller_id": 104,
+      "product_type": "fabric"
+    },
+    {
+      "product_id": 5,
+      "product_name": "Polyester Yarn",
+      "description": "Versatile polyester yarn available in a variety of colors for all your crafting needs.",
+      "price": 10.99,
+      "image_url": "/images/polyester-yarn.jpg",
+      "seller_id": 105,
+      "product_type": "yarn"
+    },
+    {
+      "product_id": 6,
+      "product_name": "Denim Fabric",
+      "description": "Sturdy and fashionable denim fabric ideal for jeans, jackets, and more.",
+      "price": 30.00,
+      "image_url": "/images/denim-fabric.jpg",
+      "seller_id": 106,
+      "product_type": "fabric"
+    },
+    {
+      "product_id": 7,
+      "product_name": "Acrylic Yarn",
+      "description": "Affordable and easy-to-care acrylic yarn suitable for various knitting projects.",
+      "price": 12.50,
+      "image_url": "/images/acrylic-yarn.jpg",
+      "seller_id": 107,
+      "product_type": "yarn"
+    },
+    {
+      "product_id": 8,
+      "product_name": "Velvet Fabric",
+      "description": "Soft and luxurious velvet fabric perfect for upholstery and elegant clothing.",
+      "price": 40.00,
+      "image_url": "/images/velvet-fabric.jpg",
+      "seller_id": 108,
+      "product_type": "fabric"
+    },
+    {
+      "product_id": 9,
+      "product_name": "Bamboo Yarn",
+      "description": "Eco-friendly bamboo yarn that is soft and breathable, ideal for summer projects.",
+      "price": 18.50,
+      "image_url": "/images/bamboo-yarn.jpg",
+      "seller_id": 109,
+      "product_type": "yarn"
+    },
+    {
+      "product_id": 10,
+      "product_name": "Chiffon Fabric",
+      "description": "Lightweight and flowy chiffon fabric perfect for making elegant and delicate garments.",
+      "price": 28.00,
+      "image_url": "/images/chiffon-fabric.jpg",
+      "seller_id": 110,
+      "product_type": "fabric"
+    },
+    {
+        "product_id": 11,
+        "product_name": "Cashmere Yarn",
+        "description": "Luxuriously soft cashmere yarn for high-end knitting projects.",
+        "price": 55.00,
+        "image_url": "/images/cashmere-yarn.jpg",
+        "seller_id": 111,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 12,
+        "product_name": "Satin Fabric",
+        "description": "Smooth and glossy satin fabric ideal for elegant evening wear.",
+        "price": 45.00,
+        "image_url": "/images/satin-fabric.jpg",
+        "seller_id": 112,
+        "product_type": "fabric"
+    },
+    {
+        "product_id": 13,
+        "product_name": "Alpaca Yarn",
+        "description": "Warm and hypoallergenic alpaca yarn, perfect for cozy winter items.",
+        "price": 35.99,
+        "image_url": "/images/alpaca-yarn.jpg",
+        "seller_id": 113,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 14,
+        "product_name": "Tweed Fabric",
+        "description": "Durable and stylish tweed fabric, ideal for outerwear and suits.",
+        "price": 38.50,
+        "image_url": "/images/tweed-fabric.jpg",
+        "seller_id": 114,
+        "product_type": "fabric"
+    },
+    {
+        "product_id": 15,
+        "product_name": "Merino Wool Yarn",
+        "description": "Fine and soft merino wool yarn for luxurious knitting projects.",
+        "price": 29.99,
+        "image_url": "/images/merino-wool-yarn.jpg",
+        "seller_id": 115,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 16,
+        "product_name": "Organza Fabric",
+        "description": "Sheer and lightweight organza fabric, perfect for elegant overlays.",
+        "price": 32.00,
+        "image_url": "/images/organza-fabric.jpg",
+        "seller_id": 116,
+        "product_type": "fabric"
+    },
+    {
+        "product_id": 17,
+        "product_name": "Mohair Yarn",
+        "description": "Luxuriously soft and fluffy mohair yarn, ideal for light and warm garments.",
+        "price": 42.50,
+        "image_url": "/images/mohair-yarn.jpg",
+        "seller_id": 117,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 18,
+        "product_name": "Corduroy Fabric",
+        "description": "Durable and soft corduroy fabric, perfect for pants and jackets.",
+        "price": 27.00,
+        "image_url": "/images/corduroy-fabric.jpg",
+        "seller_id": 118,
+        "product_type": "fabric"
+    },
+    {
+        "product_id": 19,
+        "product_name": "Lurex Yarn",
+        "description": "Sparkling lurex yarn, ideal for festive and glamorous projects.",
+        "price": 20.00,
+        "image_url": "/images/lurex-yarn.jpg",
+        "seller_id": 119,
+        "product_type": "yarn"
+    },
+    {
+        "product_id": 20,
+        "product_name": "Canvas Fabric",
+        "description": "Heavy-duty canvas fabric, great for bags, tents, and other outdoor uses.",
+        "price": 24.50,
+        "image_url": "/images/canvas-fabric.jpg",
+        "seller_id": 120,
+        "product_type": "fabric"
+    }
+
+]

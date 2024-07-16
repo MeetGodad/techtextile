@@ -1,11 +1,9 @@
-import Login from "./Login/Login"
+import Page from "./Home/page";
 
-
-export default function Page() {
-
-  return (
+export default function App() {
+    return (
     <div>
-      <Login />
+        <Page/>
     </div>
-  );
+    );
 }
