@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 export async function POST(request) {
   try {
     const requestData = await request.json();
-    const { userId, shippingAddressId, selectedPaymentMethod, cart } = requestData;
+    const { userId, firstName, lastName, street, city, state, zip, email, selectedPaymentMethod, cart } = requestData;
 
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
@@ -12,6 +12,42 @@ export async function POST(request) {
 
     // Calculate total price of the order
     const orderTotalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+    // Insert shipping address
+    let shippingAddressId;
+    try {
+      const existingAddress = await sql`
+        SELECT address_id FROM addresses
+        WHERE user_id = ${userId}
+        AND address_first_name = ${firstName}
+        AND address_last_name = ${lastName}
+        AND address_email = ${email}
+        AND street = ${street}
+        AND city = ${city}
+        AND state = ${state}
+        AND postal_code = ${zip}
+        AND country = ${country}
+        AND address_type = 'shipping'
+      `;
+
+      if (existingAddress.length > 0) {
+        // Address already exists, use the existing address_id
+        shippingAddressId = existingAddress[0].address_id;
+        console.log("Using existing shipping address:", shippingAddressId);
+      } else {
+        // Address doesn't exist, insert a new shipping address
+        const newAddress = await sql`
+          INSERT INTO addresses (user_id, address_type, address_first_name, address_last_name, address_email, street, city, state, postal_code)
+          VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${street}, ${city}, ${state}, ${zip})
+          RETURNING address_id;
+        `;
+        shippingAddressId = newAddress[0].address_id;
+        console.log("New shipping address inserted:", shippingAddressId);
+      }
+    } catch (err) {
+      console.error("Error handling shipping address:", err);
+      throw new Error("Failed to handle shipping address.");
+    }
 
     // Insert order
     let orderId;

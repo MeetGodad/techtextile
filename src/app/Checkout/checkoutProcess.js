@@ -19,12 +19,12 @@ const Checkout = () => {
     city: '',
     state: '',
     zip: '',
-    countryCode: '',
+    country: '',
     email: '',
   });
   const [isStepValid, setIsStepValid] = useState(false);
   const [totalShippingCost, setTotalShippingCost] = useState(0);
-
+  const [existingAddresses, setExistingAddresses] = useState([]);
 
   // Function to handle changes in total shipping cost
   const handleTotalShippingCostChange = (cost) => {
@@ -64,7 +64,8 @@ const Checkout = () => {
       const response = await fetch(`/api/address/${userId}`);
       if (response.ok) {
         const data = await response.json();
-        setSignupAddress(data[0]); // Assuming you get an array of addresses and you need the first one
+        setSignupAddress(data[0]);
+        setExistingAddresses(data); // Assuming you get an array of addresses and you need the first one
       } else {
         console.error('Failed to fetch address:', response.statusText);
       }
@@ -86,7 +87,7 @@ const Checkout = () => {
         city: signupAddress.city || '',
         state: signupAddress.state || '',
         zip: signupAddress.postal_code || '',
-        countryCode: signupAddress.country || '',
+        country: signupAddress.country || '',
         email: signupAddress.address_email || '',
         phone: signupAddress.phone_num || '',
       });
@@ -99,7 +100,7 @@ const Checkout = () => {
         city: '',
         state: '',
         zip: '',
-        countryCode: '',
+        country: '',
         email: '',
         phone: '',
       });
@@ -167,15 +168,15 @@ const Checkout = () => {
           userId: user.uid,
           firstName: shippingInfo.firstName,
           lastName: shippingInfo.lastName,
-          address: shippingInfo.address,
+          street: shippingInfo.street,
           city: shippingInfo.city,
           state: shippingInfo.state,
           zip: shippingInfo.zip,
+          country: shippingInfo.country,
           email: shippingInfo.email,
           cart,
         }),
       });
-
       const data = await response.json();
       if (response.ok) {
         return data.orderId;
@@ -245,6 +246,8 @@ const Checkout = () => {
           alert('Order submitted, but failed to send confirmation emails');
           // Handle email sending failure (e.g., show an error message)
         }
+
+        alert("Order confirmation emails sent successfully");
       } else {
         alert('Payment failed. Please try again.');
       }
@@ -253,7 +256,10 @@ const Checkout = () => {
     }
   };
   
-  
+  const handleAddressChange = (address) => {
+    setShippingInfo(address);
+  };
+
 const renderPaymentForm = () => {
   const inputClass = "w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white text-gray-800 placeholder-gray-400";
   const labelClass = "block text-sm font-medium text-gray-700 mb-1";
@@ -385,14 +391,29 @@ const renderStep = () => {
               <label htmlFor="useSignupAddress" className="ml-2 text-gray-700">
                 Use the same address as signup address
               </label>
-            </div>            
+            </div> 
+            <div>
+                      <h2>Existing Addresses</h2>
+                {existingAddresses.length > 0 ? (
+                  <ul>
+                    {existingAddresses.map((address) => (
+                      <li key={address.address_id} onClick={() => handleAddressChange(address)}>
+                       {address.address_id}, {address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country},
+                       
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No existing addresses found.</p>
+                )}
+              </div>           
             <div className="grid md:grid-cols-2 gap-6">
               <div className="relative">
                 <input
                   type="text"
                   name="firstName"
                   placeholder="First Name"
-                  value={useSignupAddress ? signupAddress.firstName : ''}
+                  value={useSignupAddress ? shippingInfo.firstName : ''}
                   onChange={handleShippingChange}
                   className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 />
@@ -402,7 +423,7 @@ const renderStep = () => {
                   type="text"
                   name="lastName"
                   placeholder="Last Name"
-                  value={useSignupAddress ? signupAddress.lastName : ''}
+                  value={useSignupAddress ? shippingInfo.lastName : ''}
                   onChange={handleShippingChange}
                   className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 />
@@ -415,17 +436,16 @@ const renderStep = () => {
                 city={shippingInfo.city}
                 state={shippingInfo.state}
                 postalCode={shippingInfo.zip}
-                country={shippingInfo.countryCode}
+                country={shippingInfo.country}
                 setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
                 setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
                 setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
-                setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
-                setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
+                setStateCode={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
+                setCountry={(value) => setShippingInfo(prev => ({ ...prev, country: value }))}
                 inputClassName="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 containerClassName="relative mb-4"
                 iconClassName="absolute left-3 top-4 text-gray-400"
-                readOnly={useSignupAddress} // Disable input if using signup address
               />
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -434,7 +454,7 @@ const renderStep = () => {
                   type="email"
                   name="email"
                   placeholder="Email"
-                  value={useSignupAddress ? signupAddress.email : ''}
+                  value={useSignupAddress ? shippingInfo.email : ''}
                   onChange={handleShippingChange}
                   className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 />
@@ -445,12 +465,14 @@ const renderStep = () => {
                   name="phone"
                   placeholder="Phone Number"
                   pattern="[0-9]{10}"
-                  value={useSignupAddress ? signupAddress.phone : ''}
+                  value={useSignupAddress ? shippingInfo.phone : ''}
                   onChange={handleShippingChange}
                   className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 />
               </div>
             </div>
+            {/* Checkbox to use signup address */}
+
           </form>
         </div>
       );
@@ -544,7 +566,7 @@ const renderStep = () => {
                   buyerAddress={{
                     firstName: shippingInfo.firstName,
                     lastName: shippingInfo.lastName,
-                    address: shippingInfo.street,
+                    street: shippingInfo.street,
                     city: shippingInfo.city,
                     state: shippingInfo.state,
                     zip: shippingInfo.zip,
