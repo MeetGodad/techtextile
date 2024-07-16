@@ -10,56 +10,28 @@ export default function ProductSection({
   name,
   price,
   image,
+  averageRating,
   onAddToCart,
 }) {
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [flyStyle, setFlyStyle] = useState({});
   const productRef = useRef(null);
   const imageUrls = image.split(',');
   const firstImageUrl = imageUrls[0];
-
- const frameDivStyle = useMemo(() => {
-    return {
-      backgroundColor: addToCartBackgroundColor,
-    };
-  }, [addToCartBackgroundColor]);
-
-  const rectangleDivStyle = useMemo(() => {
-    return {
-      backgroundColor: frameDivBackgroundColor,
-    };
-  }, [frameDivBackgroundColor]);
-
-  const addToCartStyle = useMemo(() => {
-    return {
-      width: propWidth,
-      flex: propFlex,
-    };
-  }, [propWidth, propFlex]);
-
- /* const addToCartHandler = () => {
-    const cartIcon = document.querySelector('#cart-icon');
-    const productImage = productRef.current;
-
-    if (productImage && cartIcon) {
-      const productRect = productImage.getBoundingClientRect();
-      const cartRect = cartIcon.getBoundingClientRect();
-      const flyX = cartRect.left - productRect.left + "px";
-      const flyY = cartRect.top - productRect.top + "px";
-
-      setFlyStyle({
-        '--fly-x': flyX,
-        '--fly-y': flyY,
-      });
-
-      setIsAnimating(true);
-
-      setTimeout(() => {
-        setIsAnimating(false);
-        onAddToCart(product);
-      }, 600);
-    }
-  };*/
+  const renderStars = () => {
+    return (
+      <div className="inline-flex items-center bg-gray-200 rounded-md px-2 py-1">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <span
+            key={i}
+            className={`text-xl ${
+              i <= averageRating ? 'text-yellow-400' : 'text-black'
+            }`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div>   
@@ -69,43 +41,21 @@ export default function ProductSection({
           query: { productId: product.product_id } 
         }} 
         as={`/Productdetail?productId=${product.product_id}`}>
-      <div className="border p-4 rounded-lg">
+      <div className="border p-4 rounded-lg relative " style={{ height: '300px' }}>
         <img
           ref={productRef}
-          className={`w-full h-48 object-cover mb-2 rounded-lg ${isAnimating ? 'animate-fly' : ''}`}
-          style={flyStyle}
+          className={`w-full h-48 object-cover mb-2 rounded-lg `}
           alt={name}
           src={firstImageUrl}/> 
         <div className="overflow-hidden ">
-          <h2 className="text-2xl text-black ml-2 font-bold truncate">{name}</h2>
+          <h2 className="text-2xl ml-2 font-bold truncate text-black">{name}</h2>
           <div className="text-red-600 font-semibold ml-2">${price}</div>
         </div>
         <div className="absolute bottom-2 right-3">
           {renderStars()}
         </div>
-          
-        <h2 className=" text-2xl ml-2 text-black font-bold">{name}</h2>
-        <div className="text-red-600 font-semibold ml-2 mb-2">${price}</div>
       </div>
       </Link>
-
-
-
-
-
     </div>
   );
 }
-      /*<button
-        onClick={(e) => {
-          e.stopPropagation();
-          addToCartHandler();
-        }}
-        className="flex items-center justify-center py-2 px-4 w-full bg-black text-white rounded-md hover:bg-darkslategray transition"
-        style={addToCartStyle}>
-        <img
-          className="w-6 h-6 mr-2"
-          alt="cart"
-          src="/Images/white_cart.png"/>
-        <span className="text-base font-bold">Add to cart</span>
-      </button>*/

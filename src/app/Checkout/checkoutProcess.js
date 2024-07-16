@@ -176,6 +176,7 @@ const Checkout = () => {
   // Function to submit the order
   const handleSubmitOrder = async () => {
     try {
+      console.log(cart);
       const response = await fetch('/api/order', {
         method: 'POST',
         headers: {
@@ -196,6 +197,7 @@ const Checkout = () => {
           totalShippingCost: totalShippingCost.toFixed(2),
           totalPrice: totalPrice.toFixed(2),
         }),
+        
       });
       const data = await response.json();
       if (response.ok) {

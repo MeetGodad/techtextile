@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 import Ratings from '../components/Ratings';
+import { useRouter } from 'next/navigation';
 
 export default function ProductDetail({ productId }) {
   const { user } = useUserAuth();
@@ -18,32 +19,39 @@ export default function ProductDetail({ productId }) {
   const [showSellerDetails, setShowSellerDetails] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [currentProductId, setCurrentProductId] = useState(productId);
   const [isRatingsOpen, setIsRatingsOpen] = useState(false);
   const [reviews, setReviews] = useState([]); 
+  const [availableQuantities, setAvailableQuantities] = useState([]);
+  const [Message, setMessage] = useState('');
+  const [averageRating, setAverageRating] = useState(0);
+  averageRating,
 
   useEffect(() => {
     const fetchProductDetails = async () => {
-      if (!productId) return;
+      if (!currentProductId) return;
+      setLoading(true);
       try {
-        const response = await fetch(`/api/products/${productId}`);
+        const response = await fetch(`/api/products/${currentProductId}`);
         const data = await response.json();
         if (response.ok) {
           setProduct(data[0]);
           setCurrentImage(data[0].image_url.split(',')[0].trim());
+          setAverageRating(data[0].average_rating || 0); 
         } else {
           console.error('Error fetching product details:', data.message);
         }
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching product details:', error);
+      } finally {
         setLoading(false);
       }
     };
 
     const fetchProductReviews = async () => {
-      if (!productId) return;
+      if (!currentProductId) return;
       try {
-        const response = await fetch(`/api/review?product_id=${productId}`);
+        const response = await fetch(`/api/review?product_id=${currentProductId}`);
         const data = await response.json();
         if (response.ok) {
           setReviews(data);
@@ -57,13 +65,97 @@ export default function ProductDetail({ productId }) {
 
     fetchProductDetails();
     fetchProductReviews();
-  }, [productId, user]);
+  }, [currentProductId]);
+
+  const renderStars = () => {
+    return (
+      <div className="inline-flex items-center bg-gray-200 rounded-md px-2 py-1">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <span
+            key={i}
+            className={`text-xl ${i <= averageRating ? 'text-yellow-400' : 'text-black'
+            }`}
+          >     
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!currentProductId) return;
+      try {
+        const response = await fetch(`/api/products/relatedProduct/${currentProductId}`);
+        const data = await response.json();
+        if (response.ok) {
+          setRelatedProducts(data);
+        } else {
+          console.error('Error fetching related products:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching related products:', error);
+      }
+    };-
+
+    fetchRelatedProducts();
+  }, [currentProductId]);
+
+
+
+useEffect(() => {
+  if (selectedColor && product) {
+    if (product.product_type === 'yarn') {
+      const deniers = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => v.denier.split(': ')[1]);
+      setAvailableDeniers(deniers);
+
+      const quantities = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => ({ denier: v.denier.split(': ')[1], quantity: v.quantity }));
+      setAvailableQuantities(quantities);
+    } else if (product.product_type === 'fabric') {
+      const quantities = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => ({ quantity: v.quantity }));
+      setAvailableQuantities(quantities);
+    }
+  } else {
+    setAvailableDeniers([]);
+    setAvailableQuantities([]);
+  }
+  setSelectedDenier(null);
+  setSelectedVariantId(null);
+}, [selectedColor, product]);
+
+
+useEffect(() => {
+  if (product) {
+    if (product.product_type === 'yarn' && selectedColor && selectedDenier) {
+      const variant = product.variants.find(
+        v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
+      );
+      console.log('Yarn variant:', variant);
+      setSelectedVariantId(variant ? variant.variant_id : null);
+    } else if (product.product_type === 'fabric' && selectedColor) {
+      const variant = product.variants.find(
+        v => v.color.split(': ')[1] === selectedColor
+      );
+      setSelectedVariantId(variant ? variant.variant_id : null);
+    } else {
+      setSelectedVariantId(null);
+    }
+  }
+}, [selectedColor, selectedDenier, product]);
+
+
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       if (!product) return;
       try {
-        const response = await fetch(`/api/products?material=${product.fabric_material}&handmade=${product.handmade}&printing_machine=${product.printing_machine}`);
+        const response = await fetch(`/api/products?material=${product.fabric_material}`);
         const data = await response.json();
         if (response.ok) {
           setRelatedProducts(data);
@@ -74,34 +166,9 @@ export default function ProductDetail({ productId }) {
         console.error('Error fetching related products:', error);
       }
     };
+
     fetchRelatedProducts();
   }, [product]);
-
-useEffect(() => {
-    if (selectedColor && product) {
-      const deniers = product.variants
-        .filter(v => v.color.split(': ')[1] === selectedColor)
-        .map(v => v.denier.split(': ')[1]);
-      setAvailableDeniers(deniers);
-    } else {
-      setAvailableDeniers([]);
-    }
-    setSelectedDenier(null);
-    setSelectedVariantId(null);
-  }, [selectedColor, product]);
-
-useEffect(() => {
-    if (selectedColor && selectedDenier && product) {
-      const variant = product.variants.find(
-        v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
-      );
-      setSelectedVariantId(variant ? variant.variant_id : null);
-    } else {
-      setSelectedVariantId(null);
-    }
-  }, [selectedColor, selectedDenier, product]);
-
-
 
   const addToCart = async () => {
   if (!user) {
@@ -164,9 +231,19 @@ useEffect(() => {
   }
 };
 
-  const handleQuantityChange = (event) => {
-    setQuantity(parseInt(event.target.value));
+ const handleQuantityChange = (event) => {
+    const maxQuantity = getSelectedVariantQuantity();
+    const newQuantity = parseInt(event.target.value);
+
+    if (newQuantity > maxQuantity) {
+      setMessage(`You can only select up to ${maxQuantity} units.`);
+      setQuantity(maxQuantity);
+    } else {
+      setMessage('');
+      setQuantity(newQuantity);
+    }
   };
+  
 
   const handleColorSelection = (color) => {
     setSelectedColor(color);
@@ -174,8 +251,10 @@ useEffect(() => {
   };
 
   const handleDenierSelection = (denier) => {
-    setSelectedDenier(denier);
-  };
+  setSelectedDenier(denier);
+  const selectedVariant = availableQuantities.find(v => v.denier === denier);
+  setSelectedVariantId(selectedVariant ? selectedVariant.variant_id : null);
+};
 
   const handleNextImage = () => {
     if (product) {
@@ -200,6 +279,10 @@ useEffect(() => {
     setIsRatingsOpen(false);
   };
 
+  const handleViewDetails = (newProductId) => {
+    setCurrentProductId(newProductId);
+  };
+
   if (loading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
@@ -213,9 +296,17 @@ useEffect(() => {
   }
 
   const imageUrls = product.image_url.split(',');
-  
+const getSelectedVariantQuantity = () => {
+  if (product.product_type === 'yarn') {
+    const selectedVariant = availableQuantities.find(v => v.denier === selectedDenier);
+    return selectedVariant ? selectedVariant.quantity : null;
+  } else if (product.product_type === 'fabric') {
+    return availableQuantities.length > 0 ? availableQuantities[0].quantity : null;
+  }
+};
 
-  const uniqueColors = product.variants
+
+const uniqueColors = product.variants
   ? [...new Set(product.variants.map(v => v.color.split(': ')[1]))]
   : [];
 
@@ -278,6 +369,7 @@ useEffect(() => {
           </div>
           <div className="md:w-1/2 md:pl-8">
             <h1 className="text-3xl font-semibold mb-4">{product.product_name}</h1>
+            {renderStars()}
             <h2 className="text-2xl font-bold text-gray-800 mb-4">${product.price}</h2>
             <div className="mb-4">
                         <h3 className="font-semibold mb-2">Color:</h3>
@@ -292,13 +384,14 @@ useEffect(() => {
                             />
                           ))}
                         </div>
-                      </div>
+            </div>
+          <div>
               {product.product_type === 'yarn' && (
               <div className="mb-4">
                 <h3 className="font-semibold mb-2">Denier:</h3>
                 <select
                   value={selectedDenier || ''}
-                  onChange={(e) => setSelectedDenier(e.target.value)}
+                  onChange={(e) => handleDenierSelection(e.target.value)}
                   disabled={!selectedColor}
                   className="w-full p-2 border rounded">
                   <option value="">Select Denier</option>
@@ -306,7 +399,37 @@ useEffect(() => {
                     <option key={denier} value={denier}>{denier}</option>
                   ))}
                 </select>
-              </div>)}
+                </div>)}
+              {selectedDenier && product.product_type === 'yarn' && (
+        <div className="mb-4">
+          <h3 className="font-semibold mb-2">Available Quantity:</h3>
+          <p>
+            {getSelectedVariantQuantity() || 'N/A'}
+          </p>
+        </div>
+      )}
+
+      {selectedColor && product.product_type === 'fabric' && (
+        <div className="mb-4">
+          <h3 className="font-semibold mb-2">Available Quantity:</h3>
+          <p>
+            {getSelectedVariantQuantity() || 'N/A'}
+          </p>
+        </div>
+      )}
+
+      {selectedDenier && product.product_type === 'yarn' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
+        <div className="mb-4">
+          <p className="text-red-600">Warning: Low quantity available!</p>
+        </div>
+      )}
+
+      {selectedColor && product.product_type === 'fabric' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
+        <div className="mb-4">
+          <p className="text-red-600">Warning: Low quantity available!</p>
+        </div>
+              )}
+            </div>
                   <div className="ml-4 flex flex-col">
                     <div className="flex items-center mb-4">
                       <label htmlFor="quantity" className="mr-2"><strong>Quantity:</strong></label>
@@ -315,10 +438,12 @@ useEffect(() => {
                         id="quantity"
                         className="border border-gray-300 rounded w-16"
                         min="1"
+                        max={getSelectedVariantQuantity()}
                         value={quantity}
                         onChange={handleQuantityChange}
                       />
-                    </div>
+              </div>
+              <>{Message && <p className="text-red-600">{Message}</p>}</>
                     <button
                       className="px-4 py-2 bg-black text-white rounded-lg"
                       onClick={() => addToCart(product)}>
@@ -332,8 +457,6 @@ useEffect(() => {
                   </div>
                 </div>
               </div>
-
-            
             {/* Display additional product details */}
             {product.yarn_material && (
               <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
@@ -348,60 +471,51 @@ useEffect(() => {
         {/* Related Products Section */}
         <div className="mt-8">
           <h2 className="w-auto text-3xl text-center italic font-bold font-inherit mb-5">Related Products</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {relatedProducts.map((relatedProduct) => (
-              <div key={relatedProduct.product_id} className="border p-4 rounded-lg">
-                <img
-                  src={relatedProduct.image_url.split(',')[0].trim()}
-                  alt={relatedProduct.product_name}
-                  className="w-full h-48 object-cover mb-2 rounded-lg"
-                />
-                <h3 className="text-lg font-semibold">{relatedProduct.product_name}</h3>
-                <p className="text-gray-700 mb-2">${relatedProduct.price}</p>
-                <button
-                  className="px-4 py-2 bg-black text-white rounded-lg"
-                  onClick={() => {
-                    // Update the productId state to the related product's ID
-                    setproductId(relatedProduct.product_id);
-                  }}>
-                  View Details
-                </button>
+          {/* Scroll Container */}
+          <div className="relative flex items-center">
+            {/* Left Arrow Placeholder */}
+            <div className="absolute left-0 z-10 bg-gray-200 rounded-full cursor-pointer">
+              {/* Implement arrow icon and functionality */}
+            </div>
+            {/* Products Grid */}
+            <div className="flex overflow-x-auto scroll-smooth scrollbar-hide">
+              <div className="grid grid-flow-col auto-cols-max gap-6">
+                {console.log(relatedProducts)}
+                {relatedProducts.map((relatedProduct) => (
+                  <div key={relatedProduct.product_id} className="border p-4 rounded-lg">
+                    {console.log(relatedProduct.related_product_id)}
+                    <img
+                      src={relatedProduct.image_url.split(',')[0].trim()}
+                      alt={relatedProduct.product_name}
+                      className="w-80 h-48 object-cover mb-2 rounded-lg"
+                    />
+                    <h3 className="text-lg font-semibold w-80">{relatedProduct.product_name}</h3>
+                    <p className="text-gray-700 mb-2">${relatedProduct.price}</p>
+                    <button
+                      className="px-4 py-2 bg-black text-white rounded-lg"
+                      onClick={() => handleViewDetails(relatedProduct.related_product_id)}>
+                      View Details
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            {/* Right Arrow Placeholder */}
+            <div className="absolute right-0 z-10 bg-gray-200 rounded-full cursor-pointer">
+              {/* Implement arrow icon and functionality */}
+            </div>
           </div>
         </div>
       {isRatingsOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={handleCloseRatings}>
-              &times;
+              onClick={addToCart}
+              className="mt-4 w-full px-4 py-2 bg-black text-white font-semibold rounded-md transition-colors duration-200 ease-in-out hover:bg-gray-800">
+              Add to Cart
             </button>
-            <Ratings productId={productId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
           </div>
-        </div>
-      )}
-        {/* Display reviews */}
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Reviews</h2>
-          {reviews.length > 0 ? (
-            reviews.map((review, index) => (
-              <div key={index} className="border-b border-gray-200 pb-4 mb-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold">{review.feedback_heading}</h3>
-                  <div className="text-yellow-400 text-4xl">
-                    {'★'.repeat(review.feedback_rating)}{'☆'.repeat(5 - review.feedback_rating)}
-                  </div>
-                </div>
-                <p>{review.feedback_text}</p>
-                <p className="text-gray-500">Reviewed by: {review.first_name} {review.last_name}</p>
-              </div>
-            ))
-          ) : (
-            <p>No reviews yet. Be the first to review this product!</p>
-          )}
-        </div>
+        </div>)}
       </div>
   );
 }
