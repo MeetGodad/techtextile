@@ -104,3 +104,7 @@ GET  http://localhost:3000/api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 GET  http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 
 
+
+###
+
+GET http://localhost:3000/api/history/ftTlS3bbXnbha2zG5Sd68FLA3IF2 HTTP/1.1
