@@ -1,3 +1,5 @@
+// checkoutProcess.js
+
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,12 +9,13 @@ import AddressInput from '../components/AddressInput';
 import { count } from 'firebase/firestore';
 import { sendOrderConfirmationEmails } from './emailService';
 
-
 const Checkout = () => {
   const router = useRouter();
   const { user } = useUserAuth();
   const [step, setStep] = useState(1);
   const [cart, setCart] = useState([]);
+  const [signupAddress, setSignupAddress] = useState({});
+  const [useSignupAddress, setUseSignupAddress] = useState(false);
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
     lastName: '',
@@ -20,21 +23,24 @@ const Checkout = () => {
     city: '',
     state: '',
     zip: '',
-    countryCode: '',
+    country: '',
     stateCode: '',
+    countryCode: '',
     email: '',
     phone: '',
   });
-  const [paymentInfo, setPaymentInfo] = useState({
-    cardName: '',
-    cardNumber: '',
-    expirationDate: '',
-    cvv: '',
-    paypalEmail: '',
-  });
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Visa');
   const [isStepValid, setIsStepValid] = useState(false);
   const [totalShippingCost, setTotalShippingCost] = useState(0);
+  const [shippingDetails, setShippingDetails] = useState([]);
+  const [existingAddresses, setExistingAddresses] = useState([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Visa');
+  const [paymentInfo, setPaymentInfo] = useState({ cardName: '', cardNumber: '', expirationDate: '', cvv: '', paypalEmail: '' });
+
+
+  const handleShippingDetailsChange = (details) => {
+    setShippingDetails(details);
+  };
+  
 
   const handleTotalShippingCostChange = (cost) => {
     setTotalShippingCost(cost);
@@ -44,14 +50,15 @@ const Checkout = () => {
   const totalPrice = subTotalPrice + totalShippingCost;
 
 
-
-
+  // Fetch cart items and user's signup address on component mount
   useEffect(() => {
     if (user) {
       fetchCartItems(user.uid);
+      fetchUserAddress(user.uid);
     }
   }, [user]);
 
+  // Function to fetch cart items for the user
   const fetchCartItems = async (userId) => {
     try {
       const response = await fetch(`/api/cart/${userId}`);
@@ -66,23 +73,77 @@ const Checkout = () => {
     }
   };
 
+  // Function to fetch user's signup address
+  const fetchUserAddress = async (userId) => {
+    try {
+      const response = await fetch(`/api/address/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSignupAddress(data[0]);
+        setExistingAddresses(data); // Assuming you get an array of addresses and you need the first one
+      } else {
+        console.error('Failed to fetch address:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching address:', error);
+    }
+  };
+
+  // Handle checkbox change to use signup address for shipping
+  const handleCheckboxChange = () => {
+    setUseSignupAddress(!useSignupAddress);
+
+    if (!useSignupAddress) {
+      // Autofill shipping details with signup address
+      setShippingInfo({
+        firstName: signupAddress.address_first_name || '',
+        lastName: signupAddress.address_last_name || '',
+        street: signupAddress.street || '',
+        city: signupAddress.city || '',
+        state: signupAddress.state || '',
+        zip: signupAddress.postal_code || '',
+        country: signupAddress.country || '',
+        email: signupAddress.address_email || '',
+        phone: signupAddress.phone_num || '',
+      });
+    } else {
+      // Clear shipping details if the checkbox is unchecked
+      setShippingInfo({
+        firstName: '',
+        lastName: '',
+        street: '',
+        city: '',
+        state: '',
+        zip: '',
+        country: '',
+        email: '',
+        phone: '',
+      });
+    }
+    validateStep1(); // Validate step after updating shipping info
+  };
+
+  // Handler for shipping info change
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
     setShippingInfo((prev) => ({ ...prev, [name]: value }));
     validateStep1();
   };
 
+  // Handler for payment info change
   const handlePaymentChange = (e) => {
     const { name, value } = e.target;
     setPaymentInfo((prev) => ({ ...prev, [name]: value }));
     validateStep2();
   };
 
+  // Handler for expiration date change
   const handleExpirationDateChange = (value) => {
     setPaymentInfo((prev) => ({ ...prev, expirationDate: value }));
     validateStep2();
   };
 
+  // Function to validate step 1 (shipping details)
   const validateStep1 = () => {
     const { firstName, lastName, street, city, state, zip, email } = shippingInfo;
     setIsStepValid(firstName && lastName && street && city && state && zip && email);
@@ -90,6 +151,7 @@ const Checkout = () => {
   
   
 
+  // Function to validate step 2 (payment details)
   const validateStep2 = () => {
     if (selectedPaymentMethod === 'PayPal') {
       setIsStepValid(paymentInfo.paypalEmail !== '');
@@ -99,17 +161,20 @@ const Checkout = () => {
     }
   };
 
+  // Handler to move to previous step
   const handlePreviousStep = () => {
     setStep(step - 1);
   };
 
+  // Handler to move to next step if current step is valid
   const handleNextStep = () => {
     if (isStepValid) {
       setStep(step + 1);
     }
   };
 
-  const handleSubmit = async () => {
+  // Function to submit the order
+  const handleSubmitOrder = async () => {
     try {
       const response = await fetch('/api/order', {
         method: 'POST',
@@ -120,19 +185,20 @@ const Checkout = () => {
           userId: user.uid,
           firstName: shippingInfo.firstName,
           lastName: shippingInfo.lastName,
-          address: shippingInfo.street,
+          street: shippingInfo.street,
           city: shippingInfo.city,
           state: shippingInfo.state,
           zip: shippingInfo.zip,
-          countryCode: shippingInfo.countryCode,
+          country: shippingInfo.country,
           email: shippingInfo.email,
-          selectedPaymentMethod,
           cart,
+          shippingDetails,
+          totalShippingCost: totalShippingCost.toFixed(2),
+          totalPrice: totalPrice.toFixed(2),
         }),
       });
       const data = await response.json();
       if (response.ok) {
-        alert('Order Submitted');
         return data.orderId;
       } else {
         console.error('Failed to submit order:', data.error);
@@ -143,6 +209,8 @@ const Checkout = () => {
       return null;
     }
   };
+
+  // Function to handle payment submission
   const handlePayment = async (orderId) => {
     const orderTotalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   
@@ -153,7 +221,6 @@ const Checkout = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-
           orderId: orderId,
           paymentMethod: selectedPaymentMethod,
           paymentAmount: orderTotalPrice,
@@ -162,7 +229,6 @@ const Checkout = () => {
 
       const data = await response.json();
       if (response.ok) {
-        console.log('Payment Submitted');
         return { orderId, detailedCart: cart, orderTotalPrice }; // Return detailed response
       } else {
         console.error('Failed to submit payment:', data.error);
@@ -174,38 +240,49 @@ const Checkout = () => {
     }
   };
 
-  
-  
-const handlePayAndSubmit = async () => {
-  const orderId = await handleSubmit();
-  if (orderId) {
-    await handlePayment(orderId);
-    const orderDetails = {
-      userId: user.uid,
-      orderId: orderId,
-      shippingInfo,
-      cart,
-      selectedPaymentMethod,
-      totalPrice: cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0).toFixed(2),
-      paymentInfo: selectedPaymentMethod === 'PayPal' ? paymentInfo.paypalEmail : `${paymentInfo.cardNumber.slice(0, 4)} **** **** ${paymentInfo.cardNumber.slice(-4)}`,
-    };
-    const emailsSent = await sendOrderConfirmationEmails(orderDetails);
 
-    if (emailsSent) {
-      console.log('Order confirmation emails sent successfully');
-      // Handle successful email sending (e.g., show a success message)
+  // Function to handle complete checkout process
+  const handleCompleteCheckout = async () => {
+    const orderId = await handleSubmitOrder();
+    if (orderId) {
+      const paymentResult = await handlePayment(orderId);
+      if (paymentResult) {
+        const orderDetails = {
+          userId: user.uid,
+          orderId: orderId,
+          shippingInfo,
+          cart,
+          selectedPaymentMethod,
+          totalShippingCost: totalShippingCost.toFixed(2),
+          totalPrice: totalPrice.toFixed(2),
+          paymentInfo: selectedPaymentMethod === 'PayPal' ? paymentInfo.paypalEmail : `${paymentInfo.cardNumber.slice(0, 4)} **** **** ${paymentInfo.cardNumber.slice(-4)}`,
+        };
+        const emailsSent = await sendOrderConfirmationEmails(orderDetails);
+
+        if (emailsSent) {
+          console.log('Order confirmation emails sent successfully');
+          alert('Order and payment submitted successfully');
+          // Handle successful email sending (e.g., show a success message, redirect to a success page)
+        } else {
+          console.error('Failed to send order confirmation emails');
+          alert('Order submitted, but failed to send confirmation emails');
+          // Handle email sending failure (e.g., show an error message)
+        }
+
+        alert("Order confirmation emails sent successfully");
+      } else {
+        alert('Payment failed. Please try again.');
+      }
     } else {
-      console.error('Failed to send order confirmation emails');
-      // Handle email sending failure (e.g., show an error message)
+      alert('Failed to create order. Please try again.');
     }
-
-  } else {
-    alert('Failed to create order. Please try again.');
-  }
-};
+  };
 
   
-  
+  const handleAddressChange = (address) => {
+    setShippingInfo(address);
+  };
+
 const renderPaymentForm = () => {
   const inputClass = "w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white text-gray-800 placeholder-gray-400";
   const labelClass = "block text-sm font-medium text-gray-700 mb-1";
@@ -325,35 +402,67 @@ const renderStep = () => {
         <div className="animate-fade-in-down">
           <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">Shipping Details</h2>
           <form className="space-y-6 bg-white p-8 rounded-xl shadow-lg max-w-2xl mx-auto">
+          <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="useSignupAddress"
+                name="useSignupAddress"
+                checked={useSignupAddress}
+                onChange={handleCheckboxChange}
+                className="form-checkbox h-5 w-5 text-blue-500"
+              />
+              <label htmlFor="useSignupAddress" className="ml-2 text-black">
+                Use the same address as signup address
+              </label>
+            </div> 
+            <div>
+                <h2>Existing Addresses</h2>
+
+                {existingAddresses.length > 0 ? (
+                  <div className='text-black'>
+                    <ul>
+                      {existingAddresses.map((address) => (
+                        <li className='text-black'
+                         key={address.address_id} 
+                         onClick={() => handleAddressChange(address)}
+                         >
+                        {address.address_id}, {address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country},
+                        
+                        </li>
+                      ))}
+                    </ul>
+                </div>
+                ) : (
+                  <p>No existing addresses found.</p>
+                )}
+              </div>           
             <div className="grid md:grid-cols-2 gap-6">
               <div className="relative">
                 <input
                   type="text"
                   name="firstName"
                   placeholder="First Name"
-                  value={shippingInfo.firstName}
+                  value={useSignupAddress ? shippingInfo.firstName : ''}
                   onChange={handleShippingChange}
 
-                  className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
                 />
-                <span className="absolute left-3 top-4 text-gray-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
-                </span>
               </div>
               <div className="relative">
                 <input
                   type="text"
                   name="lastName"
                   placeholder="Last Name"
-                  value={shippingInfo.lastName}
+                  value={useSignupAddress ? shippingInfo.lastName : ''}
                   onChange={handleShippingChange}
 
-                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                  className="w-full p-3 border text-black border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 />
               </div>
-              <AddressInput
+            </div>
+            <div className="relative">
+            <AddressInput
+                supportedCountries={['CA']}
                 role="shipping"
                 street={shippingInfo.street}
                 city={shippingInfo.city}
@@ -362,33 +471,44 @@ const renderStep = () => {
                 country={shippingInfo.countryCode}
                 setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
                 setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
-                setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
+                setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
+                setCountry={(value) => setShippingInfo(prev => ({ ...prev, country: value }))}
                 setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
                 setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
-              />
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={shippingInfo.email}
-                onChange={handleShippingChange}
-                className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
-              />
-              <input 
-                type="tel"
-                name="phone"
-                placeholder="Phone Number"
-                pattern="[0-9]{10}"
-                value={shippingInfo.phone}
-                onChange={handleShippingChange}
-                className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                inputClassName="w-full p-4 text-black  border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                containerClassName="relative mb-4"
+                iconClassName="absolute  left-3 top-4 text-gray-400"
               />
             </div>
-            </form>
-          </div>
-        );
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="relative">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={useSignupAddress ? shippingInfo.email : ''}
+                  onChange={handleShippingChange}
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                />
+              </div>
+              <div className="relative">
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone Number"
+                  pattern="[0-9]{10}"
+                  value={useSignupAddress ? shippingInfo.phone : ''}
+                  onChange={handleShippingChange}
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                />
+              </div>
+            </div>
+            {console.log("Buyer Address " , shippingInfo)}
+
+          </form>
+        </div>
+      );
         case 2:
           return (
             <div className="animate-fade-in-down">
@@ -474,20 +594,22 @@ const renderStep = () => {
                 )}
               </div>
               <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
-              <ShippingRateCalculator 
+                {console.log("Buyer Address " , shippingInfo)}
+            <ShippingRateCalculator 
                   cartItems={cart} 
                   buyerAddress={{
                     firstName: shippingInfo.firstName,
                     lastName: shippingInfo.lastName,
-                    address: shippingInfo.street,
+                    street: shippingInfo.street,
                     city: shippingInfo.city,
-                    state: shippingInfo.state,
+                    state: shippingInfo.stateCode,
                     zip: shippingInfo.zip,
                     country: shippingInfo.countryCode,
                     email: shippingInfo.email,
                     phone: shippingInfo.phone,
                   }}
                   onTotalShippingCostChange={handleTotalShippingCostChange}
+                  onShippingDetailsChange={handleShippingDetailsChange}
                 />
               </div>
               <div className="flex justify-between font-bold text-lg border-t pt-4">
@@ -506,7 +628,7 @@ const renderStep = () => {
   return (
 
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-12 bg-white p-10 rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 ease-in-out">
+      <div className="max-w-2xl w-full space-y-12 bg-white p-10 rounded-2xl shadow-2xl transform transition-all duration-500 ease-in-out hover:scale-105">
         <div className="relative">
           <div className="flex mb-4 items-center justify-between">
             <span className="text-sm font-extrabold inline-block py-2 px-4 rounded-full text-white bg-black uppercase tracking-wider shadow-lg">
@@ -554,8 +676,8 @@ const renderStep = () => {
               )}
               {step === 3 && (
                 <button
-                  onClick={handlePayAndSubmit}
-                  className="bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition-all duration-300 transform hover:scale-105 animate-pulse"
+                  onClick={handleCompleteCheckout}
+                  className="bg-gradient-to-r from-green-400 to-green-600 text-white px-8 py-3 rounded-full hover:from-green-500 hover:to-green-700 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 shadow-lg animate-pulse"
                 >
                   Pay ${totalPrice.toFixed(2)}
                 </button>
