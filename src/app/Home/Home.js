@@ -23,27 +23,27 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   ];
 
 
-  useEffect(() => {
-    if (!searchResults || searchResults.length === 0) {
-      const fetchProducts = async () => {
-        try {
-          const response = await fetch('/api/products', {
-            headers: {
-              'Cache-Control': 'no-cache',
-          }});
-          const data = await response.json();
-          setProducts(data);
-          console.log("Data", data);
-        } catch (error) {
-          console.error('Error fetching the products:', error);
-        }
-      };
+useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products', {
+          headers: {
+            'Cache-Control': 'no-cache',
+          }
+        });
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching the products:', error);
+      }
+    };
 
+    if (!searchResults || searchResults.length === 0) {
       fetchProducts();
     } else {
       setProducts(searchResults);
     }
-  }, [user, searchResults]);
+  }, [searchResults]);
 
   const addToCart = async (productId) => {
     if (!user) {
