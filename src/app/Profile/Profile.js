@@ -6,6 +6,7 @@ import UpdateUserInfo from './UpdateUserInfo';
 import PurchaseHistory from '../order/PurchaseHistory';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { FiMenu, FiX } from 'react-icons/fi';
+import BusinessStats from '../admin/BusinessStats';
 
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
@@ -31,7 +32,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
-      fetch(`api/Profile/${userId}`, {
+      fetch(`/api/Profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -51,13 +52,14 @@ export default function Profile() {
             setSellerInfo({
               business_name: data.user.business_name,
               business_address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`,
-              phone_num: data.user.seller_phone_num
+              phone_num: data.user.seller_phone_num  // Updated to use seller_phone_num
             });
           } else if (data.user.user_type === 'buyer') {
             setBuyerInfo({
-              phone_num: data.user.buyer_phone_num,
+              phone_num: data.user.buyer_phone_num,  // Updated to use buyer_phone_num
               address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`
             });
+
           }
         })
         .catch(error => {
@@ -138,7 +140,7 @@ export default function Profile() {
                   Sign Out
                 </button>
               </li>
-            </ul>
+            </ul> 
           </nav>
         </aside>
 
@@ -169,10 +171,8 @@ export default function Profile() {
                 <div className="mt-8">
                   {userDetails.user_type === 'seller' && (
                     <>
+                      <BusinessStats userId={user.uid} />
                       <div className="bg-gray-200 p-4 rounded-lg mb-4">
-                        <h3 className="text-xl font-semibold">Business Stats (Coming Soon)</h3>
-                      </div>
-                      <div className="bg-gray-200 p-4 rounded-lg">
                         <h3 className="text-xl font-semibold">Product Reviews (Coming Soon)</h3>
                       </div>
                     </>
