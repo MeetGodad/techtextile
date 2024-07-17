@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 import Ratings from '../components/Ratings';
-import next from 'next';
 import { noStore } from 'next/cache';
 import { revalidateTag } from 'next/cache';
 
@@ -36,9 +35,8 @@ export default function ProductDetail({ productId }) {
     const fetchProductDetails = async () => {
       if (!productId) return;
       try {
-        const response = await fetch(`/api/products/${productId}`, { cache: 'no-store' }, {
-          next : { revalidate: 0 },
-        });
+        const response = await fetch(`/api/products/${productId}`, { cache: 'no-store' },
+        );
         const data = await response.json();
         if (response.ok) {
           setProduct(data[0]);
