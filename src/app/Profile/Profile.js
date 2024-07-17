@@ -6,7 +6,7 @@ import UpdateUserInfo from './UpdateUserInfo';
 import PurchaseHistory from '../order/PurchaseHistory';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { FiMenu, FiX } from 'react-icons/fi';
-import BusinessStats from '../admin/BusinessStats';
+import BusinessStats from '../seller/BusinessStats';
 
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();

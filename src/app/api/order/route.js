@@ -66,8 +66,6 @@ export async function POST(request) {
       throw new Error("Failed to insert order.");
     }
 
-    const orderId = order[0].order_id;
-
     // Insert order items
     try {
        const orderItemsPromises = cart.map(async (item) => {
