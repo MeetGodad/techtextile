@@ -3,7 +3,10 @@ GET http://localhost:3000/api/  HTTP/1.1
 
 #######
 
-GET http://localhost:3000//api/products/25
+GET http://localhost:3000/api/products/52 HTTP/1.1 200 OK
+Cache-Control: no-cache, must-revalidate, proxy-revalidate, max-age=0
+Pragma: no-cache
+Expires: 0
 
 
 

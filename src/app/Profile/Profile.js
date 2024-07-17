@@ -33,7 +33,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
-      fetch(`api/profile/${userId}`, {
+      fetch(`api/Profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -198,7 +198,7 @@ export default function Profile() {
             )}
           </div>
         </div>
-      </div>
+      
     )
   );
 }
