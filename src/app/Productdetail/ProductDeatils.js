@@ -3,7 +3,15 @@ import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 import Ratings from '../components/Ratings';
-import { useRouter } from 'next/navigation';
+import next from 'next';
+import { noStore } from 'next/cache';
+import { revalidateTag } from 'next/cache';
+
+// export const fetchCache = 'force-no-store'
+// export const revalidate = 0 // seconds
+// export const dynamic = 'force-dynamic'
+
+
 
 export default function ProductDetail({ productId }) {
   const { user } = useUserAuth();
@@ -19,39 +27,36 @@ export default function ProductDetail({ productId }) {
   const [showSellerDetails, setShowSellerDetails] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [currentProductId, setCurrentProductId] = useState(productId);
   const [isRatingsOpen, setIsRatingsOpen] = useState(false);
   const [reviews, setReviews] = useState([]); 
   const [availableQuantities, setAvailableQuantities] = useState([]);
   const [Message, setMessage] = useState('');
-  const [averageRating, setAverageRating] = useState(0);
-  averageRating,
 
   useEffect(() => {
     const fetchProductDetails = async () => {
-      if (!currentProductId) return;
-      setLoading(true);
+      if (!productId) return;
       try {
-        const response = await fetch(`/api/products/${currentProductId}`);
+        const response = await fetch(`/api/products/${productId}`, { cache: 'no-store' }, {
+          next : { revalidate: 0 },
+        });
         const data = await response.json();
         if (response.ok) {
           setProduct(data[0]);
           setCurrentImage(data[0].image_url.split(',')[0].trim());
-          setAverageRating(data[0].average_rating || 0); 
         } else {
           console.error('Error fetching product details:', data.message);
         }
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching product details:', error);
-      } finally {
         setLoading(false);
       }
     };
 
     const fetchProductReviews = async () => {
-      if (!currentProductId) return;
+      if (!productId) return;
       try {
-        const response = await fetch(`/api/review?product_id=${currentProductId}`);
+        const response = await fetch(`/api/review?product_id=${productId}`);
         const data = await response.json();
         if (response.ok) {
           setReviews(data);
@@ -65,43 +70,7 @@ export default function ProductDetail({ productId }) {
 
     fetchProductDetails();
     fetchProductReviews();
-  }, [currentProductId]);
-
-  const renderStars = () => {
-    return (
-      <div className="inline-flex items-center bg-gray-200 rounded-md px-2 py-1">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <span
-            key={i}
-            className={`text-xl ${i <= averageRating ? 'text-yellow-400' : 'text-black'
-            }`}
-          >     
-            ★
-          </span>
-        ))}
-      </div>
-    );
-  };
-  useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      if (!currentProductId) return;
-      try {
-        const response = await fetch(`/api/products/relatedProduct/${currentProductId}`);
-        const data = await response.json();
-        if (response.ok) {
-          setRelatedProducts(data);
-        } else {
-          console.error('Error fetching related products:', data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching related products:', error);
-      }
-    };-
-
-    fetchRelatedProducts();
-  }, [currentProductId]);
-
-
+  }, [productId, user]);
 
 useEffect(() => {
   if (selectedColor && product) {
@@ -148,7 +117,6 @@ useEffect(() => {
     }
   }
 }, [selectedColor, selectedDenier, product]);
-
 
 
   useEffect(() => {
@@ -279,10 +247,6 @@ useEffect(() => {
     setIsRatingsOpen(false);
   };
 
-  const handleViewDetails = (newProductId) => {
-    setCurrentProductId(newProductId);
-  };
-
   if (loading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
@@ -304,7 +268,6 @@ const getSelectedVariantQuantity = () => {
     return availableQuantities.length > 0 ? availableQuantities[0].quantity : null;
   }
 };
-
 
 const uniqueColors = product.variants
   ? [...new Set(product.variants.map(v => v.color.split(': ')[1]))]
@@ -369,7 +332,6 @@ const uniqueColors = product.variants
           </div>
           <div className="md:w-1/2 md:pl-8">
             <h1 className="text-3xl font-semibold mb-4">{product.product_name}</h1>
-            {renderStars()}
             <h2 className="text-2xl font-bold text-gray-800 mb-4">${product.price}</h2>
             <div className="mb-4">
                         <h3 className="font-semibold mb-2">Color:</h3>
@@ -457,6 +419,8 @@ const uniqueColors = product.variants
                   </div>
                 </div>
               </div>
+
+            
             {/* Display additional product details */}
             {product.yarn_material && (
               <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
@@ -471,39 +435,26 @@ const uniqueColors = product.variants
         {/* Related Products Section */}
         <div className="mt-8">
           <h2 className="w-auto text-3xl text-center italic font-bold font-inherit mb-5">Related Products</h2>
-          {/* Scroll Container */}
-          <div className="relative flex items-center">
-            {/* Left Arrow Placeholder */}
-            <div className="absolute left-0 z-10 bg-gray-200 rounded-full cursor-pointer">
-              {/* Implement arrow icon and functionality */}
-            </div>
-            {/* Products Grid */}
-            <div className="flex overflow-x-auto scroll-smooth scrollbar-hide">
-              <div className="grid grid-flow-col auto-cols-max gap-6">
-                {console.log(relatedProducts)}
-                {relatedProducts.map((relatedProduct) => (
-                  <div key={relatedProduct.product_id} className="border p-4 rounded-lg">
-                    {console.log(relatedProduct.related_product_id)}
-                    <img
-                      src={relatedProduct.image_url.split(',')[0].trim()}
-                      alt={relatedProduct.product_name}
-                      className="w-80 h-48 object-cover mb-2 rounded-lg"
-                    />
-                    <h3 className="text-lg font-semibold w-80">{relatedProduct.product_name}</h3>
-                    <p className="text-gray-700 mb-2">${relatedProduct.price}</p>
-                    <button
-                      className="px-4 py-2 bg-black text-white rounded-lg"
-                      onClick={() => handleViewDetails(relatedProduct.related_product_id)}>
-                      View Details
-                    </button>
-                  </div>
-                ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {relatedProducts.map((relatedProduct) => (
+              <div key={relatedProduct.product_id} className="border p-4 rounded-lg">
+                <img
+                  src={relatedProduct.image_url.split(',')[0].trim()}
+                  alt={relatedProduct.product_name}
+                  className="w-full h-48 object-cover mb-2 rounded-lg"
+                />
+                <h3 className="text-lg font-semibold">{relatedProduct.product_name}</h3>
+                <p className="text-gray-700 mb-2">${relatedProduct.price}</p>
+                <button
+                  className="px-4 py-2 bg-black text-white rounded-lg"
+                  onClick={() => {
+                    // Update the productId state to the related product's ID
+                    setproductId(relatedProduct.product_id);
+                  }}>
+                  View Details
+                </button>
               </div>
-            </div>
-            {/* Right Arrow Placeholder */}
-            <div className="absolute right-0 z-10 bg-gray-200 rounded-full cursor-pointer">
-              {/* Implement arrow icon and functionality */}
-            </div>
+            ))}
           </div>
         </div>
       {isRatingsOpen && (
