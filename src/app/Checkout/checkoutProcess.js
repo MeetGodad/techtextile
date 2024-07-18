@@ -1,19 +1,19 @@
-// checkoutProcess.js
-
 "use client";
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
 import ShippingRateCalculator from '../ShippingRatesCalculation/ShippinhRates';
 import AddressInput from '../components/AddressInput';
-import { count } from 'firebase/firestore';
 import { sendOrderConfirmationEmails } from './emailService';
+import  StripeForm  from './stripePayment';
 
 const Checkout = () => {
   const router = useRouter();
   const { user } = useUserAuth();
   const [step, setStep] = useState(1);
   const [cart, setCart] = useState([]);
+  const [orderId, setOrderId] = useState(null);
   const [signupAddress, setSignupAddress] = useState({});
   const [useSignupAddress, setUseSignupAddress] = useState(false);
   const [shippingInfo, setShippingInfo] = useState({
@@ -24,6 +24,8 @@ const Checkout = () => {
     state: '',
     zip: '',
     country: '',
+    stateCode: '',
+    countryCode: '',
     email: '',
     phone: '',
   });
@@ -31,6 +33,7 @@ const Checkout = () => {
   const [totalShippingCost, setTotalShippingCost] = useState(0);
   const [shippingDetails, setShippingDetails] = useState([]);
   const [existingAddresses, setExistingAddresses] = useState([]);
+
   const handleShippingDetailsChange = (details) => {
     setShippingDetails(details);
   };
@@ -129,7 +132,6 @@ const Checkout = () => {
     const { firstName, lastName, street, city, state, zip, email } = shippingInfo;
     setIsStepValid(firstName && lastName && street && city && state && zip && email);
   };
-  
 
   // Handler to move to previous step
   const handlePreviousStep = () => {
@@ -143,8 +145,7 @@ const Checkout = () => {
     }
   };
 
-  // Function to submit the order
-  const handleSubmitOrder = async () => {
+  const handleSubmit = async () => {
     try {
       const response = await fetch('/api/order', {
         method: 'POST',
@@ -169,6 +170,7 @@ const Checkout = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        setOrderId(data.orderId); // Save the orderId to state
         return data.orderId;
       } else {
         console.error('Failed to submit order:', data.error);
@@ -180,40 +182,67 @@ const Checkout = () => {
     }
   };
 
-// Function to handle complete checkout process
-const handleCompleteCheckout = async () => {
-  const orderId = await handleSubmitOrder();
-  if (orderId) {
-    const orderDetails = {
-      userId: user.uid,
-      orderId: orderId,
-      shippingInfo,
-      cart,
-      selectedPaymentMethod,
-      totalShippingCost: totalShippingCost.toFixed(2),
-      totalPrice: totalPrice.toFixed(2),
-    };
-
-    const emailsSent = await sendOrderConfirmationEmails(orderDetails);
-
-    if (emailsSent) {
-      console.log('Order confirmation emails sent successfully');
-      alert('Order submitted successfully');
-      // Handle successful email sending (e.g., show a success message, redirect to a success page)
-    } else {
-      console.error('Failed to send order confirmation emails');
-      alert('Order submitted, but failed to send confirmation emails');
-      // Handle email sending failure (e.g., show an error message)
+  const handlePayAndSubmit = async () => {
+    try {
+      const orderId = await handleSubmit();
+      if (orderId) {
+        setStep(3); // Move to the payment step if order submission is successful
+      }
+    } catch (error) {
+      console.error('Failed to create order:', error);
+      alert('Failed to create order. Please try again.');
     }
-  } else {
-    alert('Failed to create order. Please try again.');
+  };
+
+const handleSuccess = async () => {
+  try {
+    // Assume payment success logic here (handled in your StripeForm component or similar)
+    console.log('Payment successful');
+    setStep(4); // Move to Step 4 after successful payment
+
+    // Send confirmation emails upon moving to Step 4
+    try {
+      const orderDetails = {
+        userId: user.uid,
+        orderId: orderId, // Assuming orderId is accessible here after successful submission
+        shippingInfo,
+        cart,
+        totalShippingCost: totalShippingCost.toFixed(2),
+        totalPrice: totalPrice.toFixed(2),
+      };
+
+      console.log('Attempting to send confirmation email');
+      const emailSent = await sendOrderConfirmationEmails(orderDetails);
+      if (emailSent) {
+        console.log('Confirmation email sent successfully');
+      } else {
+        throw new Error('Failed to send confirmation email');
+      }
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      setError('Payment succeeded, but failed to send confirmation email.');
+    }
+  } catch (error) {
+    console.error('Failed to process payment:', error);
+    setError('Failed to process payment. Please try again.');
   }
 };
 
-  const handleAddressChange = (address) => {
-    setShippingInfo(address);
-  };
-  
+
+const handleAddressChange = (address) => {
+    setShippingInfo({
+      firstName: address.address_first_name || '',
+      lastName: address.address_last_name || '',
+      street: address.street || '',
+      city: address.city || '',
+      state: address.state || '',
+      zip: address.postal_code || '',
+      country: address.country || '',
+      email: address.address_email || '',
+      phone: address.phone_num || '',
+    });
+  setUseSignupAddress(false);
+};
 const renderStep = () => {
   switch (step) {
     case 1:
@@ -230,35 +259,49 @@ const renderStep = () => {
                 onChange={handleCheckboxChange}
                 className="form-checkbox h-5 w-5 text-blue-500"
               />
-              <label htmlFor="useSignupAddress" className="ml-2 text-gray-700">
+              <label htmlFor="useSignupAddress" className="ml-2 text-black">
                 Use the same address as signup address
               </label>
             </div> 
+
             <div>
-                      <h2>Existing Addresses</h2>
-                {existingAddresses.length > 0 ? (
-                  <ul>
-                    {existingAddresses.map((address) => (
-                      <li key={address.address_id} onClick={() => handleAddressChange(address)}>
-                       {address.address_id}, {address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country},
-                       
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No existing addresses found.</p>
-                )}
-              </div>           
+              <h2 className="text-lg font-semibold mb-4">Existing Shipping Addresses</h2>
+              {existingAddresses.length > 0 ? (
+                <div className="relative mb-6">
+                  <select
+                    onChange={(e) => {
+                      const selectedAddress = existingAddresses.find(
+                        (address) => address.address_id === parseInt(e.target.value)
+                      );
+                      handleAddressChange(selectedAddress);
+                    }}
+                    className="block w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                  >
+                    <option value="" disabled selected>
+                      Select an existing shipping address
+                    </option>
+                    {existingAddresses
+                      .filter((address) => address.country === 'CA')
+                      .map((address) => (
+                        <option key={address.address_id} value={address.address_id}>
+                          {address.address_first_name}, {address.address_last_name}, {address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country}, {address.address_email}, {address.phone_num}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              ) : (
+                <p>No existing addresses found.</p>
+              )}
+            </div>           
             <div className="grid md:grid-cols-2 gap-6">
               <div className="relative">
                 <input
                   type="text"
                   name="firstName"
                   placeholder="First Name"
-                  value={useSignupAddress ? shippingInfo.firstName : ''}
+                  value={shippingInfo.firstName}
                   onChange={handleShippingChange}
-
-                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 />
               </div>
               <div className="relative">
@@ -266,15 +309,15 @@ const renderStep = () => {
                   type="text"
                   name="lastName"
                   placeholder="Last Name"
-                  value={useSignupAddress ? shippingInfo.lastName : ''}
+                  value={shippingInfo.lastName}
                   onChange={handleShippingChange}
-
-                  className="w-full p-3 border text-black border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 />
               </div>
             </div>
             <div className="relative">
-            <AddressInput
+              <AddressInput
+                supportedCountries={['CA']}
                 role="shipping"
                 street={shippingInfo.street}
                 city={shippingInfo.city}
@@ -283,11 +326,12 @@ const renderStep = () => {
                 country={shippingInfo.country}
                 setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
                 setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
-                setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
-                setStateCode={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
+                setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
                 setCountry={(value) => setShippingInfo(prev => ({ ...prev, country: value }))}
-                inputClassName="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
+                setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
+                inputClassName="w-full p-4 text-black border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 containerClassName="relative mb-4"
                 iconClassName="absolute left-3 top-4 text-gray-400"
               />
@@ -298,9 +342,9 @@ const renderStep = () => {
                   type="email"
                   name="email"
                   placeholder="Email"
-                  value={useSignupAddress ? shippingInfo.email : ''}
+                  value={shippingInfo.email}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 />
               </div>
               <div className="relative">
@@ -309,13 +353,14 @@ const renderStep = () => {
                   name="phone"
                   placeholder="Phone Number"
                   pattern="[0-9]{10}"
-                  value={useSignupAddress ? shippingInfo.phone : ''}
+                  value={shippingInfo.phone}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 />
               </div>
             </div>
-            {/* Checkbox to use signup address */}
+
+              {console.log("Buyer Address " , shippingInfo)}
 
           </form>
         </div>
@@ -359,7 +404,7 @@ const renderStep = () => {
                 )}
               </div>
               <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
-
+                {console.log("Buyer Address " , shippingInfo)}
             <ShippingRateCalculator 
                   cartItems={cart} 
                   buyerAddress={{
@@ -367,9 +412,9 @@ const renderStep = () => {
                     lastName: shippingInfo.lastName,
                     street: shippingInfo.street,
                     city: shippingInfo.city,
-                    state: shippingInfo.state,
+                    state: shippingInfo.stateCode,
                     zip: shippingInfo.zip,
-                    country: shippingInfo.countryCode,
+                    country: shippingInfo.country,
                     email: shippingInfo.email,
                     phone: shippingInfo.phone,
                   }}
@@ -384,74 +429,109 @@ const renderStep = () => {
             </div>
           </div>
         );
-
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-12 bg-white p-10 rounded-2xl shadow-2xl transform transition-all duration-500 ease-in-out hover:scale-105">
-        <div className="relative">
-          <div className="flex mb-4 items-center justify-between">
-            <span className="text-sm font-extrabold inline-block py-2 px-4 rounded-full text-white bg-black uppercase tracking-wider shadow-lg">
-              Step {step} of 2
-            </span>
-          </div>
-          <div className="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-gray-200">
-            <div
-              style={{ width: `${(step / 2) * 100}%` }}
-              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 ease-in-out"
-            ></div>
-          </div>
-        </div>
+        case 3:
+          return (
+            <div className="animate-fade-in-down max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Complete Your Order</h2>
+              <StripeForm 
+                orderId={orderId} 
+                totalPrice={totalPrice} 
+                onSuccess={handleSuccess}
+              />
+            </div>
+          );
   
-        <div className="space-y-10">
-          <div className="animate-fade-in transform transition-all duration-500 ease-in-out">
-            {renderStep()}
+        case 4:
+          return (
+            <div className="animate-fade-in-down max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md text-center">
+              <h2 className="text-3xl font-bold text-green-600 mb-4">Order Successful!</h2>
+              <p className="text-xl text-gray-700 mb-6">Thank you for your purchase.</p>
+              <svg className="w-16 h-16 mx-auto text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <button 
+                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 ease-in-out"
+                onClick={() => router.push('/Home')}
+              >
+                Back to Home
+              </button>
+            </div>
+          );
+  
+        default:
+          return null;
+      }
+    };
+  
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl w-full space-y-12 bg-white p-10 rounded-2xl shadow-2xl transform transition-all duration-500 ease-in-out hover:scale-105">
+          <div className="relative">
+            <div className="flex mb-4 items-center justify-between">
+              <span className="text-sm font-extrabold inline-block py-2 px-4 rounded-full text-white bg-black uppercase tracking-wider shadow-lg">
+                Step {step} of 4
+              </span>
+            </div>
+            <div className="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-gray-200">
+              <div
+                style={{ width: `${(step / 4) * 100}%` }}
+                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 ease-in-out"
+              ></div>
+            </div>
           </div>
-          <div className="flex items-center justify-between pt-8 border-t border-gray-300">
-            <button
-              onClick={() => router.back()}
-              className="text-gray-600 hover:text-gray-800 transition-colors duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 rounded-lg px-4 py-2"
-            >
-              Back to Cart
-            </button>
-            <div className="space-x-4">
-              {step > 1 && (
-                <button
-                  onClick={handlePreviousStep}
-                  className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-6 py-3 rounded-full hover:from-gray-500 hover:to-gray-600 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 shadow-lg"
-                >
-                  Previous
-                </button>
-              )}
-              {step < 2 && (
-                <button
-                  onClick={handleNextStep}
-                  className={`bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 shadow-lg ${
-                    isStepValid ? 'hover:from-blue-600 hover:to-purple-700' : 'opacity-50 cursor-not-allowed'
-                  }`}
-                  disabled={!isStepValid}
-                >
-                  Next
-                </button>
-              )}
-              {step === 2 && (
-                <button
-                  onClick={handleCompleteCheckout}
-                  className="bg-gradient-to-r from-green-400 to-green-600 text-white px-8 py-3 rounded-full hover:from-green-500 hover:to-green-700 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 shadow-lg animate-pulse"
-                >
-                  Pay ${totalPrice.toFixed(2)}
-                </button>
-              )}
+  
+          <div className="space-y-10">
+            <div className="animate-fade-in transform transition-all duration-500 ease-in-out">
+              {renderStep()}
+            </div>
+            <div className="flex items-center justify-between pt-8 border-t border-gray-300">
+              <button
+                onClick={() => router.back()}
+                className="text-gray-600 hover:text-gray-800 transition-colors duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 rounded-lg px-4 py-2"
+              >
+                Back to Cart
+              </button>
+              <div className="space-x-4">
+                {step > 1 && step < 4 && (
+                  <button
+                    onClick={handlePreviousStep}
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 rounded-lg px-4 py-2"
+                  >
+                    Previous
+                  </button>
+                )}
+                {step < 3 && (
+                  <button
+                    onClick={handleNextStep}
+                    disabled={!isStepValid}
+                    className={`${
+                      isStepValid
+                        ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    } transition-colors duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 rounded-lg px-4 py-2`}
+                  >
+                    Next
+                  </button>
+                )}
+                {step === 2 && (
+                  <button
+                    onClick={handlePayAndSubmit}
+                    disabled={!isStepValid}
+                    className={`${
+                      isStepValid
+                        ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    } transition-colors duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 rounded-lg px-4 py-2`}
+                  >
+                    Pay and Submit
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
   };
-
-export default Checkout;
+  
+  export default Checkout;

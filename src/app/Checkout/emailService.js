@@ -37,12 +37,11 @@ export const sendOrderConfirmationEmails = async (orderDetails) => {
         to_email: orderDetails.shippingInfo.email,
         firstName: orderDetails.shippingInfo.firstName,
         lastName: orderDetails.shippingInfo.lastName,
-        address: orderDetails.shippingInfo.address,
+        address: orderDetails.shippingInfo.street,
         city: orderDetails.shippingInfo.city,
         state: orderDetails.shippingInfo.state,
         zip: orderDetails.shippingInfo.zip,
         email: orderDetails.shippingInfo.email,
-        paymentMethod: orderDetails.selectedPaymentMethod,
         totalAmount: orderDetails.totalPrice,
         cartItemsHtml: cartItemsHtml
       }
@@ -88,8 +87,7 @@ export const sendOrderConfirmationEmails = async (orderDetails) => {
           order_number: orderDetails.orderId,
           customer_name: `${orderDetails.shippingInfo.firstName} ${orderDetails.shippingInfo.lastName}`,
           customer_email: orderDetails.shippingInfo.email,
-          shipping_address: `${orderDetails.shippingInfo.address}, ${orderDetails.shippingInfo.city}, ${orderDetails.shippingInfo.state}, ${orderDetails.shippingInfo.zip}`,
-          payment_method: orderDetails.selectedPaymentMethod,
+          shipping_address: `${orderDetails.shippingInfo.street}, ${orderDetails.shippingInfo.city}, ${orderDetails.shippingInfo.state}, ${orderDetails.shippingInfo.zip}`,
           order_total: orderDetails.totalPrice,
           cartItems: sellerCartItems
         }

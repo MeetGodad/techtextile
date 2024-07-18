@@ -4,7 +4,7 @@ export async function POST(request) {
   try {
     const requestData = await request.json();
     const shippingDetails = requestData.shippingDetails;
-    const { userId, firstName, lastName, street, city, state, zip, email, selectedPaymentMethod, cart } = requestData;
+    const { userId, firstName, lastName, street, city, state, zip, email, country , selectedPaymentMethod, cart } = requestData;
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
 
@@ -50,9 +50,9 @@ export async function POST(request) {
     // Insert order
     let orderId;
     try {
-      order = await sql`
-        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status,order_shhipping_cost , order_total_price)
-        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice})
+      const result = await sql`
+        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status, order_shhipping_cost, order_total_price, payment_status_check)
+        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice}, 'pending')
 
         RETURNING order_id;
       `;
