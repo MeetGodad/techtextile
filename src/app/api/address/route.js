@@ -12,20 +12,23 @@ export async function POST(request) {
       city,
       state,
       postalCode,
-      countryCode,
+      country,
       phone,
 
     } = requestData;
 
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
+    console.log ('which country', country);
 
     const result = await sql`
       INSERT INTO addresses (user_id, address_first_name, address_last_name, address_email, street, city, state, postal_code, country, phone_num, address_type)
-      VALUES (${userId}, ${firstName}, ${lastName}, ${email}, ${street}, ${city}, ${state}, ${postalCode}, ${countryCode}, ${phone}, 'shipping')
+      VALUES (${userId}, ${firstName}, ${lastName}, ${email}, ${street}, ${city}, ${state}, ${postalCode}, ${country}, ${phone}, 'shipping')
       RETURNING address_id;
     `;
 
+    console.log('SQL Result:', result); // Add this line
+    
     return new Response(JSON.stringify(result[0]), { 
       status: 200, 
       headers: { 'Content-Type': 'application/json' }

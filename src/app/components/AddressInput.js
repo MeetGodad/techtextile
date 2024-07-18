@@ -1,10 +1,5 @@
-// This component is used to get the address details from the user using the Google Maps Autocomplete API.
-// Reference: https://react-google-maps-api-docs.netlify.app/#autocomplete
-// Reference: https://developers.google.com/maps/documentation/javascript/places-autocompleteimport 
-// References  : GitHub Copilot
-
 import { useEffect, useRef, useState } from 'react';
-import { useLoadScript, Autocomplete } from '@react-google-maps/api';
+import { useLoadScript } from '@react-google-maps/api';
 
 const libraries = ['places'];
 
@@ -21,20 +16,18 @@ const AddressInput = ({
   setState, 
   setPostalCode, 
   setStateCode, 
-  setCountryCode
+  setCountryCode,
 }) => {
   const autocompleteRef = useRef(null);
   const inputRef = useRef(null);
   const SUPPORTED_COUNTRIES = supportedCountries;
   const [error, setError] = useState('');
   const [isManualEntry, setIsManualEntry] = useState(false);
-  
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
     libraries,
-    version: "weekly",
-    useJsApiLoader: true,
+    version: 'weekly',
   });
 
   useEffect(() => {
@@ -51,7 +44,7 @@ const AddressInput = ({
   const handlePlaceSelect = () => {
     const place = autocompleteRef.current.getPlace();
     if (!place || !place.address_components) {
-      setError("Note: Please select an address from the dropdown list after typing at least 3 characters. We don't support manual address entry at this time");
+      setError("Please select an address from the dropdown list after typing at least 3 characters. Manual address entry is not supported.");
       setIsManualEntry(true);
       return;
     }
@@ -102,7 +95,6 @@ const AddressInput = ({
     // Check if the country is supported
     if (!SUPPORTED_COUNTRIES.includes(newCountryCode)) {
       setError(`We do not support addresses in ${newCountry}.`);
-
       return;
     }
 
@@ -115,17 +107,15 @@ const AddressInput = ({
     setCountryCode(newCountryCode);
   };
 
-
   const handleManualInput = (e) => {
     setStreet(e.target.value);
     if (e.target.value.length > 10) {
       setIsManualEntry(false);
     } else {
       setIsManualEntry(true);
-      setError("Note: Please select an address from the dropdown list. We don't support manual address entry at this time");
+      setError("Please select an address from the dropdown list. Manual address entry is not supported.");
     }
   };
-
 
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading...</div>;

@@ -42,33 +42,6 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
     }
   }, [searchResults]);
 
-  const addToCart = async (productId) => {
-    if (!user) {
-      alert('Please sign up or log in first.');
-      return;
-    }
-    try {
-      const response = await fetch('/api/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.uid,
-          productId: productId.product_id,
-          quantity: 1, 
-          variantIds: [], // Empty array for no variants
-        }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to add product to cart');
-      }
-      const event = new Event('cartUpdated');
-      window.dispatchEvent(event);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -95,8 +68,10 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
         return true;
     }
   }) : [];
+
   const handleProductClick = (productId , averageRating) => {
     router.push(`/productdetail?productId=${productId}&averageRating=${averageRating}`);
+
   };
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
