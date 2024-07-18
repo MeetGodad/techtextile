@@ -62,6 +62,20 @@ GET http://localhost:3000//api/products/22
 
 
 
+### 
+//Test Business Stats API
+GET http://localhost:3000/api/sales/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+###
+//Test for Purchased Item
+GET http://localhost:3000/api/admin/1 HTTP/1.1
+###
+GET http://localhost:3000/api/admin/e7vVMBprlRYB7PHuaJgv2u2RAVb2?status=cancled  HTTP/1.1
+###
+//For Product review
+GET http://localhost:3000/api/productreviewforseller/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+###
+=======
+
 
 
 POST http://localhost:3000/api/email HTTP/1.1
