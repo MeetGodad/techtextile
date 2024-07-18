@@ -116,29 +116,31 @@ export default function ProductDetail({ productId }) {
 
     fetchRelatedProducts();
   }, [currentProductId]);
-useEffect(() => {
+  useEffect(() => {
     if (selectedColor && product) {
-      const deniers = product.variants
-        .filter(v => v.color.split(': ')[1] === selectedColor)
-        .map(v => v.denier.split(': ')[1]);
-      setAvailableDeniers(deniers);
+        const deniers = product.variants
+            .filter(v => v.color.split(': ')[1] === selectedColor)
+            .map(v => v.denier.split(': ')[1]);
+        setAvailableDeniers(deniers);
     } else {
-      setAvailableDeniers([]);
+        setAvailableDeniers([]);
     }
     setSelectedDenier(null);
     setSelectedVariantId(null);
-  }, [selectedColor, product]);
+}, [selectedColor, product]);
+
 
 useEffect(() => {
-    if (selectedColor && selectedDenier && product) {
+  if (selectedColor && selectedDenier && product) {
       const variant = product.variants.find(
-        v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
+          v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
       );
       setSelectedVariantId(variant ? variant.variant_id : null);
-    } else {
+  } else {
       setSelectedVariantId(null);
-    }
-  }, [selectedColor, selectedDenier, product]);
+  }
+}, [selectedColor, selectedDenier, product]);
+
 
   const addToCart = async () => {
   if (!user) {
@@ -270,15 +272,19 @@ useEffect(() => {
 
 
   const imageUrls = product.image_url.split(',');
-const getSelectedVariantQuantity = () => {
-  if (product.product_type === 'yarn') {
-    const selectedVariant = availableQuantities.find(v => v.denier === selectedDenier);
-    return selectedVariant ? selectedVariant.quantity : null;
-  } else if (product.product_type === 'fabric') {
-    return availableQuantities.length > 0 ? availableQuantities[0].quantity : null;
-  }
-};
+  const availableQuantities = product.variants
 
+  const getSelectedVariantQuantity = () => {
+    if (product.product_type === 'yarn') {
+      const selectedVariant = availableQuantities.find(v => v.denier === selectedDenier);
+      return selectedVariant ? selectedVariant.quantity : null;
+    } else if (product.product_type === 'fabric') {
+      return availableQuantities.length > 0 ? availableQuantities[0].quantity : null;
+    }
+    return null;
+  };
+  
+  
 const uniqueColors = product.variants
   ? [...new Set(product.variants.map(v => v.color.split(': ')[1]))]
   : [];
@@ -343,12 +349,10 @@ const uniqueColors = product.variants
               <h1 className="text-3xl font-semibold">{product.product_name}</h1>
               <div 
                 className="relative"
-                onMouseEnter={() => setIsHovering(true)}
-              >
+                onMouseEnter={() => setIsHovering(true)}>
                 <button 
                   className="share-button p-2 rounded-full hover:bg-gray-100 transition-colors duration-300"
-                  onClick={() => setIsHovering(!isHovering)}
-                >
+                  onClick={() => setIsHovering(!isHovering)}>
                   <TbWorldShare size={32} className="text-gray-600 hover:text-gray-800 transition-colors duration-300" />
                 </button>
                 {isHovering && (
@@ -394,8 +398,7 @@ const uniqueColors = product.variants
                         onClick={() => setSelectedColor(color)}
                         className={`w-8 h-8 rounded-full transition-transform duration-300 hover:scale-110 ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
                         style={{ backgroundColor: color }}
-                        title={color}
-                      />
+                        title={color}/>
                     ))}
                   </div>
                 </div>
@@ -415,36 +418,47 @@ const uniqueColors = product.variants
                         ))}
                       </select>
                     </div>
-                    <div className="flex flex-col space-x-0">
+                    <div className="flex flex-col ml-2">
                       <label htmlFor="quantity" className="font-semibold mb-2">Quantity:</label>
                       <input
                         type="number"
                         id="quantity"
                         className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
                         min="1"
-                        max={getSelectedVariantQuantity()}
                         value={quantity}
                         onChange={handleQuantityChange}
                       />
                     </div>
                   </div>
                 )}
+                {product.product_type === 'fabric' && (
+                  <div className="flex flex-col mb-6">
+                    <label htmlFor="fabric-quantity" className="font-semibold mb-2">Quantity:</label>
+                    <input
+                      type="number"
+                      id="fabric-quantity"
+                      className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
+                      min="1"
+                      value={quantity}
+                      onChange={handleQuantityChange}
+                    />
+                  </div>
+                )}
                 <div className="flex flex-row space-x-40">
                   <button
                     className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
-                    onClick={() => addToCart(product)}
-                  >
+                    onClick={() => addToCart(product)}>
                     Add to cart
                   </button>
                   <button 
                     className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
-                    onClick={handleReviewAdd}
-                  >
+                    onClick={handleReviewAdd}>
                     Add Review
                   </button>
                 </div>
               </div>
             </div>
+
             {product.yarn_material && (
               <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
             )}
@@ -455,70 +469,70 @@ const uniqueColors = product.variants
               <p className="text-lg mb-4"> <strong>Fabric Material: </strong>  {product.fabric_material}</p>
             )}
             <p className="text-lg mb-4"><strong>Description:</strong> {product.product_description}</p>
-          </div>
-        </div>
-        {/* Related Products Section */}
-        <div className="mt-16">
-          <h2 className="text-3xl text-center italic font-bold mb-8">Related Products</h2>
-          <div className="relative">
-            <div className="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-6 pb-4">
-              {relatedProducts.map((relatedProduct) => (
-                <div key={relatedProduct.product_id} className="flex-none w-64 border p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                  <img
-                    src={relatedProduct.image_url.split(',')[0].trim()}
-                    alt={relatedProduct.product_name}
-                    className="w-full h-48 object-cover mb-4 rounded-lg"
-                  />
-                  <h3 className="text-lg font-semibold mb-2 truncate">{relatedProduct.product_name}</h3>
-                  <p className="text-gray-700 mb-4">${relatedProduct.price}</p>
-                  <button
-                    className="w-full px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-300"
-                    onClick={() => handleViewDetails(relatedProduct.related_product_id)}
-                  >
-                    View Details
-                  </button>
-                </div>
-              ))}
-            </div>
-                {/* Right Arrow Placeholder */}
-                <div className="absolute right-0 z-10 bg-gray-200 rounded-full cursor-pointer">
-                  {/* Implement arrow icon and functionality */}
-                </div>
-              </div>
-            </div>
-              {isRatingsOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                  <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
-                    <button
-                      className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                      onClick={handleCloseRatings}>
-                      &times;
-                    </button>
-                    <Ratings productId={productId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
-                  </div>
-                </div>
-              )}
-                {/* Display reviews */}
-            <div className="mt-16">
-            <h2 className="text-3xl font-bold mb-8">Reviews</h2>
-            {reviews.length > 0 ? (
-              reviews.map((review, index) => (
-                <div key={index} className="border-b border-gray-200 pb-6 mb-6 animate-fade-in">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-semibold text-lg">{review.feedback_heading}</h3>
-                    <div className="text-yellow-400">
-                      {'★'.repeat(review.feedback_rating)}{'☆'.repeat(5 - review.feedback_rating)}
-                    </div>
-                  </div>
-                  <p className="text-gray-700 mb-2">{review.feedback_text}</p>
-                  <p className="text-gray-500 text-sm">Reviewed by: {review.first_name} {review.last_name}</p>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-600 italic">No reviews yet. Be the first to review this product!</p>
-            )}
-          </div>
         </div>
       </div>
+            {/* Related Products Section */}
+            <div className="mt-16">
+              <h2 className="text-3xl text-center italic font-bold mb-8">Related Products</h2>
+              <div className="relative">
+                <div className="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-6 pb-4">
+                  {relatedProducts.map((relatedProduct) => (
+                    <div key={relatedProduct.product_id} className="flex-none w-64 border p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                      <img
+                        src={relatedProduct.image_url.split(',')[0].trim()}
+                        alt={relatedProduct.product_name}
+                        className="w-full h-48 object-cover mb-4 rounded-lg"
+                      />
+                      <h3 className="text-lg font-semibold mb-2 truncate">{relatedProduct.product_name}</h3>
+                      <p className="text-gray-700 mb-4">${relatedProduct.price}</p>
+                      <button
+                        className="w-full px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-300"
+                        onClick={() => handleViewDetails(relatedProduct.related_product_id)}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                    {/* Right Arrow Placeholder */}
+                    <div className="absolute right-0 z-10 bg-gray-200 rounded-full cursor-pointer">
+                      {/* Implement arrow icon and functionality */}
+                    </div>
+                  </div>
+                </div>
+                  {isRatingsOpen && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                      <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
+                        <button
+                          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                          onClick={handleCloseRatings}>
+                          &times;
+                        </button>
+                        <Ratings productId={productId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
+                      </div>
+                    </div>
+                  )}
+                    {/* Display reviews */}
+                <div className="mt-16">
+                <h2 className="text-3xl font-bold mb-8">Reviews</h2>
+                {reviews.length > 0 ? (
+                  reviews.map((review, index) => (
+                    <div key={index} className="border-b border-gray-200 pb-6 mb-6 animate-fade-in">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="font-semibold text-lg">{review.feedback_heading}</h3>
+                        <div className="text-yellow-400">
+                          {'★'.repeat(review.feedback_rating)}{'☆'.repeat(5 - review.feedback_rating)}
+                        </div>
+                      </div>
+                      <p className="text-gray-700 mb-2">{review.feedback_text}</p>
+                      <p className="text-gray-500 text-sm">Reviewed by: {review.first_name} {review.last_name}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-600 italic">No reviews yet. Be the first to review this product!</p>
+                )}
+        </div>
+      </div>
+    </div>
   );
 }
