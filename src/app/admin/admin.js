@@ -1,3 +1,5 @@
+// src/app/admin/admin.js
+
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
@@ -7,6 +9,7 @@ import PurchasedItems from './PurchasedItems';
 import SellerViewItem from '../seller/SellerViewItem';
 import ListProduct from '../seller/ListProduct';
 import BusinessStats from './BusinessStats';
+import ProductReviews from './ProductReviews'; // Import the new component
 
 export default function Adminpage() {
   const { user } = useUserAuth();
@@ -15,6 +18,7 @@ export default function Adminpage() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showPurchasedItems, setShowPurchasedItems] = useState(false);
   const [showBusinessStats, setShowBusinessStats] = useState(true); // Set Business Stats as the default
+  const [showProductReviews, setShowProductReviews] = useState(false); // Add state for Product Reviews
   const router = useRouter();
 
   useEffect(() => {
@@ -28,6 +32,7 @@ export default function Adminpage() {
     setShowAddProduct(false);
     setShowPurchasedItems(false);
     setShowBusinessStats(false);
+    setShowProductReviews(false); // Hide Product Reviews
   };
 
   const handleAddProduct = () => {
@@ -35,6 +40,7 @@ export default function Adminpage() {
     setShowListedItems(false);
     setShowPurchasedItems(false);
     setShowBusinessStats(false);
+    setShowProductReviews(false); // Hide Product Reviews
   };
 
   const handleShowPurchasedItems = () => {
@@ -42,10 +48,20 @@ export default function Adminpage() {
     setShowListedItems(false);
     setShowAddProduct(false);
     setShowBusinessStats(false);
+    setShowProductReviews(false); // Hide Product Reviews
   };
 
   const handleViewBusinessStats = () => {
     setShowBusinessStats(true);
+    setShowPurchasedItems(false);
+    setShowListedItems(false);
+    setShowAddProduct(false);
+    setShowProductReviews(false); // Hide Product Reviews
+  };
+
+  const handleShowProductReviews = () => {
+    setShowProductReviews(true); // Show Product Reviews
+    setShowBusinessStats(false);
     setShowPurchasedItems(false);
     setShowListedItems(false);
     setShowAddProduct(false);
@@ -81,6 +97,11 @@ export default function Adminpage() {
               </button>
             </li>
             <li>
+              <button onClick={handleShowProductReviews} className={`block py-2.5 px-4 rounded transition duration-200 ${showProductReviews ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                Product Reviews
+              </button>
+            </li>
+            <li>
               <button onClick={() => router.push('/Profile')} className="block py-2.5 px-4 rounded hover:bg-gray-700 transition duration-200">
                 Back to Profile
               </button>
@@ -94,7 +115,7 @@ export default function Adminpage() {
             <div className={`transition-opacity duration-500 ${showBusinessStats ? 'opacity-100' : 'opacity-0 hidden'}`}>
               {showBusinessStats && (
                 <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                  <BusinessStats userId={user.uid} />
+                  <BusinessStats userId={user.uid} onShowPurchasedItems={handleShowPurchasedItems} />
                 </aside>
               )}
             </div>
@@ -119,6 +140,14 @@ export default function Adminpage() {
               {showPurchasedItems && (
                 <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
                   <PurchasedItems userId={user.uid} />
+                </aside>
+              )}
+            </div>
+
+            <div className={`transition-opacity duration-500 ${showProductReviews ? 'opacity-100' : 'opacity-0 hidden'}`}>
+              {showProductReviews && (
+                <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                  <ProductReviews userId={user.uid} />
                 </aside>
               )}
             </div>

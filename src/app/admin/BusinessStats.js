@@ -25,8 +25,7 @@ ChartJS.register(
   Legend
 );
 
-const BusinessStats = ({ userId }) => {
-  const router = useRouter();
+const BusinessStats = ({ userId, onShowPurchasedItems }) => {
   const [stats, setStats] = useState({
     salesByProduct: [],
     salesByCategory: [],
@@ -80,10 +79,6 @@ const BusinessStats = ({ userId }) => {
 
   const handleYearChange = (event) => {
     setSelectedYear(event.target.value);
-  };
-
-  const handlePurchasedItems = () => {
-    router.push('/admin/PurchasedItems'); // Navigate to the PurchasedItems page
   };
 
   const filteredMonthlySales = stats.monthlySales.filter(item => {
@@ -277,9 +272,10 @@ const BusinessStats = ({ userId }) => {
         </div>
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
-          <h2 className="text-2xl font-bold mb-4">Product Stock Levels</h2>
+        <h2 className="text-2xl font-bold mb-4">Product Stock Levels</h2>
+          {/* Changed to display 8 products, 4 on the left and 4 on the right */}
           <div className="grid grid-cols-2 gap-4">
-            {stats.productStockLevels.slice(0, showMoreStockLevels ? undefined : 6).map((product, index) => (
+            {stats.productStockLevels.slice(0, showMoreStockLevels ? undefined : 8).map((product, index) => (
               <div key={index} className="flex items-center space-x-4">
                 <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
                 <div>
@@ -292,7 +288,7 @@ const BusinessStats = ({ userId }) => {
               </div>
             ))}
           </div>
-          {stats.productStockLevels.length > 6 && (
+          {stats.productStockLevels.length > 8 && (
             <button
               onClick={() => setShowMoreStockLevels(!showMoreStockLevels)}
               className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
@@ -306,33 +302,7 @@ const BusinessStats = ({ userId }) => {
         </div>
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
-          <h2 className="text-2xl font-bold mb-4">Low Stock Alerts</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {stats.lowStockAlerts.slice(0, showMoreLowStock ? undefined : 10).map((product, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
-                <div>
-                  <p className="text-lg font-semibold">{product.product_name}</p>
-                  <p className="text-red-500">Only {product.quantity} left in stock!</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          {stats.lowStockAlerts.length > 10 && (
-            <button
-              onClick={() => setShowMoreLowStock(!showMoreLowStock)}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-            >
-              {showMoreLowStock ? 'Show Less' : 'Show More'}
-            </button>
-          )}
-          {stats.lowStockAlerts.length === 0 && (
-            <p className="text-center text-gray-500">Your inventory is up to date!</p>
-          )}
-        </div>
-
-        <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
-          <h2 className="text-2xl font-bold mb-4">Top-Selling Products</h2>
+        <h2 className="text-2xl font-bold mb-4">Top-Selling Products</h2>
           <div className="grid grid-cols-2 gap-4">
             {stats.topSellingProducts.slice(0, showMoreTopSelling ? undefined : 5).map((product, index) => (
               <div key={index} className="flex items-center space-x-4">
@@ -358,8 +328,34 @@ const BusinessStats = ({ userId }) => {
         </div>
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
+        <h2 className="text-2xl font-bold mb-4">Low Stock Alerts</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {stats.lowStockAlerts.slice(0, showMoreLowStock ? undefined : 10).map((product, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
+                <div>
+                  <p className="text-lg font-semibold">{product.product_name}</p>
+                  <p className="text-red-500">Only {product.quantity} left in stock!</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          {stats.lowStockAlerts.length > 10 && (
+            <button
+              onClick={() => setShowMoreLowStock(!showMoreLowStock)}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
+            >
+              {showMoreLowStock ? 'Show Less' : 'Show More'}
+            </button>
+          )}
+          {stats.lowStockAlerts.length === 0 && (
+            <p className="text-center text-gray-500">Your inventory is up to date!</p>
+          )}
+        </div>
+
+        <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Total Orders</h2>
-          <p className="text-lg">{stats.totalOrders > 0 ? stats.totalOrders : 'No orders placed yet.'}</p>
+          <p className="text-lg">Total Orders So Far: {stats.totalOrders > 0 ? stats.totalOrders : 'No orders placed yet.'}</p>
         </div>
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
@@ -372,7 +368,7 @@ const BusinessStats = ({ userId }) => {
                 </p>
               ))}
               <button
-                onClick={handlePurchasedItems}
+                onClick={onShowPurchasedItems}
                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
               >
                 Go to Purchased Items
@@ -385,7 +381,7 @@ const BusinessStats = ({ userId }) => {
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Average Order Value</h2>
-          <p className="text-lg">${stats.averageOrderValue.toFixed(2)}</p>
+          <p className="text-lg">Average Value Per Order: ${stats.averageOrderValue.toFixed(2)}</p>
         </div>
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">

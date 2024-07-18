@@ -7,6 +7,7 @@ import PurchaseHistory from '../order/PurchaseHistory';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { FiMenu, FiX } from 'react-icons/fi';
 import BusinessStats from '../seller/BusinessStats';
+import ProductReviews from '../seller/ProductReviews';
 
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
@@ -169,11 +170,12 @@ export default function Profile() {
                   </>
                 )}
                 <div className="mt-8">
+                <h3 className="text-2xl font-semibold">Business Stats</h3>
                   {userDetails.user_type === 'seller' && (
                     <>
                       <BusinessStats userId={user.uid} />
                       <div className="bg-gray-200 p-4 rounded-lg mb-4">
-                        <h3 className="text-xl font-semibold">Product Reviews (Coming Soon)</h3>
+                        <ProductReviews userId={user.uid} />
                       </div>
                     </>
                   )}
