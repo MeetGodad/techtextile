@@ -104,6 +104,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
       type="text"
       placeholder="What are you looking for?"
       className="text-left bg-transparent outline-none text-sm"
+      value={searchText}
       onChange={(e) => {
         setSearchText(e.target.value);
             }}
