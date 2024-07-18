@@ -31,7 +31,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
-      fetch(`api/Profile/${userId}`, {
+      fetch(`api/profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,9 @@ export default function Profile() {
   };
 
   return (
+
     user && userDetails && (
+
       <div className="min-h-screen bg-gray-100 flex">
         <aside className={`transition-transform duration-500 ease-in-out ${sidebarVisible ? 'translate-x-0' : '-translate-x-full'} bg-gray-900 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform lg:relative lg:translate-x-0`}>
           <button onClick={() => setSidebarVisible(!sidebarVisible)} className="text-white absolute top-4 right-4 lg:hidden">
@@ -214,6 +216,7 @@ export default function Profile() {
             )}
           </div>
       </div>
+    </div>
     )
   );
 }

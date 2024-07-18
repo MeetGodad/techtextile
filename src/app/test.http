@@ -1,7 +1,52 @@
 
-GET http://localhost:3000/api/  HTTP/1.1
+POST http://localhost:3000/api/order/cancel-item HTTP/1.1
+Content-Type: application/json
+
+{
+  "orderItemId": 820,
+  "userId": "ftTlS3bbXnbha2zG5Sd68FLA3IF2",
+  "cancellationReason": "Changed my mind about this item"
+}
+
+
+######
+
+
+POST http://localhost:3000/api/order/update-shipping-cost HTTP/1.1
+Content-Type: application/json
+
+{
+  "orderId": 185,
+  "userId": "e7vVMBprlRYB7PHuaJgv2u2RAVb2",
+  "newShippingCost": 177.50
+}
+
+
+######
+
+
+
+
+
+GET http://localhost:3000/api/history/ftTlS3bbXnbha2zG5Sd68FLA3IF2  HTTP/1.1
 
 #######
+
+
+
+
+POST http://localhost:3000/api/order/cancel-item HTTP/1.1
+Content-Type: application/json
+
+{
+  "orderItemId": 820,
+  "userId": "ftTlS3bbXnbha2zG5Sd68FLA3IF2",
+  "cancellationReason": "Changed my mind about this item"
+}
+
+
+
+
 
 GET http://localhost:3000//api/products/25
 
@@ -43,7 +88,6 @@ Content-Type: application/json
     "cvv": "123"
   }
 }
-
 
 
 
@@ -117,11 +161,11 @@ content-type: application/json
   "rating": 5,
   "review": "This is a good product"
 }
+######
 
 
 
-
-GET  http://localhost:3000/api/cart/RUHSDGwCDoXoGZMGM2i1X7pybMn1 HTTP/1.1
+GET  http://localhost:3000/api/cart/ftTlS3bbXnbha2zG5Sd68FLA3IF2 HTTP/1.1
 
 
 ####

@@ -77,7 +77,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   }) : [];
 
   const handleProductClick = (productId) => {
-    router.push(`/productdetail?productId=${productId}`);
+    router.push(`/Productdetail?productId=${productId}`);
   };
 
   return (

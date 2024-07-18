@@ -20,6 +20,7 @@ export async function GET(req, { params }) {
             p.product_id,
             p.product_name,
             p.price,
+            p.product_type,
             p.image_url,
             jsonb_build_object(
             'variant_id', pv.variant_id,

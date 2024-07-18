@@ -66,10 +66,9 @@ export async function POST(request) {
       throw new Error("Failed to insert order.");
     }
 
-    const orderId = order[0].order_id;
-
     // Insert order items
     try {
+
        const orderItemsPromises = cart.map(async (item) => {
     await sql`
       INSERT INTO orderitems (order_id, product_id, quantity, item_price, variant_id)
@@ -92,26 +91,33 @@ export async function POST(request) {
 
 
     try {
-      const shippingDetailsPromises = shippingDetails.map(detail => {
-        const sellerIds = detail.sellerId === 'centralWarehouse' ? detail.indianSellers : [detail.sellerId];
+      const shippingDetailsPromises = Object.entries(shippingDetails).map(([key, detail]) => {
+        const isCentralWarehouse = key === 'centralWarehouse';
+        const sellerIds = isCentralWarehouse ? detail.indianSellers : [key];
         return sql`
           INSERT INTO ShippingDetails (
-        order_id, 
-        seller_ids, 
-        carrier_id, 
-        service_code, 
-        shipping_cost, 
-        is_central_warehouse
-      )
-      VALUES (
-        ${orderId}, 
-        ${sellerIds}, 
-        ${detail.carrierId}, 
-        ${detail.serviceCode}, 
-        ${detail.amount}, 
-        ${detail.sellerId === 'centralWarehouse'}
-      );
-    `;
+            order_id, 
+            seller_ids, 
+            carrier_id, 
+            service_code, 
+            shipping_cost, 
+            is_central_warehouse,
+            rate_id,
+            shipment_id,
+            estimated_delivery_days
+          )
+          VALUES (
+            ${orderId}, 
+            ${sellerIds}, 
+            ${detail.carrierId}, 
+            ${detail.serviceCode}, 
+            ${detail.amount}, 
+            ${isCentralWarehouse},
+            ${detail.rateId},
+            ${detail.shipmentId},
+            ${detail.deliveryDays}
+          );
+        `;
       });
       await Promise.all(shippingDetailsPromises);
       console.log("Shipping Details inserted successfully");
@@ -119,7 +125,6 @@ export async function POST(request) {
       console.error("Error inserting shipping details:", err);
       throw new Error("Failed to insert shipping details.");
     }
-
   
 
     return new Response(JSON.stringify({ orderId }), { 
