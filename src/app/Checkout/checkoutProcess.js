@@ -413,8 +413,8 @@ const renderStep = () => {
                 )}
               </div>
               <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
-                {console.log("Buyer Address " , shippingInfo)}
-            <ShippingRateCalculator 
+                {console.log("Shipping Detail" , shippingDetails)}
+            <ShippingRateCalculator
                   cartItems={cart} 
                   buyerAddress={{
                     firstName: shippingInfo.firstName,

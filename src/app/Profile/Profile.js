@@ -32,7 +32,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
-      fetch(`/api/Profile/${userId}`, {
+      fetch(`api/profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -100,7 +100,9 @@ export default function Profile() {
   };
 
   return (
+
     user && userDetails && (
+
       <div className="min-h-screen bg-gray-100 flex">
         <aside className={`transition-transform duration-500 ease-in-out ${sidebarVisible ? 'translate-x-0' : '-translate-x-full'} bg-gray-900 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform lg:relative lg:translate-x-0`}>
           <button onClick={() => setSidebarVisible(!sidebarVisible)} className="text-white absolute top-4 right-4 lg:hidden">
@@ -182,21 +184,44 @@ export default function Profile() {
             )}
           </div>
 
-          <div className={`transition-opacity duration-500 ${showListedItems ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showListedItems && userDetails.user_type === 'seller' && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <SellerViewItem userId={user.uid} />
-              </aside>
-            )}
-          </div>
+              <div className={`transition-opacity duration-500 ${showListedItems ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                {showListedItems && userDetails.user_type === 'seller' && (
+                  <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                    <SellerViewItem userId={user.uid} />
+                  </aside>
+                )}
+              </div>
 
-        {userDetails.user_type === 'seller' && showAddProduct && (
-          <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showAddProduct ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
-            <ListProduct userId={user.uid} />
-          </aside>
-        )}
+
+          
+           
+
+            <div className={`transition-opacity duration-500 ${showUpdateUser ? 'opacity-100' : 'opacity-0 hidden'}`}>
+              {showUpdateUser && (
+                <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                  <UpdateUserInfo userDetails={userDetails} setShowUpdateUser={setShowUpdateUser} />
+                </aside>
+              )}
+            </div>
+
+            <div className={`transition-opacity duration-500 ${showPurchaseHistory ? 'opacity-100' : 'opacity-0 hidden'}`}>
+              {showPurchaseHistory && userDetails.user_type === 'buyer' && (
+                <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                  <PurchaseHistory userId={user.uid} onClose={() => setShowPurchaseHistory(false)} />
+                </aside>
+              )}
+            </div>
+
+        <div className={`transition-opacity duration-500 ${showAddProduct ? 'opacity-100' : 'opacity-0 hidden'}`}>
+          {userDetails.user_type === 'seller' && showAddProduct && (
+            <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showAddProduct ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
+              <ListProduct userId={user.uid} />
+            </aside>
+          )}
+        </div>
+      
       </div>
-      </div>
+    </div>
     )
   );
 }

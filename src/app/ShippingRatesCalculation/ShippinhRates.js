@@ -10,7 +10,7 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const hasInternationalShippingRef = useRef(false);
-  const [selectedShippingDetails, setSelectedShippingDetails] = useState([]);
+  const [selectedShippingDetails, setSelectedShippingDetails] = useState({});
   const memoizedCartItems = useMemo(() => cartItems, [JSON.stringify(cartItems)]);
   const memoizedBuyerAddress = useMemo(() => buyerAddress, [JSON.stringify(buyerAddress)]);
 
@@ -31,7 +31,7 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
   const AVERAGE_FABRIC_WEIGHT = 0.15;
 
   const calculateProductWeight = useCallback((item) => {
-    if (item.type === 'fabric') {
+    if (item.product_type === 'fabric') {
       return parseFloat((item.quantity * AVERAGE_FABRIC_WEIGHT).toFixed(2));
     } else {
       return parseFloat(item.quantity.toFixed(2));
@@ -95,7 +95,9 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
 
     for (const [sellerId, shipment] of Object.entries(shipmentsBySeller)) {
       const sellerAddress = shipment.sellerAddress;
+      console.log(`Processing shipment for seller ${sellerId}:`, shipment);
       const packages = calculatePackages(shipment.items);
+      console.log(`Packages for seller ${sellerId}:`, packages);
       console.log(`Calculating shipping for seller ${sellerId} with packages: Seller Address:`, sellerAddress);
       if (sellerAddress.country === 'IN') {
         totalIndiaWeight += packages.reduce((acc, pkg) => acc + pkg.weight, 0);
@@ -154,10 +156,9 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
               }
             };
       
-            setSelectedShippingDetails(prevDetails => [
+            setSelectedShippingDetails(prevDetails => ({
               ...prevDetails,
-              {
-                sellerId,
+              [sellerId]: {
                 rateId: cheapestRate.rate_id,
                 carrierId: cheapestRate.carrier_id,
                 serviceCode: cheapestRate.service_code,
@@ -165,9 +166,9 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
                 amount: amountInCAD,
                 currency: 'cad',
                 deliveryDays: cheapestRate.delivery_days,
-                items: shipment.items  // Include the items for this seller
+                items: shipment.items
               }
-            ]);
+            }));
       
             totalCost += amountInCAD;
           } else {
@@ -240,10 +241,9 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
           indianSellers: indianSellers
         };
   
-        setSelectedShippingDetails(prevDetails => [
+        setSelectedShippingDetails(prevDetails => ({
           ...prevDetails,
-          {
-            sellerId: 'centralWarehouse',
+          centralWarehouse: {
             rateId: cheapestRate.rate_id,
             carrierId: cheapestRate.carrier_id,
             serviceCode: cheapestRate.service_code,
@@ -253,7 +253,7 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
             deliveryDays: cheapestRate.delivery_days,
             indianSellers: indianSellers
           }
-        ]);
+        }));
   
         totalCost += amountInCAD;
     
@@ -274,19 +274,22 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
     if (!isEqual(newShippingRates, shippingRates)) {
       setShippingRates(newShippingRates);
     }
+    
     if (totalCost !== totalShippingCost) {
       setTotalShippingCost(totalCost);
     }
+    
     if (!isEqual(newErrors, errors)) {
       setErrors(newErrors);
     }
+    
     setIsLoading(false);
   }, [memoizedCartItems, memoizedBuyerAddress, calculatePackages, findCheapestRate , groupShipmentsBySeller]);
 
   const debouncedCalculateShippingRates = useMemo(
     () => debounce(calculateShippingRates, 300),
     [calculateShippingRates]
-  );
+  ); 
   
   useEffect(() => {
     debouncedCalculateShippingRates();

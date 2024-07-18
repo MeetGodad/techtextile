@@ -105,7 +105,7 @@ CREATE TABLE Orders (
     payment_id INT REFERENCES Payments(payment_id),
     shipping_address_id INT REFERENCES Addresses(address_id),
     order_status VARCHAR(20) CHECK (order_status IN ('pending', 'confirmed', 'shipped', 'delivered', 'canceled'));
-    payment_status_check VARCHAR(20) CHECK (payment_status IN ('pending', 'confirmed'));
+    payment_status_check VARCHAR(20) CHECK (payment_status IN ('pending', 'confirmed' , 'refunded'));
     order_shhipping_cost DECIMAL(10, 2) NOT NULL,
     order_total_price DECIMAL(10, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -118,10 +118,21 @@ CREATE TABLE OrderItems (
     quantity INT NOT NULL,
     item_price DECIMAL(10, 2) NOT NULL,
     variant_id INT REFERENCES ProductVariant(variant_id)
+    item_status VARCHAR(20) CHECK (item_status IN ('active', 'cancelled', 'refunded'));
 );
 
 CREATE TABLE OrderCancellations (
     cancellation_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES Orders(order_id),
+    canceled_by VARCHAR(200),
+    cancellation_reason TEXT,
+    canceled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE OrderItemCancellations (
+    cancellation_id SERIAL PRIMARY KEY,
+    order_item_id INT REFERENCES OrderItems(order_item_id),
     canceled_by VARCHAR(200),
     cancellation_reason TEXT,
     canceled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -132,7 +143,7 @@ CREATE TABLE Payments (
     payment_method VARCHAR(50),
     payment_amount DECIMAL(10, 2) NOT NULL,
     order_id INT REFERENCES orders(order_id),
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP=
     stripe_payment_intent_id SERIAL,
 );
 
@@ -143,25 +154,17 @@ CREATE TABLE ShippingDetails (
   carrier_id VARCHAR(100),
   service_code VARCHAR(100),
   shipping_cost DECIMAL(10, 2),
+  rate_id VARCHAR(100),
+  shipment_id VARCHAR(100),
   estimated_delivery_days DATE,
   is_central_warehouse BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  status VARCHAR(20) chk_status CHECK (status IN ('pending', 'shipped', 'delivered', 'canceled'));
 );
 
 
 
 
-
--- ALTER TABLE Orders
---     ADD CONSTRAINT order_status_check CHECK (order_status IN ('pending', 'shipped', 'delivered', 'canceled'));
-
--- CREATE TABLE OrderCancellations (
---     cancellation_id SERIAL PRIMARY KEY,
---     order_id INT REFERENCES Orders(order_id),
---     canceled_by VARCHAR(200), -- This could be a user_id or an admin_id
---     cancellation_reason TEXT,
---     canceled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
 
 
 
