@@ -11,18 +11,14 @@ module.exports = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
-      animation: {
-            'fade-in-up': 'fadeInUp 0.5s ease-out',
-            'float': 'float 3s ease-in-out infinite',
-      },
       keyframes: {
         fly: {
           '0%': { transform: 'translate(0, 0)', opacity: '1' },
           '100%': { transform: 'translate(var(--fly-x), var(--fly-y))', opacity: '0' },
         },
         fadeIn: {
-          '0%': { opacity: 0 },
-          '100%': { opacity: 1 },
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
         'fade-in-down': {
           '0%': {
@@ -35,12 +31,8 @@ module.exports = {
           },
         },
         'fade-in': {
-          '0%': {
-            opacity: '0'
-          },
-          '100%': {
-            opacity: '1'
-          },
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
         fadeInUp: {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
@@ -55,7 +47,8 @@ module.exports = {
         fly: 'fly 0.6s ease-out forwards',
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'fade-in-down': 'fade-in-down 0.5s ease-out',
-        'fade-in': 'fade-in 0.5s ease-out'
+        'fade-in-up': 'fadeInUp 0.5s ease-out',
+        'float': 'float 3s ease-in-out infinite',
       },
     },
   },

@@ -77,8 +77,7 @@ const PurchaseHistory = ({ userId }) => {
         await updateOrderShippingCost(updatedOrder.order_id, newShippingCost);
       }
     } catch (error) {
-      console.error('Error recalculating shipping cost:', error);
-      alert('Failed to recalculate shipping cost: ' + error.message);
+      console.error('Error recalculating shipping cost:', error.message);
       return updatedOrder;
     }
   };
