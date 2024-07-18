@@ -220,47 +220,73 @@ const PurchaseHistory = ({ userId }) => {
                   <p>{order.order_cancellation_reason}</p>
                 </div>
               )}
-              <h4 className="text-lg font-semibold mb-2">Ordered Items:</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {order.order_items.map((item) => (
-                  <div key={item.order_item_id} className={`border rounded-lg p-4 flex flex-col relative ${item.item_status === 'cancelled' ? 'border-red-500 border-2' : ''}`}>
-                    <div className="relative mb-2">
-                      {item.image_url && 
-                        <img src={item.image_url.split(',')[0]} alt={item.product_name} className="w-full h-32 object-cover rounded-lg mb-2" />
-                      }
-                      {item.item_status === 'cancelled' && (
-                        <div className="absolute inset-0 bg-red-500 bg-opacity-70 flex items-center justify-center rounded-lg">
-                          <span className="text-white font-bold text-sm">Item Cancelled</span>
-                        </div>
-                      )}
-                    </div>
-                    <h5 className="font-semibold text-sm mb-1">{item.product_name}</h5>
-                    <p className="text-sm mb-1">Price: ${item.price}</p>
-                    <p className="text-sm mb-2">Quantity: {item.quantity}</p>
-                    <button 
-                          onClick={() => handleBuyAgain(item.product_id)}
-                          className="mt-auto bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 text-sm"
-                        >
-                          Buy Again
-                    </button>
-                    {item.item_status === 'cancelled' ? (
-                      <p className="text-sm mb-1 text-red-600 ">Cancellation Reason: {item.cancellation_reason}</p>
-                    ) : (
-                      <>
-                        
-                        {order.can_cancel && (
-                          <button 
-                            onClick={() => handleCancelItem(order.order_id, item.order_item_id)}
-                            className="mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 text-sm"
-                          >
-                            Cancel Item
-                          </button>
-                        )}
-                      </>
+
+            <h4 className="text-lg font-semibold mb-2">Ordered Items:</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {order.order_items.map((item) => (
+                <div key={item.order_item_id} className={`border rounded-lg p-4 flex flex-col relative ${item.item_status === 'cancelled' ? 'border-red-500 border-2' : ''}`}>
+                  <div className="relative mb-2">
+                    {item.image_url && 
+                      <img src={item.image_url.split(',')[0]} alt={item.product_name} className="w-full h-32 object-cover rounded-lg mb-2" />
+                    }
+                    {item.item_status === 'cancelled' && (
+                      <div className="absolute inset-0 bg-red-500 bg-opacity-70 flex items-center justify-center rounded-lg">
+                        <span className="text-white font-bold text-sm">Item Cancelled</span>
+                      </div>
                     )}
                   </div>
-                ))}
-              </div>
+                  <h5 className="font-semibold text-sm mb-1">{item.product_name}</h5>
+                  {item.selected_variant && (
+                    <div className="mb-4">
+                      <label className="block text-black-300 mb-2">Variant:</label>
+                      <div className="text-black-600 mb-2">
+                        {item.selected_variant.color && (
+                          <div>
+                            <span className="font-semibold">Color: </span>
+                            <span style={{ 
+                              display: 'inline-block', 
+                              backgroundColor: item.selected_variant.color.split(':')[1]?.trim() || item.selected_variant.color,
+                              width: '20px', 
+                              height: '20px', 
+                              borderRadius: '50%',
+                              marginLeft: '5px'
+                            }}></span>
+                          </div>
+                        )}
+                        {item.selected_variant.denier && (
+                          <div>
+                            <span className="font-semibold">Denier: </span>
+                            <span>{item.selected_variant.denier.split(':')[1]?.trim() || item.selected_variant.denier}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-sm mb-1">Price: ${item.price}</p>
+                  <p className="text-sm mb-2">Quantity: {item.quantity}</p>
+                  <button 
+                    onClick={() => handleBuyAgain(item.product_id)}
+                    className="mt-auto bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 text-sm"
+                  >
+                    Buy Again
+                  </button>
+                  {item.item_status === 'cancelled' ? (
+                    <p className="text-sm mb-1 text-red-600 ">Cancellation Reason: {item.cancellation_reason}</p>
+                  ) : (
+                    <>
+                      {order.can_cancel && (
+                        <button 
+                          onClick={() => handleCancelItem(order.order_id, item.order_item_id)}
+                          className="mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 text-sm"
+                        >
+                          Cancel Item
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
               {order.can_cancel && (
                 <button 
                   onClick={() => handleCancelOrder(order.order_id)}
