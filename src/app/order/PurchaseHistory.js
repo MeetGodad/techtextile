@@ -236,32 +236,6 @@ const PurchaseHistory = ({ userId }) => {
                     )}
                   </div>
                   <h5 className="font-semibold text-sm mb-1">{item.product_name}</h5>
-                  {item.selected_variant && (
-                    <div className="mb-4">
-                      <label className="block text-black-300 mb-2">Variant:</label>
-                      <div className="text-black-600 mb-2">
-                        {item.selected_variant.color && (
-                          <div>
-                            <span className="font-semibold">Color: </span>
-                            <span style={{ 
-                              display: 'inline-block', 
-                              backgroundColor: item.selected_variant.color.split(':')[1]?.trim() || item.selected_variant.color,
-                              width: '20px', 
-                              height: '20px', 
-                              borderRadius: '50%',
-                              marginLeft: '5px'
-                            }}></span>
-                          </div>
-                        )}
-                        {item.selected_variant.denier && (
-                          <div>
-                            <span className="font-semibold">Denier: </span>
-                            <span>{item.selected_variant.denier.split(':')[1]?.trim() || item.selected_variant.denier}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
                   <p className="text-sm mb-1">Price: ${item.price}</p>
                   <p className="text-sm mb-2">Quantity: {item.quantity}</p>
                   <button 
