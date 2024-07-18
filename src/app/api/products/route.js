@@ -1,16 +1,20 @@
 import { neon } from '@neondatabase/serverless';
 
-
-
 export async function GET() {
     try {
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
         const products = await sql`
-            SELECT p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material,  COALESCE(pr.average_rating, 0) AS average_rating
-            FROM Products p LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id
-            LEFT JOIN ProductVariant pv ON p.product_id = pv.product_id LEFT JOIN product_ratings pr ON p.product_id = pr.product_id
-            GROUP BY p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material, pr.average_rating;`;
+            SELECT p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, p.product_type, 
+                   yp.yarn_material, fp.fabric_print_tech, fp.fabric_material, 
+                   COALESCE(pr.average_rating, 0) AS average_rating
+            FROM Products p 
+            LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id 
+            LEFT JOIN FabricProducts fp ON p.product_id = fp.product_id
+            LEFT JOIN ProductVariant pv ON p.product_id = pv.product_id 
+            LEFT JOIN product_ratings pr ON p.product_id = pr.product_id
+            GROUP BY p.product_id, p.product_name, p.product_description, p.price, p.image_url, p.seller_id, 
+                     p.product_type, yp.yarn_material, fp.fabric_print_tech, fp.fabric_material, pr.average_rating;`;
 
         if (products.length === 0) {
             return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
@@ -22,7 +26,6 @@ export async function GET() {
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
 }
-
 
 export async function POST(req) {
     try {
@@ -45,7 +48,6 @@ export async function POST(req) {
         const variantId = productVariantResult[0].variantid;
         console.log("ProductVariant inserted with ID:", variantId);
 
-      
         const categoryResult = await sql`
             INSERT INTO Category (categoryName, parentCategory_id)
             VALUES (${requestData.categoryName}, ${requestData.parentCategory_id})
@@ -61,12 +63,9 @@ export async function POST(req) {
         `;
         console.log("Marketplace data inserted successfully", marketplaceResult);
 
-
         return new Response(JSON.stringify({ message: "Data inserted successfully" }), { status: 200 });
     } catch (error) {
         console.error('An error occurred: Internal server error', error);
         return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
     }
-
 }
-

@@ -1,5 +1,9 @@
 import { neon } from "@neondatabase/serverless";
 
+export const fetchCache = 'force-no-store'
+export const revalidate = 0 // seconds
+export const dynamic = 'force-dynamic'
+
 
 export async function GET(req, { params }) {  
     const id = params.id;
@@ -39,8 +43,8 @@ export async function GET(req, { params }) {
         'state', a.state,
         'postal_code', a.postal_code
     ) AS seller_address,
-    pr.average_rating,
-    pr.total_reviews
+    pr.total_reviews,
+    COALESCE(pr.average_rating, 0) AS average_rating
 FROM 
     Products p 
     LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id 
@@ -67,8 +71,8 @@ GROUP BY
     a.city,
     a.state,
     a.postal_code,
-    pr.average_rating,
-    pr.total_reviews;`;
+    pr.total_reviews,
+    pr.average_rating;`;
 
     if (Products.length === 0) {
         return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
