@@ -66,17 +66,18 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
   }, [user]);
 
   const handleSearch = async () => {
-    if (!searchText) {
+    try {
+      if (!searchText) {
+      onSearchResults([]); 
       return;
     }
 
-    try {
+    
       const response = await fetch(`/api/search?term=${searchText}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setSearchResults(data);
       onSearchResults(data); 
       // Navigate to the search results page
       router.push('/search');
@@ -84,12 +85,17 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
       console.error('Error searching products:', error);
     }
   };
+  const resetSearchResults = () => {
+    setSearchText('');
+    onSearchResults([]);
+  };
+
 
   return (
     <div className="w-full bg-white overflow-visible flex items-center gap-80 px-3 box-border z-40 sticky top-0 leading-normal tracking-normal text-xl text-black font-sans">
     <div className="flex flex-auto items-center">
       <div className="flex items-center justify-center w-20 h-20"></div>
-      <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}><Link href="/Home">TECH TEXTILE</Link></h3>
+      <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}><Link href="/Home" onClick={resetSearchResults} >TECH TEXTILE</Link></h3>
     </div>
       <div className="flex justify-between items-start gap-5">
         <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[250px] h-10">
@@ -100,11 +106,14 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
       className="text-left bg-transparent outline-none text-sm"
       onChange={(e) => {
         setSearchText(e.target.value);
-      }}
+            }}
+      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
       style={{ width: 'calc(100% - 24px)' }}
     />
     <button
-      onClick={() => handleSearch()}
+      onClick={() => {handleSearch();
+    setSearchText(''); // Reset searchText after search
+      }}
       style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
     >
       {searchText === '' ? (

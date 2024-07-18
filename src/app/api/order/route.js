@@ -36,8 +36,8 @@ export async function POST(request) {
       } else {
         // Address doesn't exist, insert a new shipping address
         const newAddress = await sql`
-          INSERT INTO addresses (user_id, address_type, address_first_name, address_last_name, address_email, street, city, state, postal_code)
-          VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${street}, ${city}, ${state}, ${zip})
+          INSERT INTO addresses (user_id, address_type, address_first_name, address_last_name, address_email, street, city, state, postal_code, country)
+          VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${street}, ${city}, ${state}, ${zip}, ${country})
           RETURNING address_id;
         `;
         shippingAddressId = newAddress[0].address_id;
@@ -53,8 +53,8 @@ export async function POST(request) {
     let orderId;
     try {
       const result = await sql`
-        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status,order_shhipping_cost , order_total_price)
-        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice})
+        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status, order_shhipping_cost, order_total_price, payment_status_check)
+        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice}, 'pending')
 
         RETURNING order_id;
       `;
@@ -68,6 +68,7 @@ export async function POST(request) {
 
     // Insert order items
     try {
+
        const orderItemsPromises = cart.map(async (item) => {
     await sql`
       INSERT INTO orderitems (order_id, product_id, quantity, item_price, variant_id)
@@ -90,26 +91,33 @@ export async function POST(request) {
 
 
     try {
-      const shippingDetailsPromises = shippingDetails.map(detail => {
-        const sellerIds = detail.sellerId === 'centralWarehouse' ? detail.indianSellers : [detail.sellerId];
+      const shippingDetailsPromises = Object.entries(shippingDetails).map(([key, detail]) => {
+        const isCentralWarehouse = key === 'centralWarehouse';
+        const sellerIds = isCentralWarehouse ? detail.indianSellers : [key];
         return sql`
           INSERT INTO ShippingDetails (
-        order_id, 
-        seller_ids, 
-        carrier_id, 
-        service_code, 
-        shipping_cost, 
-        is_central_warehouse
-      )
-      VALUES (
-        ${orderId}, 
-        ${sellerIds}, 
-        ${detail.carrierId}, 
-        ${detail.serviceCode}, 
-        ${detail.amount}, 
-        ${detail.sellerId === 'centralWarehouse'}
-      );
-    `;
+            order_id, 
+            seller_ids, 
+            carrier_id, 
+            service_code, 
+            shipping_cost, 
+            is_central_warehouse,
+            rate_id,
+            shipment_id,
+            estimated_delivery_days
+          )
+          VALUES (
+            ${orderId}, 
+            ${sellerIds}, 
+            ${detail.carrierId}, 
+            ${detail.serviceCode}, 
+            ${detail.amount}, 
+            ${isCentralWarehouse},
+            ${detail.rateId},
+            ${detail.shipmentId},
+            ${detail.deliveryDays}
+          );
+        `;
       });
       await Promise.all(shippingDetailsPromises);
       console.log("Shipping Details inserted successfully");
@@ -117,7 +125,6 @@ export async function POST(request) {
       console.error("Error inserting shipping details:", err);
       throw new Error("Failed to insert shipping details.");
     }
-
   
 
     return new Response(JSON.stringify({ orderId }), { 

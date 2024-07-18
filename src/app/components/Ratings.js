@@ -7,7 +7,7 @@ export default function Ratings({ productId,userId, onClose }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const  handleReviewSubmit = async () => {
-
+  try{
     const response = await fetch('/api/review', {
       method: 'POST',
       body: JSON.stringify({
@@ -26,8 +26,12 @@ export default function Ratings({ productId,userId, onClose }) {
     } else if (response.ok) {
       console.log("Review Added Successfully")
       onClose();
+      window.location.reload();
     }
-  };
+  } catch (error) {
+    console.error("Error submitting review:", error);
+  }
+};
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

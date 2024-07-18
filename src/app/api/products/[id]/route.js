@@ -1,9 +1,16 @@
+//https://github.com/vercel/next.js/issues/51788  :- for caching issue
+
+
 import { neon } from "@neondatabase/serverless";
 
-
+export const fetchCache = 'force-no-store'
+export const revalidate = 0 // seconds
+export const dynamic = 'force-dynamic'
 export async function GET(req, { params }) {  
-    const id = params.id;
-    console.log("User ID:", id);
+    try {
+    const user_id = params.id;
+    const id = user_id
+    
 
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
@@ -39,8 +46,8 @@ export async function GET(req, { params }) {
         'state', a.state,
         'postal_code', a.postal_code
     ) AS seller_address,
-    pr.average_rating,
-    pr.total_reviews
+    pr.total_reviews,
+    COALESCE(pr.average_rating, 0) AS average_rating
 FROM 
     Products p 
     LEFT JOIN YarnProducts yp ON p.product_id = yp.product_id 
@@ -69,11 +76,36 @@ GROUP BY
     a.postal_code,
     pr.average_rating,
     pr.total_reviews;`;
+  if (Products.length === 0) {
+            return new Response(JSON.stringify({ message: "Product not found" }), {
+                status: 404,
+                next: '/products',
+                headers: {
+                'Cache-Control': fetchCache,
+                'Content-Type': 'application/json'
+            }
+            });
+        }
 
-    if (Products.length === 0) {
-        return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
+        return new Response(JSON.stringify(Products), {
+            status: 200,
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+
+    } catch (error) {
+        console.error('An error occurred:', error.message);
+        console.error('Stack trace:', error.stack);
+        return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), {
+            status: 500,
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
     }
-
-    return new Response(JSON.stringify(Products), { status: 200 });
-
 }
