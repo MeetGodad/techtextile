@@ -1,5 +1,10 @@
 // https://chatgpt.com/c/22e9babf-91d6-4e67-8e17-d8393610f4f2 for this database taken a help 
 import { neon } from '@neondatabase/serverless';
+
+export const fetchCache = 'force-no-store'
+export const revalidate = 0 // seconds
+export const dynamic = 'force-dynamic'
+
 export async function POST(req) {
 
     try {

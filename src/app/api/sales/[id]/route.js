@@ -1,5 +1,9 @@
 import { neon } from '@neondatabase/serverless';
 
+export const fetchCache = 'force-no-store'
+export const revalidate = 0 // seconds
+export const dynamic = 'force-dynamic'
+
 export async function GET(req, { params }) {
   const userId = params.id;
   const databaseUrl = process.env.DATABASE_URL || "";

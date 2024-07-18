@@ -33,7 +33,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
-      fetch(`api/profile/${userId}`, {
+      fetch(`api/Profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -172,9 +172,10 @@ export default function Profile() {
                   </>
                 )}
                 <div className="mt-8">
-                <h3 className="text-2xl font-semibold">Business Stats</h3>
+
                   {userDetails.user_type === 'seller' && (
                     <>
+                      <h3 className="text-2xl font-semibold">Business Stats</h3>
                       <BusinessStats userId={user.uid} />
                       <div className="bg-gray-200 p-4 rounded-lg mb-4">
                         <ProductReviews userId={user.uid} />
