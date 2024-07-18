@@ -1,3 +1,4 @@
+
 import { Inter } from "next/font/google";
 import { AuthContextProvider } from "./auth/auth-context";
 

@@ -131,11 +131,9 @@ export default function Cart({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-400 to-gray-200 p-8 relative overflow-hidden">
-      <div className="absolute inset-0 bg-cover bg-center opacity-10 animate-pulse"></div>
-      <div className="stars absolute inset-0"></div>
-      <div className="max-w-6xl mx-auto bg-white bg-opacity-5 backdrop-filter backdrop-blur-xl rounded-3xl shadow-2xl p-8 animate-fade-in-up relative z-10">
-        <h1 className="text-5xl font-extrabold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-gray-300 to-gray-100 text-center animate-pulse">
+    <div className="bg-gray-600 p-8">
+      <div className="max-w-6xl bg-gray-200 mx-auto bg-black-500 rounded-3xl shadow-2xl p-8">
+        <h1 className="text-5xl font-extrabold mb-12 text-gray-600 text-center">
           Your Shopping Cart
         </h1>
         {cart.length > 0 ? (
@@ -144,11 +142,10 @@ export default function Cart({ children }) {
               {cart.map((item, index) => (
                 <div 
                   key={item.product_id} 
-                  className="bg-gradient-to-br from-gray-200 to-gray-400 rounded-2xl p-6 transform transition duration-500 hover:scale-105 hover:rotate-1 hover:shadow-2xl border border-gray-700"
-                >
-                  <div className={`relative mb-6 group ${parseInt(item.selected_variant.quantity) === 0 ? 'filter blur-md opacity-50 pointer-events-none' : ''}`}>
+                  className="bg-gray-200 rounded-2xl p-6 shadow-x2 transform transition duration-500 hover:bg-gray-600 hover:-rotate-1 hover:text-white">
+                  <div className="relative mb-6 group">
                     <img 
-                      src={item.image_url.split(',')[0]} 
+                      src={item.image_url.split(',')[0]}  
                       alt={item.product_name} 
                       className="w-full h-48 object-cover rounded-xl shadow-md transition duration-300 group-hover:shadow-xl"
                     />
@@ -156,33 +153,43 @@ export default function Cart({ children }) {
                       <span className="text-white text-lg font-semibold">{item.product_name}</span>
                     </div>
                   </div>
-                  <div className="text-black font-bold text-2xl mb-4">${parseFloat(item.price).toFixed(2)}</div>
+                  <div className="transform transition hover:bg-gray-600 hover:text-white font-bold text-2xl mb-4">${parseFloat(item.price).toFixed(2)}</div>
+                  {console.log(item.selected_variant)}
                   {item.selected_variant && (
-                    <div className="mb-4">
-                      <label className="block text-black-300 mb-2">Variant:</label>
-                      <div className="text-black-600 mb-2">
-                        {item.selected_variant.color && (
-                          <div>
-                            <span className="font-semibold">Color: </span>
-                            <span style={{ 
-                              display: 'inline-block', 
-                              backgroundColor: item.selected_variant.color.split(':')[1]?.trim() || item.selected_variant.color,
-                              width: '20px', 
-                              height: '20px', 
-                              borderRadius: '50%',
-                              marginLeft: '5px'
-                            }}></span>
-                          </div>
-                        )}
-                        {item.selected_variant.denier && (
-                          <div>
-                            <span className="font-semibold">Denier: </span>
-                            <span>{item.selected_variant.denier.split(':')[1]?.trim() || item.selected_variant.denier}</span>
-                          </div>
-                        )}
+                      <div className="mb-4">
+                        <label className="block text-black-300 mb-2">Variant:</label>
+                        <div className="text-black-600 mb-2">
+                          {item.selected_variant.color && (
+                            <div className='flex items-center'>
+                              <span className="font-semibold">Color: </span>
+                              <span className="
+                                  inline-block w-5 h-5 rounded-full ml-2
+                                  bg-black-500 p-2
+                                  transform transition duration-300 border-black ease-in-out
+                                  hover:scale-110 hover:border-white
+                                  border-2 border-black
+                                " 
+                              style={{ 
+                                display: 'inline-block', 
+                                backgroundColor: item.selected_variant.color.split(':')[1]?.trim() || item.selected_variant.color,
+                                /*width: '20px', 
+                                height: '20px', 
+                                borderRadius: '50%',
+                                marginLeft: '5px',
+                                border:'0 0 0 5px solid black',
+                                padding:'10px'*/
+                              }}></span>
+                            </div>
+                          )}
+                          {item.selected_variant.denier && (
+                            <div>
+                              <span className="font-semibold">Denier: </span>
+                              <span>{item.selected_variant.denier.split(':')[1]?.trim() || item.selected_variant.denier}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                   <div className="mb-6">
                     <label className="block text-black-300 mb-2">Quantity</label>
                     <input
@@ -202,8 +209,7 @@ export default function Cart({ children }) {
                   <div className="font-semibold text-black-300 mb-4">Subtotal: ${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
                   <button 
                     onClick={() => removeItem(item.cart_item_id)} 
-                    className="text-red-500 hover:text-red transition duration-300 transform hover:scale-110"
-                  >
+                    className="text-red-500 font-semibold hover:text-red transition duration-300 transform hover:scale-110">
                     Remove
                   </button>
                 </div>

@@ -53,8 +53,8 @@ export async function POST(request) {
     let orderId;
     try {
       const result = await sql`
-        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status,order_shhipping_cost , order_total_price)
-        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice})
+        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status, order_shhipping_cost, order_total_price, payment_status_check)
+        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice}, 'pending')
 
         RETURNING order_id;
       `;

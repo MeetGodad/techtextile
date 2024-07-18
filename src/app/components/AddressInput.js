@@ -1,11 +1,5 @@
 // This component is used to get the address details from the user using the Google Maps Autocomplete API.
 // Reference: https://react-google-maps-api-docs.netlify.app/#autocomplete
-// Reference: https://developers.google.com/maps/documentation/javascript/places-autocomplete
-// Reference : Perplexity AI
-
-
-// This component is used to get the address details from the user using the Google Maps Autocomplete API.
-// Reference: https://react-google-maps-api-docs.netlify.app/#autocomplete
 // Reference: https://developers.google.com/maps/documentation/javascript/places-autocompleteimport 
 // References  : GitHub Copilot
 
@@ -34,6 +28,7 @@ const AddressInput = ({
   const SUPPORTED_COUNTRIES = supportedCountries;
   const [error, setError] = useState('');
   const [isManualEntry, setIsManualEntry] = useState(false);
+  
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -62,6 +57,7 @@ const AddressInput = ({
     }
 
     setIsManualEntry(false);
+
     let newStreet = '', newCity = '', newState = '', newStateCode = '', newPostalCode = '', newCountry = '', newCountryCode = '';
   
     for (const component of place.address_components) {
@@ -119,6 +115,7 @@ const AddressInput = ({
     setCountryCode(newCountryCode);
   };
 
+
   const handleManualInput = (e) => {
     setStreet(e.target.value);
     if (e.target.value.length > 10) {
@@ -128,6 +125,7 @@ const AddressInput = ({
       setError("Note: Please select an address from the dropdown list. We don't support manual address entry at this time");
     }
   };
+
 
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading...</div>;

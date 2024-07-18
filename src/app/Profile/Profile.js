@@ -190,31 +190,13 @@ export default function Profile() {
             )}
           </div>
 
-          <div className={`transition-opacity duration-500 ${showAddProduct ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showAddProduct && userDetails.user_type === 'seller' && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <ListProduct userId={user.uid} />
-              </aside>
-            )}
-          </div>
-
-          <div className={`transition-opacity duration-500 ${showUpdateUser ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showUpdateUser && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <UpdateUserInfo userDetails={userDetails} setShowUpdateUser={setShowUpdateUser} />
-              </aside>
-            )}
-          </div>
-
-          <div className={`transition-opacity duration-500 ${showPurchaseHistory ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showPurchaseHistory && userDetails.user_type === 'buyer' && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <PurchaseHistory userId={user.uid} onClose={() => setShowPurchaseHistory(false)} />
-              </aside>
-            )}
-          </div>
-        </div>
-      
+        {userDetails.user_type === 'seller' && showAddProduct && (
+          <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showAddProduct ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
+            <ListProduct userId={user.uid} />
+          </aside>
+        )}
+      </div>
+      </div>
     )
   );
 }
