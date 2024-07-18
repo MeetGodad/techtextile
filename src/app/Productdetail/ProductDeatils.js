@@ -42,6 +42,8 @@ export default function ProductDetail({ productId }) {
   const [copied, setCopied] = useState(false);
   const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [availableQuantities, setAvailableQuantities] = useState([]);
+  const [Message, setMessage] = useState('');
 
   useEffect(() => {
     // Function to hide share icons when clicking outside
@@ -116,28 +118,50 @@ export default function ProductDetail({ productId }) {
 
     fetchRelatedProducts();
   }, [currentProductId]);
-  useEffect(() => {
-    if (selectedColor && product) {
-        const deniers = product.variants
-            .filter(v => v.color.split(': ')[1] === selectedColor)
-            .map(v => v.denier.split(': ')[1]);
-        setAvailableDeniers(deniers);
-    } else {
-        setAvailableDeniers([]);
+
+useEffect(() => {
+  if (selectedColor && product) {
+    if (product.product_type === 'yarn') {
+      const deniers = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => v.denier.split(': ')[1]);
+      setAvailableDeniers(deniers);
+
+      const quantities = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => ({ denier: v.denier.split(': ')[1], quantity: v.quantity }));
+      setAvailableQuantities(quantities);
+    } else if (product.product_type === 'fabric') {
+      const quantities = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => ({ quantity: v.quantity }));
+      setAvailableQuantities(quantities);
     }
-    setSelectedDenier(null);
-    setSelectedVariantId(null);
+  } else {
+    setAvailableDeniers([]);
+    setAvailableQuantities([]);
+  }
+  setSelectedDenier(null);
+  setSelectedVariantId(null);
 }, [selectedColor, product]);
 
 
 useEffect(() => {
-  if (selectedColor && selectedDenier && product) {
+  if (product) {
+    if (product.product_type === 'yarn' && selectedColor && selectedDenier) {
       const variant = product.variants.find(
-          v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
+        v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
+      );
+      console.log('Yarn variant:', variant);
+      setSelectedVariantId(variant ? variant.variant_id : null);
+    } else if (product.product_type === 'fabric' && selectedColor) {
+      const variant = product.variants.find(
+        v => v.color.split(': ')[1] === selectedColor
       );
       setSelectedVariantId(variant ? variant.variant_id : null);
-  } else {
+    } else {
       setSelectedVariantId(null);
+    }
   }
 }, [selectedColor, selectedDenier, product]);
 
@@ -199,17 +223,27 @@ useEffect(() => {
     alert(error.message);
   }
 };
-  const handleQuantityChange = (event) => {
-    setQuantity(parseInt(event.target.value));
-  };
-  /*
-  const handleColorSelection = (color) => {
-    setSelectedColor(color);
-    setSelectedDenier(null); 
-  };
-  const handleDenierSelection = (denier) => {
-    setSelectedDenier(denier);
-  };*/
+const handleQuantityChange = (event) => {
+  const maxQuantity = getSelectedVariantQuantity();
+  const newQuantity = parseInt(event.target.value);
+
+  if (newQuantity > maxQuantity) {
+    setMessage(`You can only select up to ${maxQuantity} units.`);
+    setQuantity(maxQuantity);
+  } else {
+    setMessage('');
+    setQuantity(newQuantity);
+  }
+};
+const handleColorSelection = (color) => {
+  setSelectedColor(color);
+  setSelectedDenier(null); // Reset selected denier when color changes
+};
+const handleDenierSelection = (denier) => {
+setSelectedDenier(denier);
+const selectedVariant = availableQuantities.find(v => v.denier === denier);
+setSelectedVariantId(selectedVariant ? selectedVariant.variant_id : null);
+};
   const handleNextImage = () => {
     if (product) {
       const imageUrls = product.image_url.split(',');
@@ -234,6 +268,7 @@ useEffect(() => {
   if (loading) return <Loder />;
   if (error) return <div>Error: {error}</div>;
   if (!product) return <div>Product not found</div>;
+
   const handlePrevImage = () => {
     if (product) {
       const imageUrls = product.image_url.split(',');
@@ -272,8 +307,6 @@ useEffect(() => {
 
 
   const imageUrls = product.image_url.split(',');
-  const availableQuantities = product.variants
-
   const getSelectedVariantQuantity = () => {
     if (product.product_type === 'yarn') {
       const selectedVariant = availableQuantities.find(v => v.denier === selectedDenier);
@@ -281,7 +314,6 @@ useEffect(() => {
     } else if (product.product_type === 'fabric') {
       return availableQuantities.length > 0 ? availableQuantities[0].quantity : null;
     }
-    return null;
   };
   
   
@@ -387,92 +419,109 @@ const uniqueColors = product.variants
               <span className="text-gray-600">({reviews.length} reviews)</span>
             </div>
             <h2 className="text-3xl font-bold text-gray-800 my-4">${product.price}</h2>
+            <div></div>
             <div className="flex space-x-6 mb-6">
               <div className="flex-grow">
-                <div className="mb-6">
-                  <h3 className="font-semibold mb-2">Color:</h3>
-                  <div className="flex space-x-2">
-                    {uniqueColors.map(color => (
-                      <button
-                        key={color}
-                        onClick={() => setSelectedColor(color)}
-                        className={`w-8 h-8 rounded-full transition-transform duration-300 hover:scale-110 ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
-                        style={{ backgroundColor: color }}
-                        title={color}/>
-                    ))}
-                  </div>
-                </div>
-                {product.product_type === 'yarn' && (
-                  <div className="flex items-center mb-6 space-x-24">
-                    <div className="flex flex-col">
-                      <h3 className="font-semibold mb-2">Denier:</h3>
-                      <select
-                        value={selectedDenier || ''}
-                        onChange={(e) => setSelectedDenier(e.target.value)}
-                        disabled={!selectedColor}
-                        className="w-48 p-2 border rounded focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
-                      >
-                        <option value="">Select Denier</option>
-                        {availableDeniers.map(denier => (
-                          <option key={denier} value={denier}>{denier}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex flex-col ml-2">
-                      <label htmlFor="quantity" className="font-semibold mb-2">Quantity:</label>
-                      <input
-                        type="number"
-                        id="quantity"
-                        className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
-                        min="1"
-                        value={quantity}
-                        onChange={handleQuantityChange}
-                      />
-                    </div>
-                  </div>
-                )}
-                {product.product_type === 'fabric' && (
-                  <div className="flex flex-col mb-6">
-                    <label htmlFor="fabric-quantity" className="font-semibold mb-2">Quantity:</label>
-                    <input
-                      type="number"
-                      id="fabric-quantity"
-                      className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
-                      min="1"
-                      value={quantity}
-                      onChange={handleQuantityChange}
-                    />
-                  </div>
-                )}
-                <div className="flex flex-row space-x-40">
-                  <button
-                    className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
-                    onClick={() => addToCart(product)}>
-                    Add to cart
-                  </button>
-                  <button 
-                    className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
-                    onClick={handleReviewAdd}>
-                    Add Review
-                  </button>
-                </div>
+                        <div className="mb-6">
+                          <h3 className="font-semibold mb-2">Color:</h3>
+                          <div className="flex space-x-2">
+                            {uniqueColors.map(color => (
+                              <button
+                                key={color}
+                                onClick={() => setSelectedColor(color)}
+                                className={`w-8 h-8 rounded-full transition-transform duration-300 hover:scale-110 ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
+                                style={{ backgroundColor: color }}
+                                title={color}/>
+                            ))}
+                          </div>
+                        </div>
+                      {/* div */}
+                          {product.product_type === 'yarn' && (
+                          <div className="mb-4">
+                            <h3 className="font-semibold mb-2">Denier:</h3>
+                            <select
+                              value={selectedDenier || ''}
+                              // onChange={(e) => handleDenierSelection(e.target.value)}
+                              disabled={!selectedColor}
+                              className="w-full p-2 border rounded">
+                              <option value="">Select Denier</option>
+                              {availableDeniers.map(denier => (
+                                <option key={denier} value={denier}>{denier}</option>
+                              ))}
+                            </select>
+                          </div>
+                          )}
+                          {selectedDenier && product.product_type === 'yarn' && (
+                          <div className="mb-4">
+                            <h3 className="font-semibold mb-2">Available Quantity:</h3>
+                            <p>
+                              {getSelectedVariantQuantity() || 'N/A'}
+                            </p>
+                          </div>
+                          )}
+                          {selectedColor && product.product_type === 'fabric' && (
+                            <div className="mb-4">
+                              <h3 className="font-semibold mb-2">Available Quantity:</h3>
+                              <p>
+                                {getSelectedVariantQuantity() || 'N/A'}
+                              </p>
+                            </div>
+                          )}
+                          {selectedDenier && product.product_type === 'yarn' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
+                          <div className="mb-4">
+                            <p className="text-red-600">Warning: Low quantity available!</p>
+                          </div>
+                          )}
+                          {selectedColor && product.product_type === 'fabric' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
+                        <div className="mb-4">
+                          <p className="text-red-600">Warning: Low quantity available!</p>
+                        </div>
+                              )}
+                  {/*</div>*/}
+                            <div>
+                                              <div className="flex flex-col ml-2">
+                                                <label htmlFor="quantity" className="font-semibold mb-2">Quantity:</label>
+                                                  <input
+                                                    type="number"
+                                                    id="quantity"
+                                                    className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
+                                                    min="1"
+                                                    max={getSelectedVariantQuantity()}
+                                                    value={quantity}
+                                                    onChange={handleQuantityChange}
+                                                  />
+                                              </div>
+                                              <>{Message && <p className="text-red-600">{Message}</p>}</>
+                                              <div className="flex flex-row space-x-40">
+  
+                                                <button   
+                                                  className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
+                                                  onClick={() => addToCart(product)}>
+                                                  Add to cart
+                                                </button>
+                                                <button 
+                                                  className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
+                                                  onClick={handleReviewAdd}>
+                                                  Add Review
+                                                </button>
+                                              </div>
+                            </div>
+                      {product.yarn_material && (
+                        <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
+                      )}
+                      {product.fabric_print_tech && (
+                        <p className="text-lg mb-4"> <strong>Fabric Print Technology: </strong>  {product.fabric_print_tech}</p>
+                      )}
+                      {product.fabric_material && (
+                        <p className="text-lg mb-4"> <strong>Fabric Material: </strong>  {product.fabric_material}</p>
+                      )}
+                      <p className="text-lg mb-4"><strong>Description:</strong> {product.product_description}</p>
               </div>
             </div>
-
-            {product.yarn_material && (
-              <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
-            )}
-            {product.fabric_print_tech && (
-              <p className="text-lg mb-4"> <strong>Fabric Print Technology: </strong>  {product.fabric_print_tech}</p>
-            )}
-            {product.fabric_material && (
-              <p className="text-lg mb-4"> <strong>Fabric Material: </strong>  {product.fabric_material}</p>
-            )}
-            <p className="text-lg mb-4"><strong>Description:</strong> {product.product_description}</p>
-        </div>
-      </div>
-            {/* Related Products Section */}
-            <div className="mt-16">
+            </div>
+          </div>
+                      {/* Related Products Section */}
+                      <div className="mt-16">
               <h2 className="text-3xl text-center italic font-bold mb-8">Related Products</h2>
               <div className="relative">
                 <div className="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-6 pb-4">
@@ -531,7 +580,7 @@ const uniqueColors = product.variants
                 ) : (
                   <p className="text-gray-600 italic">No reviews yet. Be the first to review this product!</p>
                 )}
-        </div>
+              </div>
       </div>
     </div>
   );

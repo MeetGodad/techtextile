@@ -129,6 +129,9 @@ export default function Cart({ children }) {
       alert('Please remove out-of-stock items or items with zero quantity before proceeding to checkout.');
     }
   };
+  const handleProductClick = (productId) => {
+    router.push(`Productdetail?productId=${productId}`);
+  };
 
   return (
     <div className="bg-gray-600 p-8">
@@ -141,7 +144,7 @@ export default function Cart({ children }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {cart.map((item, index) => (
                 <div 
-                  key={item.product_id} 
+                  key={item.product_id} onClick={() => handleProductClick(item.product_id)}
                   className="bg-gray-200 rounded-2xl p-6 shadow-x2 transform transition duration-500 hover:bg-gray-600 hover:-rotate-1 hover:text-white">
                   <div className="relative mb-6 group">
                     <img 
@@ -165,7 +168,7 @@ export default function Cart({ children }) {
                               <span className="
                                   inline-block w-5 h-5 rounded-full ml-2
                                   bg-black-500 p-2
-                                  transform transition duration-300 border-black ease-in-out
+                                  transform transition duration-300 ease-in-out
                                   hover:scale-110 hover:border-white
                                   border-2 border-black
                                 " 
