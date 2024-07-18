@@ -26,8 +26,6 @@ const Checkout = () => {
     country: '',
     stateCode: '',
     countryCode: '',
-    stateCode: '',
-    countryCode: '',
     email: '',
     phone: '',
   });
@@ -327,7 +325,7 @@ const renderStep = () => {
                 city={shippingInfo.city}
                 state={shippingInfo.state}
                 postalCode={shippingInfo.zip}
-                country={shippingInfo.countryCode}
+                country={shippingInfo.country}
                 setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
                 setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
@@ -378,7 +376,7 @@ const renderStep = () => {
                 <div className="bg-gray-100 p-4 rounded-md transition-all duration-300 hover:shadow-md">
                   <h3 className="font-bold text-lg mb-2 text-gray-800">Shipping Information</h3>
                   <p className="text-gray-700 break-words">{shippingInfo.firstName} {shippingInfo.lastName}</p>
-                  <p className="text-gray-700 break-words">{shippingInfo.address}</p>
+                  <p className="text-gray-700 break-words">{shippingInfo.street}</p>
                   <p className="text-gray-700 break-words">{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zip}</p>
                   <p className="text-gray-700 break-words">{shippingInfo.email}</p>
                 </div>
