@@ -5,6 +5,7 @@ import Loder from '../components/Loder';
 import Ratings from '../components/Ratings';
 import { FiCopy } from 'react-icons/fi';
 import { TbWorldShare } from "react-icons/tb";
+import { useRouter } from 'next/navigation';
 
 import {
   FacebookShareButton,
@@ -44,6 +45,7 @@ export default function ProductDetail({ productId }) {
   const [isHovering, setIsHovering] = useState(false);
   const [availableQuantities, setAvailableQuantities] = useState([]);
   const [Message, setMessage] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     // Function to hide share icons when clicking outside
@@ -292,6 +294,10 @@ useEffect(() => {
   const handleCloseRatings = () => {
     setIsRatingsOpen(false);
   };
+  const handleViewDetails = (productId) => {
+    setCurrentProductId(productId);
+  };
+
 
   if (loading) {
     return (
