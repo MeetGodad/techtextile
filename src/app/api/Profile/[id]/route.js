@@ -13,7 +13,7 @@ export async function GET(req, { params }) {
       SELECT 
         ua.user_id, ua.email, ua.first_name, ua.last_name, ua.user_type, 
         a.street, a.city, a.state, a.postal_code, 
-        s.business_name, s.phone_num AS seller_phone_num,
+        s.seller_id, s.business_name, s.phone_num AS seller_phone_num,
         b.phone_num AS buyer_phone_num
       FROM UserAccounts ua
       LEFT JOIN Addresses a ON ua.user_id = a.user_id
@@ -31,6 +31,8 @@ export async function GET(req, { params }) {
     return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
   }
 }
+
+
 
 
 export async function PUT(req, { params }) {

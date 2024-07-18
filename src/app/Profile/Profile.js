@@ -6,6 +6,7 @@ import UpdateUserInfo from './UpdateUserInfo';
 import PurchaseHistory from '../order/PurchaseHistory';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { FiMenu, FiX } from 'react-icons/fi';
+import BusinessStats from '../admin/BusinessStats';
 
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
@@ -51,13 +52,14 @@ export default function Profile() {
             setSellerInfo({
               business_name: data.user.business_name,
               business_address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`,
-              phone_num: data.user.seller_phone_num
+              phone_num: data.user.seller_phone_num  // Updated to use seller_phone_num
             });
           } else if (data.user.user_type === 'buyer') {
             setBuyerInfo({
-              phone_num: data.user.buyer_phone_num,
+              phone_num: data.user.buyer_phone_num,  // Updated to use buyer_phone_num
               address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`
             });
+
           }
         })
         .catch(error => {
@@ -140,7 +142,7 @@ export default function Profile() {
                   Sign Out
                 </button>
               </li>
-            </ul>
+            </ul> 
           </nav>
         </aside>
 
@@ -171,10 +173,8 @@ export default function Profile() {
                 <div className="mt-8">
                   {userDetails.user_type === 'seller' && (
                     <>
+                      <BusinessStats userId={user.uid} />
                       <div className="bg-gray-200 p-4 rounded-lg mb-4">
-                        <h3 className="text-xl font-semibold">Business Stats (Coming Soon)</h3>
-                      </div>
-                      <div className="bg-gray-200 p-4 rounded-lg">
                         <h3 className="text-xl font-semibold">Product Reviews (Coming Soon)</h3>
                       </div>
                     </>
@@ -184,37 +184,42 @@ export default function Profile() {
             )}
           </div>
 
-          <div className={`transition-opacity duration-500 ${showListedItems ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showListedItems && userDetails.user_type === 'seller' && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <SellerViewItem userId={user.uid} />
-              </aside>
-            )}
-          </div>
+              <div className={`transition-opacity duration-500 ${showListedItems ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                {showListedItems && userDetails.user_type === 'seller' && (
+                  <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                    <SellerViewItem userId={user.uid} />
+                  </aside>
+                )}
+              </div>
 
-          <div className={`transition-opacity duration-500 ${showAddProduct ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showAddProduct && userDetails.user_type === 'seller' && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <ListProduct userId={user.uid} />
-              </aside>
-            )}
-          </div>
 
-          <div className={`transition-opacity duration-500 ${showUpdateUser ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showUpdateUser && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <UpdateUserInfo userDetails={userDetails} setShowUpdateUser={setShowUpdateUser} />
-              </aside>
-            )}
-          </div>
+          
+           
 
-          <div className={`transition-opacity duration-500 ${showPurchaseHistory ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            {showPurchaseHistory && userDetails.user_type === 'buyer' && (
-              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                <PurchaseHistory userId={user.uid} onClose={() => setShowPurchaseHistory(false)} />
-              </aside>
-            )}
-          </div>
+            <div className={`transition-opacity duration-500 ${showUpdateUser ? 'opacity-100' : 'opacity-0 hidden'}`}>
+              {showUpdateUser && (
+                <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                  <UpdateUserInfo userDetails={userDetails} setShowUpdateUser={setShowUpdateUser} />
+                </aside>
+              )}
+            </div>
+
+            <div className={`transition-opacity duration-500 ${showPurchaseHistory ? 'opacity-100' : 'opacity-0 hidden'}`}>
+              {showPurchaseHistory && userDetails.user_type === 'buyer' && (
+                <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                  <PurchaseHistory userId={user.uid} onClose={() => setShowPurchaseHistory(false)} />
+                </aside>
+              )}
+            </div>
+
+        <div className={`transition-opacity duration-500 ${showAddProduct ? 'opacity-100' : 'opacity-0 hidden'}`}>
+          {userDetails.user_type === 'seller' && showAddProduct && (
+            <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showAddProduct ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
+              <ListProduct userId={user.uid} />
+            </aside>
+          )}
+        </div>
+      
       </div>
     </div>
     )

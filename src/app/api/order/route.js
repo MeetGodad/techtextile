@@ -36,8 +36,8 @@ export async function POST(request) {
       } else {
         // Address doesn't exist, insert a new shipping address
         const newAddress = await sql`
-          INSERT INTO addresses (user_id, address_type, address_first_name, address_last_name, address_email, street, city, state, postal_code)
-          VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${street}, ${city}, ${state}, ${zip})
+          INSERT INTO addresses (user_id, address_type, address_first_name, address_last_name, address_email, street, city, state, postal_code, country)
+          VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${street}, ${city}, ${state}, ${zip}, ${country})
           RETURNING address_id;
         `;
         shippingAddressId = newAddress[0].address_id;
@@ -53,8 +53,8 @@ export async function POST(request) {
     let orderId;
     try {
       const result = await sql`
-        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status,order_shhipping_cost , order_total_price)
-        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice})
+        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status, order_shhipping_cost, order_total_price, payment_status_check)
+        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice}, 'pending')
 
         RETURNING order_id;
       `;

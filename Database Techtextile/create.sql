@@ -143,8 +143,8 @@ CREATE TABLE Payments (
     payment_method VARCHAR(50),
     payment_amount DECIMAL(10, 2) NOT NULL,
     order_id INT REFERENCES orders(order_id),
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    stripe_payment_intent_id SERIAL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP=
+    stripe_payment_intent_id SERIAL,
 );
 
 CREATE TABLE ShippingDetails (

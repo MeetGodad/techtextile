@@ -1,6 +1,5 @@
 // https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option, for search option
 "use client";
-
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import ProductSection from '../components/ProductSection';
@@ -8,7 +7,6 @@ import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 import { useRouter } from 'next/navigation';
 import styled, { keyframes } from 'styled-components';
-
 
 export default function Home({ category, subCategory, subSubCategory, searchResults }) {
   const { user } = useUserAuth();
@@ -21,7 +19,6 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
     "/Images/fashion shop.gif",
     "/Images/Choosing clothes.gif"
   ];
-
 
   useEffect(() => {
     if (!searchResults || searchResults.length === 0) {
@@ -38,30 +35,25 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
           console.error('Error fetching the products:', error);
         }
       };
-
       fetchProducts();
     } else {
       setProducts(searchResults);
     }
-  }, [user, searchResults]);
-
+  }, [searchResults]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, 3000); // Change image every 3 seconds
-
     return () => clearInterval(interval);
   }, [images.length]);
 
   const showMoreProducts = () => {
     setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 12);
   };
-
   const filteredProducts = Array.isArray(products) ? products.filter(product => {
     // Filter by category unless it's 'all'
     if (category !== 'all' && product.product_type !== category) return false;
-
     // Additional filtering based on category
     switch (category) {
       case 'fabric':
@@ -76,21 +68,13 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
     }
   }) : [];
 
-  const handleProductClick = (productId) => {
-    router.push(`/Productdetail?productId=${productId}`);
-  };
+  const handleProductClick = (productId , averageRating) => {
+    router.push(`/productdetail?productId=${productId}&averageRating=${averageRating}`);
 
+  };
   return (
     <div className="flex flex-col w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden">
-      <div className="bg-gray-400 box-content">
-          {/*{images.map((image, index) => (
-              key={index},
-              src={image},
-              alt={${index + 1}}
-              fadeType={index === currentImageIndex ? 'in' : 'out'}          
-          ))}*/}
-      </div>
-      <main className="max-w-screen-xl mx-auto mt-20"> {/* Add margin-top to move products down */}
+      <main className="max-w-screen-xl mx-auto mt-20">
         {products.length > 0 ? (
           <>
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 product-grid">
@@ -102,7 +86,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
                   image={product.image_url}
                   product={product}
                   averageRating={product.average_rating}
-                  onProductClick={() => handleProductClick(product.product_id)} />
+                  onProductClick={() => handleProductClick(product.product_id , product.average_rating)} />
               ))}
             </section>
             {visibleProducts < filteredProducts.length && (
