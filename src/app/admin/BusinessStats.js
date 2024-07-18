@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { useRouter } from 'next/navigation';
 
 ChartJS.register(
   CategoryScale,
@@ -25,6 +26,7 @@ ChartJS.register(
 );
 
 const BusinessStats = ({ userId }) => {
+  const router = useRouter();
   const [stats, setStats] = useState({
     salesByProduct: [],
     salesByCategory: [],
@@ -42,9 +44,9 @@ const BusinessStats = ({ userId }) => {
   const [showMoreRepeatOrders, setShowMoreRepeatOrders] = useState(false);
   const [showMoreTopSelling, setShowMoreTopSelling] = useState(false);
   const [showMoreLowStock, setShowMoreLowStock] = useState(false);
-  const [timeView, setTimeView] = useState('date'); // 'date', 'month', 'year'
-  const [selectedMonth, setSelectedMonth] = useState('2024-07'); // Default to July 2024 for monthly view
-  const [selectedYear, setSelectedYear] = useState('2024'); // Default to 2024 for yearly view
+  const [timeView, setTimeView] = useState('date');
+  const [selectedMonth, setSelectedMonth] = useState('2024-07');
+  const [selectedYear, setSelectedYear] = useState('2024');
 
   useEffect(() => {
     fetch(`/api/sales/${userId}`)
@@ -80,6 +82,10 @@ const BusinessStats = ({ userId }) => {
     setSelectedYear(event.target.value);
   };
 
+  const handlePurchasedItems = () => {
+    router.push('/admin/PurchasedItems'); // Navigate to the PurchasedItems page
+  };
+
   const filteredMonthlySales = stats.monthlySales.filter(item => {
     if (!item.date) return false;
     if (timeView === 'date') {
@@ -88,7 +94,7 @@ const BusinessStats = ({ userId }) => {
     if (timeView === 'month') {
       return item.date.startsWith(selectedYear);
     }
-    return true; // For 'year' view, include all data 
+    return true; // For 'year' view, include all data
   });
 
   const productData = {
@@ -124,7 +130,7 @@ const BusinessStats = ({ userId }) => {
   };
 
   const monthlySalesData = {
-    labels: filteredMonthlySales.map(item => item.date.split('T')[0]), // Display date in 'YYYY-MM-DD' format
+    labels: filteredMonthlySales.map(item => item.date.split('T')[0]),
     datasets: [
       {
         label: 'Yarn Sales ($)',
@@ -249,7 +255,7 @@ const BusinessStats = ({ userId }) => {
             )}
           </div>
         </div>
-        <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300 ">
+        <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Sales by Product</h2>
           <div className="relative h-[90%]">
             {stats.salesByProduct.length > 0 ? (
@@ -300,6 +306,58 @@ const BusinessStats = ({ userId }) => {
         </div>
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
+          <h2 className="text-2xl font-bold mb-4">Low Stock Alerts</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {stats.lowStockAlerts.slice(0, showMoreLowStock ? undefined : 10).map((product, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
+                <div>
+                  <p className="text-lg font-semibold">{product.product_name}</p>
+                  <p className="text-red-500">Only {product.quantity} left in stock!</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          {stats.lowStockAlerts.length > 10 && (
+            <button
+              onClick={() => setShowMoreLowStock(!showMoreLowStock)}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
+            >
+              {showMoreLowStock ? 'Show Less' : 'Show More'}
+            </button>
+          )}
+          {stats.lowStockAlerts.length === 0 && (
+            <p className="text-center text-gray-500">Your inventory is up to date!</p>
+          )}
+        </div>
+
+        <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
+          <h2 className="text-2xl font-bold mb-4">Top-Selling Products</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {stats.topSellingProducts.slice(0, showMoreTopSelling ? undefined : 5).map((product, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
+                <div>
+                  <p className="text-lg font-semibold">{product.product_name}</p>
+                  <p className="text-gray-600">Total Sales: ${product.total_sales}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          {stats.topSellingProducts.length > 5 && (
+            <button
+              onClick={() => setShowMoreTopSelling(!showMoreTopSelling)}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
+            >
+              {showMoreTopSelling ? 'Show Less' : 'Show More'}
+            </button>
+          )}
+          {stats.topSellingProducts.length === 0 && (
+            <p className="text-center text-gray-500">No top-selling products yet.</p>
+          )}
+        </div>
+
+        <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Total Orders</h2>
           <p className="text-lg">{stats.totalOrders > 0 ? stats.totalOrders : 'No orders placed yet.'}</p>
         </div>
@@ -307,11 +365,19 @@ const BusinessStats = ({ userId }) => {
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Order Status Breakdown</h2>
           {stats.orderStatus.length > 0 ? (
-            stats.orderStatus.map((status, index) => (
-              <p key={index} className="text-lg">
-                {status.order_status}: {status.count}
-              </p>
-            ))
+            <>
+              {stats.orderStatus.map((status, index) => (
+                <p key={index} className="text-lg">
+                  {status.order_status}: {status.count}
+                </p>
+              ))}
+              <button
+                onClick={handlePurchasedItems}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
+              >
+                Go to Purchased Items
+              </button>
+            </>
           ) : (
             <p className="text-center text-gray-500">No order status data available.</p>
           )}
@@ -345,58 +411,6 @@ const BusinessStats = ({ userId }) => {
           )}
           {stats.repeatOrders.length === 0 && (
             <p className="text-center text-gray-500">No repeat orders yet.</p>
-          )}
-        </div>
-
-        <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
-          <h2 className="text-2xl font-bold mb-4">Top-Selling Products</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {stats.topSellingProducts.slice(0, showMoreTopSelling ? undefined : 5).map((product, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
-                <div>
-                  <p className="text-lg font-semibold">{product.product_name}</p>
-                  <p className="text-gray-600">Total Sales: ${product.total_sales}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          {stats.topSellingProducts.length > 5 && (
-            <button
-              onClick={() => setShowMoreTopSelling(!showMoreTopSelling)}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-            >
-              {showMoreTopSelling ? 'Show Less' : 'Show More'}
-            </button>
-          )}
-          {stats.topSellingProducts.length === 0 && (
-            <p className="text-center text-gray-500">No top-selling products yet.</p>
-          )}
-        </div>
-
-        <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
-          <h2 className="text-2xl font-bold mb-4">Low Stock Alerts</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {stats.lowStockAlerts.slice(0, showMoreLowStock ? undefined : 10).map((product, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
-                <div>
-                  <p className="text-lg font-semibold">{product.product_name}</p>
-                  <p className="text-red-500">Only {product.quantity} left in stock!</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          {stats.lowStockAlerts.length > 10 && (
-            <button
-              onClick={() => setShowMoreLowStock(!showMoreLowStock)}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-            >
-              {showMoreLowStock ? 'Show Less' : 'Show More'}
-            </button>
-          )}
-          {stats.lowStockAlerts.length === 0 && (
-            <p className="text-center text-gray-500">Your inventory is up to date!</p>
           )}
         </div>
       </div>
