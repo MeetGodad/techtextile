@@ -33,7 +33,6 @@ export default function Profile() {
 
     if (userId !== null) {
       fetch(`/api/Profile/${userId}`, {
-      fetch(`api/Profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -196,6 +195,7 @@ export default function Profile() {
             <ListProduct userId={user.uid} />
           </aside>
         )}
+      </div>
       </div>
     )
   );

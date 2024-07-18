@@ -264,7 +264,6 @@ const renderStep = () => {
                 className="form-checkbox h-5 w-5 text-blue-500"
               />
               <label htmlFor="useSignupAddress" className="ml-2 text-black">
-              <label htmlFor="useSignupAddress" className="ml-2 text-black">
                 Use the same address as signup address
               </label>
             </div> 
@@ -332,7 +331,6 @@ const renderStep = () => {
                 setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
                 setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
-                setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
                 setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
                 setCountry={(value) => setShippingInfo(prev => ({ ...prev, country: value }))}
                 setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}

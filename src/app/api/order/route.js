@@ -5,7 +5,6 @@ export async function POST(request) {
     const requestData = await request.json();
     const shippingDetails = requestData.shippingDetails;
     const { userId, firstName, lastName, street, city, state, zip, email, country , selectedPaymentMethod, cart } = requestData;
-    const { userId, firstName, lastName, street, city, state, zip, email, country , selectedPaymentMethod, cart } = requestData;
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
 
