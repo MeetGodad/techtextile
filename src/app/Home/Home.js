@@ -39,7 +39,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
     } else {
       setProducts(searchResults);
     }
-  }, [user, searchResults]);
+  }, [searchResults]);
 
   const addToCart = async (productId) => {
     if (!user) {

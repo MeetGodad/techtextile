@@ -32,7 +32,7 @@ export default function ProductSection({
           alt={name}
           src={firstImageUrl}/> 
         <div className="overflow-hidden ">
-          <h2 className="text-2xl ml-2 font-bold truncate">{name}</h2>
+          <h2 className="text-2xl ml-2 font-bold truncate text-black">{name}</h2>
           <div className="text-red-600 font-semibold ml-2">${price}</div>
         </div>
         <div className="absolute bottom-2 right-3">

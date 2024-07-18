@@ -256,10 +256,6 @@ useEffect(() => {
     setIsRatingsOpen(false);
   };
 
-  const handleViewDetails = (newProductId) => {
-    setCurrentProductId(newProductId);
-  };
-
   if (loading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
@@ -274,8 +270,16 @@ useEffect(() => {
 
 
   const imageUrls = product.image_url.split(',');
+const getSelectedVariantQuantity = () => {
+  if (product.product_type === 'yarn') {
+    const selectedVariant = availableQuantities.find(v => v.denier === selectedDenier);
+    return selectedVariant ? selectedVariant.quantity : null;
+  } else if (product.product_type === 'fabric') {
+    return availableQuantities.length > 0 ? availableQuantities[0].quantity : null;
+  }
+};
 
-  const uniqueColors = product.variants
+const uniqueColors = product.variants
   ? [...new Set(product.variants.map(v => v.color.split(': ')[1]))]
   : [];
   return (
@@ -418,6 +422,7 @@ useEffect(() => {
                         id="quantity"
                         className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
                         min="1"
+                        max={getSelectedVariantQuantity()}
                         value={quantity}
                         onChange={handleQuantityChange}
                       />

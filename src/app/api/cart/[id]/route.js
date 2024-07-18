@@ -1,5 +1,10 @@
 import { neon } from "@neondatabase/serverless";
 
+
+
+export const fetchCache = 'force-no-store'
+export const revalidate = 0 // seconds
+export const dynamic = 'force-dynamic'
 export async function GET(req, { params }) {
     try {
         const id = params.id;
@@ -24,7 +29,8 @@ export async function GET(req, { params }) {
             jsonb_build_object(
             'variant_id', pv.variant_id,
             'color', split_part(split_part(pv.variant_attributes, ', ', 1), ': ', 2),
-            'denier', split_part(split_part(pv.variant_attributes, ', ', 2), ': ', 2)
+            'denier', split_part(split_part(pv.variant_attributes, ', ', 2), ': ', 2),
+            'quantity', pv.quantity
         ) AS selected_variant,
             s.seller_id,
             s.business_name,
@@ -46,7 +52,11 @@ export async function GET(req, { params }) {
         `;
 
         if (cart.length === 0) {
-            return new Response(JSON.stringify({ message: "No items in the cart" }), { status: 400 });
+            return new Response(JSON.stringify({ message: "No items in the cart" }), { status: 400,headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            } },);
         }
 
         return new Response(JSON.stringify(cart), { status: 200, headers: { 'Content-Type': 'application/json' } });
