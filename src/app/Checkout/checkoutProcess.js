@@ -99,7 +99,7 @@ const Checkout = () => {
         city: signupAddress.city || '',
         state: signupAddress.state || '',
         zip: signupAddress.postal_code || '',
-        country: signupAddress.country || '',
+        country: signupAddress.countryCode || '',
         email: signupAddress.address_email || '',
         phone: signupAddress.phone_num || '',
       });
@@ -147,6 +147,7 @@ const Checkout = () => {
 
   const handleSubmit = async () => {
     try {
+      console.log('Shipping Info:', shippingInfo);
       console.log(cart);
       const response = await fetch('/api/order', {
         method: 'POST',
@@ -161,7 +162,7 @@ const Checkout = () => {
           city: shippingInfo.city,
           state: shippingInfo.state,
           zip: shippingInfo.zip,
-          country: shippingInfo.country,
+          country: shippingInfo.countryCode,
           email: shippingInfo.email,
           cart,
           shippingDetails,
@@ -202,7 +203,7 @@ const handleSuccess = async () => {
     console.log('Payment successful');
     setStep(4); // Move to Step 4 after successful payment
 
-    // Send confirmation emails upon moving to Step 4
+    // Send confirmation emails upon moving to Step 4+
     try {
       const orderDetails = {
         userId: user.uid,
@@ -239,7 +240,7 @@ const handleAddressChange = (address) => {
       city: address.city || '',
       state: address.state || '',
       zip: address.postal_code || '',
-      country: address.country || '',
+      country: address.countryCode || '',
       email: address.address_email || '',
       phone: address.phone_num || '',
     });
@@ -265,8 +266,7 @@ const renderStep = () => {
                 Use the same address as signup address
               </label>
             </div> 
-
-            <div>
+            <div className="w-full max-w-md mx-auto">
               <h2 className="text-lg font-semibold mb-4">Existing Shipping Addresses</h2>
               {existingAddresses.length > 0 ? (
                 <div className="relative mb-6">
@@ -277,24 +277,31 @@ const renderStep = () => {
                       );
                       handleAddressChange(selectedAddress);
                     }}
-                    className="block w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                    className="block w-full p-4 pr-8 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none bg-white text-gray-700"
                   >
-                    <option value="" disabled selected>
+                    <option value="" disabled selected className="text-gray-500">
                       Select an existing shipping address
                     </option>
-                    {existingAddresses
-                      .filter((address) => address.country === 'CA')
-                      .map((address) => (
-                        <option key={address.address_id} value={address.address_id}>
-                          {address.address_first_name}, {address.address_last_name}, {address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country}, {address.address_email}, {address.phone_num}
-                        </option>
-                      ))}
+                    {existingAddresses.map((address) => (
+                      <option 
+                        key={address.address_id} 
+                        value={address.address_id}
+                        className="truncate"
+                      >
+                        {`${address.address_first_name} ${address.address_last_name}, ${address.street}, ${address.city}`}
+                      </option>
+                    ))}
                   </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                    </svg>
+                  </div>
                 </div>
               ) : (
-                <p>No existing addresses found.</p>
+                <p className="text-gray-600">No existing addresses found.</p>
               )}
-            </div>           
+            </div>         
             <div className="grid md:grid-cols-2 gap-6">
               <div className="relative">
                 <input
@@ -325,7 +332,7 @@ const renderStep = () => {
                 city={shippingInfo.city}
                 state={shippingInfo.state}
                 postalCode={shippingInfo.zip}
-                country={shippingInfo.country}
+                country={shippingInfo.countryCode}
                 setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
                 setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
@@ -407,7 +414,6 @@ const renderStep = () => {
               </div>
               <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
                 {console.log("Buyer Address " , shippingInfo)}
-                {console.log("Buyer Address " , shippingInfo)}
             <ShippingRateCalculator 
                   cartItems={cart} 
                   buyerAddress={{
@@ -416,9 +422,8 @@ const renderStep = () => {
                     street: shippingInfo.street,
                     city: shippingInfo.city,
                     state: shippingInfo.stateCode,
-                    state: shippingInfo.stateCode,
                     zip: shippingInfo.zip,
-                    country: shippingInfo.country,
+                    country: shippingInfo.countryCode,
                     email: shippingInfo.email,
                     phone: shippingInfo.phone,
                   }}

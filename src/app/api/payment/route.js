@@ -16,7 +16,7 @@ export async function POST(request) {
 
     // Create a PaymentIntent with Stripe
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalPrice * 100, // This should be in cents
+      amount: Math.round(totalPrice * 100), // This should be in cents
       currency: 'cad',
       payment_method: paymentMethod,
       confirm: true,
