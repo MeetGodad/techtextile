@@ -1,53 +1,65 @@
-import { neon } from "@neondatabase/serverless";
+import { neon } from '@neondatabase/serverless';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+const MySwal = withReactContent(Swal);
 
 export async function GET(req, { params }) {
-    const id = params.id;
-    console.log("User ID:", id);
+  const userId = params.id;
+  const databaseUrl = process.env.DATABASE_URL || "";
+  const sql = neon(databaseUrl);
 
-    const databaseUrl = process.env.DATABASE_URL || "";
-    const sql = neon(databaseUrl);
+  try {
+    const user = await sql`
+      SELECT 
+        ua.user_id, ua.email, ua.first_name, ua.last_name, ua.user_type, 
+        a.street, a.city, a.state, a.postal_code, 
+        s.seller_id, s.business_name, s.phone_num AS seller_phone_num,
+        b.phone_num AS buyer_phone_num
+      FROM UserAccounts ua
+      LEFT JOIN Addresses a ON ua.user_id = a.user_id
+      LEFT JOIN Sellers s ON ua.user_id = s.user_id
+      LEFT JOIN Buyers b ON ua.user_id = b.user_id
+      WHERE ua.user_id = ${userId};`;
 
-    try {
-        // Parameterized query for user details
-        const response = await sql`
-            SELECT * FROM useraccounts WHERE user_id = ${id}
-        `;
-
-        if (response.length === 0) {
-            return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
-        }
-
-        let user = response[0];
-        console.log("User Details:", user);
-
-        if (user.user_type === "buyer") {
-            // Parameterized query for buyer details
-            const buyerResponse = await sql`
-                SELECT * FROM buyers WHERE user_id = ${id}
-            `;
-
-            if (buyerResponse.length === 0) {
-                return new Response(JSON.stringify({ message: "Buyer not found" }), { status: 404 });
-            }
-
-            user.buyerDetails = buyerResponse[0];
-            console.log("Buyer Details:", user.buyerDetails);
-        } else if (user.user_type === "seller") {
-            // Parameterized query for seller details
-            const sellerResponse = await sql`
-                SELECT * FROM sellers WHERE user_id = ${id}
-            `;
-
-            if (sellerResponse.length === 0) {
-                return new Response(JSON.stringify({ message: "Seller not found" }), { status: 404 });
-            }
-
-            user.sellerDetails = sellerResponse[0];
-        }
-
-        return new Response(JSON.stringify({ message: "User found", user }), { status: 200 });
-    } catch (error) {
-        console.error("Error fetching user details:", error);
-        return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
+    if (user.length === 0) {
+      return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
     }
+
+    return new Response(JSON.stringify({ user: user[0] }), { status: 200 });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
+  }
+}
+
+
+
+
+export async function PUT(req, { params }) {
+  const userId = params.id;
+  const { firstName, lastName, phone, address, companyName, role } = await req.json();
+  const databaseUrl = process.env.DATABASE_URL || "";
+  const sql = neon(databaseUrl);
+
+  try {
+    if (!firstName || !lastName || !phone || !address || !address.street || !address.city || !address.state || !address.postalCode) {
+      throw new Error("Missing parameters");
+    }
+
+    await sql.transaction(async (trx) => {
+      await trx`UPDATE UserAccounts SET first_name = ${firstName}, last_name = ${lastName} WHERE user_id = ${userId};`;
+      await trx`UPDATE Addresses SET street = ${address.street}, city = ${address.city}, state = ${address.state}, postal_code = ${address.postalCode} WHERE user_id = ${userId};`;
+
+      if (role === 'seller') {
+        await trx`UPDATE Sellers SET business_name = ${companyName}, phone_num = ${phone} WHERE user_id = ${userId};`;
+      } else if (role === 'buyer') {
+        await trx`UPDATE Buyers SET phone_num = ${phone} WHERE user_id = ${userId};`;
+      }
+    });
+
+    return new Response(JSON.stringify({ message: "User updated successfully" }), { status: 200 });
+  } catch (error) {
+    console.error('An error occurred:', error);
+    return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
+  }
 }

@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from 'react';
 import { useUserAuth } from '../auth/auth-context';
 import { useRouter } from 'next/navigation';
@@ -37,6 +38,13 @@ export default function Cart({ children }) {
       const parsedQuantity = parseInt(quantity);
       if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
         setErrorMessages('Please enter a valid quantity');
+        return;
+      }
+      const variant = cart.find(item => item.cart_item_id === cart_item_id).selected_variant;
+      const availableQuantity = parseInt(variant.quantity);
+
+      if (parsedQuantity > availableQuantity) {
+        setErrorMessages(`Only ${availableQuantity} items available in stock`);
         return;
       }
       setErrorMessages('');
@@ -107,8 +115,19 @@ export default function Cart({ children }) {
     }, 0);
   };
 
+  const canProceedToCheckout = () => {
+    // Check if there are any items in the cart that are out of stock or have zero quantity
+    return cart.every(item => {
+      return parseInt(item.selected_variant.quantity) > 0 && item.quantity > 0;
+    });
+  };
+
   const handleCheckout = () => {
-    router.push('/Checkout');
+    if (canProceedToCheckout()) {
+      router.push('/Checkout');
+    } else {
+      alert('Please remove out-of-stock items or items with zero quantity before proceeding to checkout.');
+    }
   };
 
   return (
@@ -177,11 +196,16 @@ export default function Cart({ children }) {
                       type="number"
                       className="w-full bg-gray-700 border-2 border-black-600 rounded-full py-2 px-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition duration-300"
                       min="1"
+                      max={item.selected_variant.quantity}
                       value={item.quantity}
                       onChange={(e) => updateQuantity(item.cart_item_id, e.target.value, item.variant_ids)}
+                      disabled={parseInt(item.selected_variant.quantity) === 0}
                     />
                     {errorMessages && <div className="text-red-300 text-sm mt-2 animate-bounce">{errorMessages}</div>}
                   </div>
+                  {parseInt(item.selected_variant.quantity) === 0 && (
+                    <p className="text-red-500 text-sm mb-2">Product is out of stock</p>
+                  )}
                   <div className="font-semibold text-black-300 mb-4">Subtotal: ${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
                   <button 
                     onClick={() => removeItem(item.cart_item_id)} 
@@ -192,13 +216,14 @@ export default function Cart({ children }) {
               ))}
             </div>
             <div className="mt-12 flex justify-end">
-              <div className="bg-gradient-to-br from-gray-400 to-gray-500 p-8 rounded-2xl shadow-xl transform transition duration-500 hover:scale-105 hover:-rotate-1 border border-gray-700">
+              <div className={`bg-gradient-to-br from-gray-400 to-gray-500 p-8 rounded-2xl shadow-xl transform transition duration-500 hover:scale-105 hover:-rotate-1 border border-gray-700 ${canProceedToCheckout() ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
                 <div className="text-2xl font-bold text-white mb-2">Subtotal: <span className="text-black-500">${calculateSubtotal().toFixed(2)}</span></div>
                 <div className="text-lg text-black-400 mb-4">Shipping: Free</div>
                 <div className="text-3xl font-extrabold text-white mb-6">Total: <span className="text-black-500">${calculateSubtotal().toFixed(2)}</span></div>
                 <button
                   className="w-full py-4 bg-gradient-to-r from-gray-600 to-gray-800 text-white font-bold rounded-full transition duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                   onClick={handleCheckout}
+                  disabled={!canProceedToCheckout()}
                 >
                   Proceed to Checkout
                 </button>

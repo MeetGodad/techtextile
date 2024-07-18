@@ -26,6 +26,8 @@ const Checkout = () => {
     country: '',
     stateCode: '',
     countryCode: '',
+    stateCode: '',
+    countryCode: '',
     email: '',
     phone: '',
   });
@@ -147,6 +149,7 @@ const Checkout = () => {
 
   const handleSubmit = async () => {
     try {
+      console.log(cart);
       const response = await fetch('/api/order', {
         method: 'POST',
         headers: {
@@ -167,6 +170,7 @@ const Checkout = () => {
           totalShippingCost: totalShippingCost.toFixed(2),
           totalPrice: totalPrice.toFixed(2),
         }),
+        
       });
       const data = await response.json();
       if (response.ok) {
@@ -260,6 +264,7 @@ const renderStep = () => {
                 className="form-checkbox h-5 w-5 text-blue-500"
               />
               <label htmlFor="useSignupAddress" className="ml-2 text-black">
+              <label htmlFor="useSignupAddress" className="ml-2 text-black">
                 Use the same address as signup address
               </label>
             </div> 
@@ -323,17 +328,18 @@ const renderStep = () => {
                 city={shippingInfo.city}
                 state={shippingInfo.state}
                 postalCode={shippingInfo.zip}
-                country={shippingInfo.country}
+                country={shippingInfo.countryCode}
                 setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
                 setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
+                setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
                 setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
                 setCountry={(value) => setShippingInfo(prev => ({ ...prev, country: value }))}
                 setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
                 setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
                 inputClassName="w-full p-4 text-black border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 containerClassName="relative mb-4"
-                iconClassName="absolute left-3 top-4 text-gray-400"
+                iconClassName="absolute  left-3 top-4 text-gray-400"
               />
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -405,6 +411,7 @@ const renderStep = () => {
               </div>
               <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
                 {console.log("Buyer Address " , shippingInfo)}
+                {console.log("Buyer Address " , shippingInfo)}
             <ShippingRateCalculator 
                   cartItems={cart} 
                   buyerAddress={{
@@ -412,6 +419,7 @@ const renderStep = () => {
                     lastName: shippingInfo.lastName,
                     street: shippingInfo.street,
                     city: shippingInfo.city,
+                    state: shippingInfo.stateCode,
                     state: shippingInfo.stateCode,
                     zip: shippingInfo.zip,
                     country: shippingInfo.country,

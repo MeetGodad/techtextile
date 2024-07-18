@@ -1,6 +1,19 @@
 
 GET http://localhost:3000/api/payment/UOOkFNPe2vUFwcJLObqRDgjPrBJ3  HTTP/1.1
+GET http://localhost:3000/api/  HTTP/1.1
 
+#######
+
+GET http://localhost:3000/api/products/52 HTTP/1.1 200 OK
+Cache-Control: no-cache, must-revalidate, proxy-revalidate, max-age=0
+Pragma: no-cache
+Expires: 0
+
+
+### 
+//Test Business Stats API
+GET http://localhost:3000/api/sales/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+###
 
 
 
@@ -35,6 +48,11 @@ Content-Type: application/json
     "expiryDate": "12/24",
     "cvv": "123"
   }
+}
+
+
+
+
 
 
 POST http://localhost:3000/api/fedexApi HTTP/1.1
@@ -42,11 +60,11 @@ Content-Type: application/json
 
 {
   "sellerAddress": {
-    "street": "912 6 Avenue Southwest",
-    "city": "Calgary",
-    "state": "AB",
-    "zipCode": "T2P0V6",
-    "country": "CA"
+    "street": "No 4 Shubhlaxmi Bunglows",
+    "city": "Surat",
+    "state": "GJ",
+    "zipCode": "395017",
+    "country": "IN"
   },
   "buyerAddress": {
    "street": "1919 University Dr NW",
@@ -68,12 +86,17 @@ Content-Type: application/json
  
 
 
-
 ####
 
-GET http://localhost:3000/api/address/Hi8AE6SxwMOATGMH2jrC8dfnxf43 HTTP/1.1
+
+PUT http://localhost:3000/api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 content-type: application/json
 
+ {
+   "quantity": 3,
+   "cartItemId": "70",
+   "variantId": [70,78]
+ }
 
 
 
@@ -85,22 +108,32 @@ content-type: application/json
 
 
 
-PUT http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+# #####4
+
+
+
+
+#####
+
+POST http://localhost:3000//api/review  HTTP/1.1
 content-type: application/json
 
 {
-  "quantity": 3,
-  "cartItemId": "21"
+  "": "e7vVMBprlRYB7PHuaJgv2u2RAVb2",
+  "rating": 5,
+  "review": "This is a good product"
 }
+
+
+
+
+GET  http://localhost:3000/api/cart/RUHSDGwCDoXoGZMGM2i1X7pybMn1 HTTP/1.1
+
+
 ####
 
+GET http://localhost:3000/api/searc?searchTerm=dewefgh HTTP/1.1
 
 
-
-GET  http://localhost:3000/api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
-
-
-
-GET  http://localhost:3000//api/cart/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
-
-
+####
+GET http://localhost:3000/api/products/21 HTTP/1.1

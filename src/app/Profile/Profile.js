@@ -1,19 +1,26 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useUserAuth } from '../auth/auth-context';
-import { useRouter } from 'next/navigation'; // Correctly import useRouter from next/router
-import SellerViewItem from '../seller/SellerViewItem';
-import ListProduct from '../seller/ListProduct';
+import UpdateUserInfo from './UpdateUserInfo';
+import PurchaseHistory from '../order/PurchaseHistory';
+import { AiOutlineEdit } from 'react-icons/ai';
+import { FiMenu, FiX } from 'react-icons/fi';
+import BusinessStats from '../admin/BusinessStats';
 
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
-  const [userDetails, setUserDetails] = useState(null);
-  const [buyerInfo, setBuyerInfo] = useState(null);
-  const [sellerInfo, setSellerInfo] = useState(null);
-  const [showListedItems, setShowListedItems] = useState(false);
-  const [listedItemsVisible, setListedItemsVisible] = useState(false);
-  const [showAddProduct, setShowAddProduct] = useState(false);
   const router = useRouter();
+  const [userDetails, setUserDetails] = useState(null);
+  const [sellerInfo, setSellerInfo] = useState(null);
+  const [buyerInfo, setBuyerInfo] = useState(null);
+  const [showListedItems, setShowListedItems] = useState(false);
+  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [showUpdateUser, setShowUpdateUser] = useState(false);
+  const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [showProfile, setShowProfile] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -25,6 +32,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
+      fetch(`/api/Profile/${userId}`, {
       fetch(`api/Profile/${userId}`, {
         method: 'GET',
         headers: {
@@ -42,9 +50,17 @@ export default function Profile() {
           console.log(data);
           setUserDetails(data.user);
           if (data.user.user_type === 'seller') {
-            setSellerInfo(data.user.sellerDetails);
+            setSellerInfo({
+              business_name: data.user.business_name,
+              business_address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`,
+              phone_num: data.user.seller_phone_num  // Updated to use seller_phone_num
+            });
           } else if (data.user.user_type === 'buyer') {
-            setBuyerInfo(data.user.buyerDetails);
+            setBuyerInfo({
+              phone_num: data.user.buyer_phone_num,  // Updated to use buyer_phone_num
+              address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`
+            });
+
           }
         })
         .catch(error => {
@@ -53,77 +69,127 @@ export default function Profile() {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/Home');
-    }
-  }, [user, router]);
-
-  const handleAddProduct = () => {
-    if (!showAddProduct) {
-      setShowAddProduct(true);
-      setListedItemsVisible(false);
-      setTimeout(() => setShowAddProduct(true), 10);
-    } else {
-      setShowAddProduct(false);
-      setTimeout(() => setListedItemsVisible(false), 1000);
-    }
+  const handleUpdateUserInfo = () => {
+    setShowProfile(false);
+    setShowUpdateUser(true);
+    setShowAddProduct(false);
+    setShowListedItems(false);
+    setShowPurchaseHistory(false);
+    setShowAdminDashboard(false);
   };
 
-  const handleViewListedItems = () => {
-    const event = new Event('sellerDataUpdated');
-    window.dispatchEvent(event);
+  const handleViewPurchaseHistory = () => {
+    setShowProfile(false);
+    setShowPurchaseHistory(true);
+    setShowUpdateUser(false);
+    setShowAddProduct(false);
+    setShowListedItems(false);
+    setShowAdminDashboard(false);
+  };
 
-    if (!showListedItems) {
-      setListedItemsVisible(true);
-      setShowAddProduct(false);
-      setTimeout(() => setShowListedItems(true), 10);
-    } else {
-      setShowListedItems(false);
-      setTimeout(() => setListedItemsVisible(false), 1000);
-    }
+  const handleGoToAdmin = () => {
+    router.push('/admin');
+  };
+
+  const handleShowProfile = () => {
+    setShowProfile(true);
+    setShowUpdateUser(false);
+    setShowAddProduct(false);
+    setShowListedItems(false);
+    setShowPurchaseHistory(false);
+    setShowAdminDashboard(false);
   };
 
   return (
     user && userDetails && (
-      <div className="min-h-screen bg-gray-100 p-4 relative flex items-start justify-center">
-        <main className={`transition-all duration-1000 ease-in-out transform ${showListedItems ? 'absolute top-15 left-0 m-2' : showAddProduct ? 'absolute  pt-1 top-18 left-0 m-2' : 'm-auto'}`} style={{ width: showListedItems ? '30%' : showAddProduct ? '30%' : 'auto', height: 'auto', padding: '10px', boxSizing: 'border-box', marginTop: showListedItems ? '15px' : showAddProduct ? '15px' : '0' }}>
-          <section className="bg-white text-black shadow p-4 rounded-lg mb-6">
-            <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏</h1>
-            <h2 className="text-3xl font-semibold border-b pb-2 mb-4">User Information</h2>
-            <p className="text-xl"><strong>Email:</strong> {userDetails.email}</p>
-            <button onClick={firebaseSignOut} className="mt-4 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-200">Sign Out</button>
-            {userDetails.user_type === 'seller' && sellerInfo && (
-              <>
-                <p className="text-xl mt-4"><strong>Business Name:</strong> {sellerInfo.business_name}</p>
-                <p className="text-xl"><strong>Business Address:</strong> {sellerInfo.business_address}</p>
-                <p className="text-xl"><strong>Business Phone Number:</strong> {sellerInfo.phone_num}</p>
-                <button onClick={handleViewListedItems} className="flex mt-4 bg-green-500 text-white px-6 py-3 w-1/2 justify-center rounded-lg hover:bg-green-600 transition-colors duration-200">
-                  View Listed Items
+      <div className="min-h-screen bg-gray-100 flex">
+        <aside className={`transition-transform duration-500 ease-in-out ${sidebarVisible ? 'translate-x-0' : '-translate-x-full'} bg-gray-900 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform lg:relative lg:translate-x-0`}>
+          <button onClick={() => setSidebarVisible(!sidebarVisible)} className="text-white absolute top-4 right-4 lg:hidden">
+            {sidebarVisible ? <FiX size={24} /> : <FiMenu size={24} />}
+          </button>
+          <nav>
+            <h1 className="text-2xl font-semibold mb-6">Profile</h1>
+            <ul>
+              <li>
+                <button onClick={handleShowProfile} className={`block py-2.5 px-4 rounded transition duration-200 ${showProfile ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                  Profile
                 </button>
-                <button onClick={handleAddProduct} className="flex mt-4 bg-green-500 text-white px-6 py-3 w-1/2 justify-center rounded-lg hover:bg-green-600 transition-colors duration-200">
-                  Add Product
+              </li>
+              {userDetails.user_type === 'seller' && (
+                <>
+                  <li>
+                    <button onClick={handleGoToAdmin} className={`block py-2.5 px-4 rounded transition duration-200 ${showAdminDashboard ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                      Admin Dashboard
+                    </button>
+                  </li>
+                </>
+              )}
+              {userDetails.user_type === 'buyer' && (
+                <li>
+                  <button onClick={handleViewPurchaseHistory} className={`block py-2.5 px-4 rounded transition duration-200 ${showPurchaseHistory ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                    View Purchase History
+                  </button>
+                </li>
+              )}
+              <li>
+                <button onClick={handleUpdateUserInfo} className={`block py-2.5 px-4 rounded transition duration-200 ${showUpdateUser ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                  Edit Profile
                 </button>
-              </>
-            )}
-            {userDetails.user_type === 'buyer' && buyerInfo && (
-              <>
-                <p className="text-xl mt-4"><strong>Address:</strong> {buyerInfo.shipping_address}</p>
-                <p className="text-xl"><strong>Phone Number:</strong> {buyerInfo.phone_num}</p>
-                <button className="flex mt-4 bg-green-500 text-white px-6 py-3 w-1/2 justify-center rounded-lg hover:bg-green-600 transition-colors duration-200">
-                  View Purchase History
+              </li>
+              <li>
+                <button onClick={firebaseSignOut} className="block py-2.5 px-4 rounded hover:bg-gray-700 transition duration-200">
+                  Sign Out
                 </button>
-              </>
-              
-            )}
-          </section>
-        </main>
+              </li>
+            </ul> 
+          </nav>
+        </aside>
 
-        {userDetails.user_type === 'seller' && listedItemsVisible && (
-          <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showListedItems ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
-            <SellerViewItem userId={user.uid} />
-          </aside>
-        )}
+        <div className="flex-1 p-10">
+          <div className={`transition-opacity duration-500 ${showProfile ? 'opacity-100' : 'opacity-0 hidden'}`}>
+            {showProfile && (
+              <main className="bg-white text-black shadow p-4 rounded-lg mb-6">
+                <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏
+                  <button onClick={handleUpdateUserInfo} className="absolute right-4 top-4">
+                    <AiOutlineEdit size={24} />
+                  </button>
+                </h1>
+                <h2 className="text-3xl font-semibold border-b pb-2 mb-4">User Information</h2>
+                <p className="text-xl"><strong>Email:</strong> {userDetails.email}</p>
+                {userDetails.user_type === 'seller' && sellerInfo && (
+                  <>
+                    <p className="text-xl"><strong>Phone Number:</strong> {sellerInfo.phone_num}</p>
+                    <p className="text-xl mt-4"><strong>Business Name:</strong> {sellerInfo.business_name}</p>
+                    <p className="text-xl"><strong>Business Address:</strong> {sellerInfo.business_address}</p>
+                  </>
+                )}
+                {userDetails.user_type === 'buyer' && buyerInfo && (
+                  <>
+                    <p className="text-xl"><strong>Address:</strong> {buyerInfo.address}</p>
+                    <p className="text-xl"><strong>Phone Number:</strong> {buyerInfo.phone_num}</p>
+                  </>
+                )}
+                <div className="mt-8">
+                  {userDetails.user_type === 'seller' && (
+                    <>
+                      <BusinessStats userId={user.uid} />
+                      <div className="bg-gray-200 p-4 rounded-lg mb-4">
+                        <h3 className="text-xl font-semibold">Product Reviews (Coming Soon)</h3>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </main>
+            )}
+          </div>
+
+          <div className={`transition-opacity duration-500 ${showListedItems ? 'opacity-100' : 'opacity-0 hidden'}`}>
+            {showListedItems && userDetails.user_type === 'seller' && (
+              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                <SellerViewItem userId={user.uid} />
+              </aside>
+            )}
+          </div>
 
         {userDetails.user_type === 'seller' && showAddProduct && (
           <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showAddProduct ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>

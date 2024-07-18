@@ -1,5 +1,10 @@
 import { neon } from "@neondatabase/serverless";
 
+
+
+export const fetchCache = 'force-no-store'
+export const revalidate = 0 // seconds
+export const dynamic = 'force-dynamic'
 export async function GET(req, { params }) {
     try {
         const id = params.id;
@@ -24,7 +29,8 @@ export async function GET(req, { params }) {
             jsonb_build_object(
             'variant_id', pv.variant_id,
             'color', split_part(split_part(pv.variant_attributes, ', ', 1), ': ', 2),
-            'denier', split_part(split_part(pv.variant_attributes, ', ', 2), ': ', 2)
+            'denier', split_part(split_part(pv.variant_attributes, ', ', 2), ': ', 2),
+            'quantity', pv.quantity
         ) AS selected_variant,
             s.seller_id,
             s.business_name,
@@ -46,7 +52,11 @@ export async function GET(req, { params }) {
         `;
 
         if (cart.length === 0) {
-            return new Response(JSON.stringify({ message: "No items in the cart" }), { status: 400 });
+            return new Response(JSON.stringify({ message: "No items in the cart" }), { status: 400,headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            } },);
         }
 
         return new Response(JSON.stringify(cart), { status: 200, headers: { 'Content-Type': 'application/json' } });
@@ -92,47 +102,6 @@ export async function PUT(req, { params }) {
             throw new Error('Failed to update the product in the cart. No matching cart item found.');
         }
 
-        // const cartId = updatedCart[0].cart_id;
-
-        // const updatedProduct = await sql`
-
-        //     SELECT 
-        //         ci.cart_item_id,
-        //         ci.cart_id,
-        //         ci.quantity,
-        //         p.product_id,
-        //         p.product_name,
-        //         p.product_type,
-        //         p.price,
-        //         p.image_url,
-        //         (
-        //             SELECT jsonb_agg(
-        //                 jsonb_build_object(
-        //                     'variant_id', pv.variant_id,
-        //                     'color', split_part(pv.variant_attributes, ', ', 1),
-        //                     'denier', split_part(pv.variant_attributes, ', ', 2),
-        //                     'quantity', pv.quantity
-        //                 )
-        //             )
-        //             FROM ProductVariant pv
-        //             WHERE pv.variant_id = p.product_id
-        //         ) AS selected_variants
-        //     FROM 
-        //         CartItems ci
-        //         JOIN Products p ON ci.product_id = p.product_id
-        //         JOIN ShoppingCart sc ON ci.cart_id = sc.cart_id
-        //     WHERE ci.cart_item_id = ${requestData.cartItemId} AND sc.cart_id = ${cartId}
-        // `;
-
-
-        // if (updatedProduct.length === 0) {
-        //     throw new Error('Failed to get updated product of the product in the cart.');
-        // }
-
-        // return new Response(JSON.stringify(updatedProduct[0]), {
-        //     status: 200,
-        //     headers: { 'Content-Type': 'application/json' }
-        // });
 
         return new Response(JSON.stringify(updatedCart[0]), {   
             status: 200,

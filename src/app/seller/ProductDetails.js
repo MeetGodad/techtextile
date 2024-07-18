@@ -52,14 +52,32 @@ const ProductDetails = ({ product, onClose, onRemove, onUpdate, position }) => {
             <>
               <p><strong>Yarn Material:</strong> {product.yarn_material}</p>
               <p><strong>Yarn Denier:</strong> {product.yarn_denier}</p>
-              <p><strong>Yarn Colors:</strong> {product.yarn_color}</p>
+              <p><strong>Yarn Colors:</strong></p>
+              {Array.isArray(product.yarn_color) ? (
+                <div className="flex flex-wrap">
+                  {product.yarn_color.map((color, index) => (
+                    <div key={index} className="w-8 h-8 rounded-full mr-2 mb-2" style={{ backgroundColor: color }}></div>
+                  ))}
+                </div>
+              ) : (
+                <p>{product.yarn_color}</p>
+              )}
             </>
           )}
           {product.product_type === 'fabric' && (
             <>
               <p><strong>Fabric Print Tech:</strong> {product.fabric_print_tech}</p>
               <p><strong>Fabric Material:</strong> {product.fabric_material}</p>
-              <p><strong>Fabric Colors:</strong> {product.fabric_color}</p>
+              <p><strong>Fabric Colors:</strong></p>
+              {Array.isArray(product.fabric_color) ? (
+                <div className="flex flex-wrap">
+                  {product.fabric_color.map((color, index) => (
+                    <div key={index} className="w-8 h-8 rounded-full mr-2 mb-2" style={{ backgroundColor: color }}></div>
+                  ))}
+                </div>
+              ) : (
+                <p>{product.fabric_color}</p>
+              )}
             </>
           )}
         </div>

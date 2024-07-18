@@ -5,6 +5,7 @@ export async function POST(request) {
     const requestData = await request.json();
     const shippingDetails = requestData.shippingDetails;
     const { userId, firstName, lastName, street, city, state, zip, email, country , selectedPaymentMethod, cart } = requestData;
+    const { userId, firstName, lastName, street, city, state, zip, email, country , selectedPaymentMethod, cart } = requestData;
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
 
@@ -28,6 +29,7 @@ export async function POST(request) {
         AND address_type = 'shipping'
       `;
 
+
       if (existingAddress.length > 0) {
         // Address already exists, use the existing address_id
         shippingAddressId = existingAddress[0].address_id;
@@ -48,6 +50,7 @@ export async function POST(request) {
     }
 
     // Insert order
+
     let orderId;
     try {
       const result = await sql`
@@ -56,6 +59,7 @@ export async function POST(request) {
 
         RETURNING order_id;
       `;
+
       orderId = result[0].order_id;
       console.log("Order inserted:", result);
     } catch (err) {
@@ -63,15 +67,24 @@ export async function POST(request) {
       throw new Error("Failed to insert order.");
     }
 
+ 
+
     // Insert order items
     try {
-      const orderItemsPromises = cart.map(item => 
-        sql`
-          INSERT INTO orderitems (order_id, product_id, quantity, item_price)
-          VALUES (${orderId}, ${item.product_id}, ${item.quantity}, ${item.price});
-        `
-      );
+       const orderItemsPromises = cart.map(async (item) => {
+    await sql`
+      INSERT INTO orderitems (order_id, product_id, quantity, item_price, variant_id)
+      VALUES (${orderId}, ${item.product_id}, ${item.quantity}, ${item.price}, ${item.selected_variant.variant_id});
+    `;
+
+    await sql`
+      UPDATE productvariant
+      SET quantity = quantity - ${item.quantity}
+      WHERE variant_id = ${item.selected_variant.variant_id};
+    `;
+  });
       await Promise.all(orderItemsPromises);
+      console.log(orderItemsPromises);
       console.log("Order Items inserted successfully");
     } catch (err) {
       console.error("Error inserting order items:", err);

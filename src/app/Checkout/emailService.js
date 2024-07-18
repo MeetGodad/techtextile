@@ -38,6 +38,7 @@ export const sendOrderConfirmationEmails = async (orderDetails) => {
         firstName: orderDetails.shippingInfo.firstName,
         lastName: orderDetails.shippingInfo.lastName,
         address: orderDetails.shippingInfo.street,
+        address: orderDetails.shippingInfo.street,
         city: orderDetails.shippingInfo.city,
         state: orderDetails.shippingInfo.state,
         zip: orderDetails.shippingInfo.zip,

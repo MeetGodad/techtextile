@@ -109,7 +109,7 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
             body: JSON.stringify({
               sellerAddress,
               buyerAddress: {
-                street: buyerAddress.address,
+                street: buyerAddress.street,
                 city: buyerAddress.city,
                 state: buyerAddress.state,
                 zipCode: buyerAddress.zip,
@@ -128,7 +128,18 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
             throw new Error(rateData.error || `HTTP error! status: ${response.status}`);
           }
 
-          const cheapestRate = findCheapestRate(rateData.rate_response?.rates);
+          let ratesToUse = [];
+          if (rateData.rate_response && rateData.rate_response.rates && rateData.rate_response.rates.length > 0) {
+            ratesToUse = rateData.rate_response.rates;
+          } else if (rateData.rate_response && rateData.rate_response.invalid_rates && rateData.rate_response.invalid_rates.length > 0) {
+            ratesToUse = rateData.rate_response.invalid_rates;
+            console.warn(`Using invalid rates for seller. These rates may not be accurate.`);
+          } else {
+            console.log(`No shipping rates available for seller. Full response:`, rateData);
+            throw new Error('No shipping rates available');
+          }
+
+          const cheapestRate = findCheapestRate(ratesToUse);
           if (cheapestRate) {
             const amountInCAD = cheapestRate.shipping_amount.currency === 'inr'
               ? cheapestRate.shipping_amount.amount * exchangeRate
@@ -184,7 +195,7 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
           body: JSON.stringify({
             sellerAddress: CENTRAL_WAREHOUSE_ADDRESS,
             buyerAddress: {
-              street: buyerAddress.address,
+              street: buyerAddress.street,
               city: buyerAddress.city,
               state: buyerAddress.state,
               zipCode: buyerAddress.zip,

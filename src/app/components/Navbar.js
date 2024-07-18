@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useUserAuth } from '../auth/auth-context';
 import { usePathname } from 'next/navigation';
 import CategoryDropdown from '../components/Category';
-import { FaOpencart } from "react-icons/fa";
+import { RiShoppingBag4Fill } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
 
 
@@ -66,17 +66,18 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
   }, [user]);
 
   const handleSearch = async () => {
-    if (!searchText) {
+    try {
+      if (!searchText) {
+      onSearchResults([]); 
       return;
     }
 
-    try {
+    
       const response = await fetch(`/api/search?term=${searchText}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setSearchResults(data);
       onSearchResults(data); 
       // Navigate to the search results page
       router.push('/search');
@@ -84,12 +85,17 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
       console.error('Error searching products:', error);
     }
   };
+  const resetSearchResults = () => {
+    setSearchText('');
+    onSearchResults([]);
+  };
+
 
   return (
-    <div className="w-full bg-white overflow-visible flex flex-row items-center gap-80 px-3 box-border z-40 sticky leading-normal tracking-normal text-xl text-black font-sans" /*style={{ borderBottom: '2px solid black' }}*/>
+    <div className="w-full bg-white overflow-visible flex items-center gap-80 px-3 box-border z-40 sticky top-0 leading-normal tracking-normal text-xl text-black font-sans">
     <div className="flex flex-auto items-center">
       <div className="flex items-center justify-center w-20 h-20"></div>
-      <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}><Link href="/Home">TECH TEXTILE</Link></h3>
+      <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}><Link href="/Home" onClick={resetSearchResults} >TECH TEXTILE</Link></h3>
     </div>
       <div className="flex justify-between items-start gap-5">
         <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[250px] h-10">
@@ -100,11 +106,14 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
       className="text-left bg-transparent outline-none text-sm"
       onChange={(e) => {
         setSearchText(e.target.value);
-      }}
+            }}
+      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
       style={{ width: 'calc(100% - 24px)' }}
     />
     <button
-      onClick={() => handleSearch()}
+      onClick={() => {handleSearch();
+    setSearchText(''); // Reset searchText after search
+      }}
       style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
     >
       {searchText === '' ? (
@@ -124,7 +133,6 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
     </button>
   </div>
 
-        <Link className="nav-link font-semibold ml-4" href="/Home">Home</Link>
         {isHomePage && (
           <div className="flex items-center ml-4">
             <CategoryDropdown
@@ -140,9 +148,9 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
         <Link className="nav-link font-semibold ml-4" href="#">About</Link>
         <Link href="/Cart" className="flex items-center nav-link ml-4">
           <div id="cart-icon" className="relative flex items-center w-10 h-8">
-            <FaOpencart size={45} />
+            <RiShoppingBag4Fill size={45} />
             {user && cart.length > 0 && (
-              <div className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+              <div className="bg-red-600 text-white rounded-full text-xs w-7 h-5 flex items-center mb-4 justify-center">
                 {cart.length}
               </div>
             )}

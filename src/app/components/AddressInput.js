@@ -10,6 +10,7 @@ const libraries = ['places'];
 
 const AddressInput = ({ 
   supportedCountries,
+  supportedCountries,
   role, 
   street, 
   city, 
@@ -22,8 +23,13 @@ const AddressInput = ({
   setPostalCode, 
   setStateCode, 
   setCountryCode
+  setCountryCode
 }) => {
   const autocompleteRef = useRef(null);
+  const inputRef = useRef(null);
+  const SUPPORTED_COUNTRIES = supportedCountries;
+  const [error, setError] = useState('');
+  const [isManualEntry, setIsManualEntry] = useState(false);
   const inputRef = useRef(null);
   const SUPPORTED_COUNTRIES = supportedCountries;
   const [error, setError] = useState('');
@@ -36,6 +42,26 @@ const AddressInput = ({
     useJsApiLoader: true,
   });
 
+  useEffect(() => {
+    if (isLoaded && inputRef.current) {
+      const autocompleteInstance = new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ['address'],
+        componentRestrictions: { country: SUPPORTED_COUNTRIES },
+      });
+      autocompleteRef.current = autocompleteInstance;
+      autocompleteInstance.addListener('place_changed', handlePlaceSelect);
+    }
+  }, [isLoaded]);
+
+  const handlePlaceSelect = () => {
+    const place = autocompleteRef.current.getPlace();
+    if (!place || !place.address_components) {
+      setError("Note: Please select an address from the dropdown list after typing at least 3 characters. We don't support manual address entry at this time");
+      setIsManualEntry(true);
+      return;
+    }
+
+    setIsManualEntry(false);
   useEffect(() => {
     if (isLoaded && inputRef.current) {
       const autocompleteInstance = new window.google.maps.places.Autocomplete(inputRef.current, {
@@ -105,12 +131,31 @@ const AddressInput = ({
     }
 
     setError('');
+
+    // Check if the country is supported
+    if (!SUPPORTED_COUNTRIES.includes(newCountryCode)) {
+      setError(`We do not support addresses in ${newCountry}.`);
+
+      return;
+    }
+
+    setError('');
     setStreet(newStreet);
     setCity(newCity);
     setState(newState);
     setPostalCode(newPostalCode);
     setStateCode(newStateCode);
     setCountryCode(newCountryCode);
+  };
+
+  const handleManualInput = (e) => {
+    setStreet(e.target.value);
+    if (e.target.value.length > 10) {
+      setIsManualEntry(false);
+    } else {
+      setIsManualEntry(true);
+      setError("Note: Please select an address from the dropdown list. We don't support manual address entry at this time");
+    }
   };
 
   const handleManualInput = (e) => {
@@ -142,6 +187,20 @@ const AddressInput = ({
           className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
         />
       </div>
+      {(error || isManualEntry) && <div className="text-red-500">{error}</div>}
+      <div className="w-full mb-4">
+        <label className="block text-sm font-semibold mb-2 text-black" htmlFor="street">Street</label>
+        <input 
+          ref={inputRef}
+          type="text" 
+          required
+          placeholder="Start typing your address"
+          value={street}
+          disabled={role === ""}
+          onChange={handleManualInput}
+          className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+        />
+      </div>
       <div className="flex flex-wrap mb-4">
         <div className="w-1/2 pr-2">
           <label className="block text-sm font-semibold mb-2 text-black" htmlFor="city">City</label>
@@ -149,6 +208,8 @@ const AddressInput = ({
             type="text" 
             required
             value={city}
+            disabled={role === "" || !isManualEntry}
+            readOnly
             disabled={role === "" || !isManualEntry}
             readOnly
             className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
@@ -160,6 +221,8 @@ const AddressInput = ({
             type="text" 
             required
             value={state}
+            disabled={role === "" || !isManualEntry}
+            readOnly
             disabled={role === "" || !isManualEntry}
             readOnly
             className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
@@ -175,6 +238,8 @@ const AddressInput = ({
             value={postalCode}
             disabled={role === "" || !isManualEntry}
             readOnly
+            disabled={role === "" || !isManualEntry}
+            readOnly
             className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
           />
         </div>
@@ -184,6 +249,8 @@ const AddressInput = ({
             type="text" 
             required
             value={country}
+            disabled={role === "" || !isManualEntry}
+            readOnly
             disabled={role === "" || !isManualEntry}
             readOnly
             className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
