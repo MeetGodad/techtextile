@@ -142,11 +142,14 @@ export default function Cart({ children }) {
         {cart.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {cart.map((item, index) => (
-
-                  key={item.product_id} onClick={() => handleProductClick(item.product_id)}
-                  className="bg-gray-200 rounded-2xl p-6 shadow-x2 transform transition duration-500 hover:bg-gray-600 hover:-rotate-1 hover:text-white">
-                  <div className="relative mb-6 group">
+              {cart.map((item) => (
+                <div
+                key={item.product_id}
+                className="bg-gray-200 rounded-2xl p-6 shadow-x2 transform transition duration-500 hover:bg-gray-600 hover:-rotate-1 hover:text-white"
+                >
+                  <div className="relative mb-6 group"
+                  onClick={() => handleProductClick(item.product_id)}
+                  >
                     <img 
                       src={item.image_url.split(',')[0]}  
                       alt={item.product_name} 
