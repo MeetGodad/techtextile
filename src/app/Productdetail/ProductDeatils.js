@@ -5,6 +5,7 @@ import Loder from '../components/Loder';
 import Ratings from '../components/Ratings';
 import { FiCopy } from 'react-icons/fi';
 import { TbWorldShare } from "react-icons/tb";
+import { useRouter } from 'next/navigation';
 
 import {
   FacebookShareButton,
@@ -42,6 +43,9 @@ export default function ProductDetail({ productId }) {
   const [copied, setCopied] = useState(false);
   const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [availableQuantities, setAvailableQuantities] = useState([]);
+  const [Message, setMessage] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     // Function to hide share icons when clicking outside
@@ -116,28 +120,50 @@ export default function ProductDetail({ productId }) {
 
     fetchRelatedProducts();
   }, [currentProductId]);
-  useEffect(() => {
-    if (selectedColor && product) {
-        const deniers = product.variants
-            .filter(v => v.color.split(': ')[1] === selectedColor)
-            .map(v => v.denier.split(': ')[1]);
-        setAvailableDeniers(deniers);
-    } else {
-        setAvailableDeniers([]);
+
+useEffect(() => {
+  if (selectedColor && product) {
+    if (product.product_type === 'yarn') {
+      const deniers = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => v.denier.split(': ')[1]);
+      setAvailableDeniers(deniers);
+
+      const quantities = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => ({ denier: v.denier.split(': ')[1], quantity: v.quantity }));
+      setAvailableQuantities(quantities);
+    } else if (product.product_type === 'fabric') {
+      const quantities = product.variants
+        .filter(v => v.color.split(': ')[1] === selectedColor)
+        .map(v => ({ quantity: v.quantity }));
+      setAvailableQuantities(quantities);
     }
-    setSelectedDenier(null);
-    setSelectedVariantId(null);
+  } else {
+    setAvailableDeniers([]);
+    setAvailableQuantities([]);
+  }
+  setSelectedDenier(null);
+  setSelectedVariantId(null);
 }, [selectedColor, product]);
 
 
 useEffect(() => {
-  if (selectedColor && selectedDenier && product) {
+  if (product) {
+    if (product.product_type === 'yarn' && selectedColor && selectedDenier) {
       const variant = product.variants.find(
-          v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
+        v => v.color.split(': ')[1] === selectedColor && v.denier.split(': ')[1] === selectedDenier
+      );
+      console.log('Yarn variant:', variant);
+      setSelectedVariantId(variant ? variant.variant_id : null);
+    } else if (product.product_type === 'fabric' && selectedColor) {
+      const variant = product.variants.find(
+        v => v.color.split(': ')[1] === selectedColor
       );
       setSelectedVariantId(variant ? variant.variant_id : null);
-  } else {
+    } else {
       setSelectedVariantId(null);
+    }
   }
 }, [selectedColor, selectedDenier, product]);
 
@@ -199,17 +225,27 @@ useEffect(() => {
     alert(error.message);
   }
 };
-  const handleQuantityChange = (event) => {
-    setQuantity(parseInt(event.target.value));
-  };
-  /*
-  const handleColorSelection = (color) => {
-    setSelectedColor(color);
-    setSelectedDenier(null); 
-  };
-  const handleDenierSelection = (denier) => {
-    setSelectedDenier(denier);
-  };*/
+const handleQuantityChange = (event) => {
+  const maxQuantity = getSelectedVariantQuantity();
+  const newQuantity = parseInt(event.target.value);
+
+  if (newQuantity > maxQuantity) {
+    setMessage(`You can only select up to ${maxQuantity} units.`);
+    setQuantity(maxQuantity);
+  } else {
+    setMessage('');
+    setQuantity(newQuantity);
+  }
+};
+const handleColorSelection = (color) => {
+  setSelectedColor(color);
+  setSelectedDenier(null); // Reset selected denier when color changes
+};
+const handleDenierSelection = (denier) => {
+setSelectedDenier(denier);
+const selectedVariant = availableQuantities.find(v => v.denier === denier);
+setSelectedVariantId(selectedVariant ? selectedVariant.variant_id : null);
+};
   const handleNextImage = () => {
     if (product) {
       const imageUrls = product.image_url.split(',');
@@ -234,6 +270,7 @@ useEffect(() => {
   if (loading) return <Loder />;
   if (error) return <div>Error: {error}</div>;
   if (!product) return <div>Product not found</div>;
+
   const handlePrevImage = () => {
     if (product) {
       const imageUrls = product.image_url.split(',');
@@ -257,6 +294,10 @@ useEffect(() => {
   const handleCloseRatings = () => {
     setIsRatingsOpen(false);
   };
+  const handleViewDetails = (productId) => {
+    setCurrentProductId(productId);
+  };
+
 
   if (loading) {
     return (
@@ -272,8 +313,6 @@ useEffect(() => {
 
 
   const imageUrls = product.image_url.split(',');
-  const availableQuantities = product.variants
-
   const getSelectedVariantQuantity = () => {
     if (product.product_type === 'yarn') {
       const selectedVariant = availableQuantities.find(v => v.denier === selectedDenier);
@@ -281,7 +320,6 @@ useEffect(() => {
     } else if (product.product_type === 'fabric') {
       return availableQuantities.length > 0 ? availableQuantities[0].quantity : null;
     }
-    return null;
   };
   
   
@@ -387,6 +425,7 @@ const uniqueColors = product.variants
               <span className="text-gray-600">({reviews.length} reviews)</span>
             </div>
             <h2 className="text-3xl font-bold text-gray-800 my-4">${product.price}</h2>
+            <div></div>
             <div className="flex space-x-6 mb-6">
               <div className="flex-grow">
                         <div className="mb-6">
@@ -547,7 +586,7 @@ const uniqueColors = product.variants
                 ) : (
                   <p className="text-gray-600 italic">No reviews yet. Be the first to review this product!</p>
                 )}
-        </div>
+              </div>
       </div>
     </div>
   );

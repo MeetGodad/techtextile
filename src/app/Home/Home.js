@@ -15,6 +15,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   const [visibleProducts, setVisibleProducts] = useState(12);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const router = useRouter();
+  const [sortOrder, setSortOrder] = useState('none');
   const images = [
     "/Images/fashion shop.gif",
     "/Images/Choosing clothes.gif"
@@ -72,10 +73,30 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
     router.push(`/productdetail?productId=${productId}&averageRating=${averageRating}`);
 
   };
+  const handleSortChange = (e) => {
+    setSortOrder(e.target.value);
+  };
+
+  const sortProducts = (products) => {
+      switch (sortOrder) {
+        case 'lowToHigh':
+          return [...products].sort((a, b) => a.price - b.price);
+        case 'highToLow':
+          return [...products].sort((a, b) => b.price - a.price);
+        case 'latest':
+        return [...products].sort((a, b) => Number(b.product_id) - Number(a.product_id));
+        case 'oldest':
+          return [...products].sort((a, b) => Number(a.product_id) - Number(b.product_id));
+        default:
+        return products;
+      }
+    };
+    const sortedAndFilteredProducts = sortProducts(filteredProducts);
   return (
     <div className="flex flex-col w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden">
       <main className="max-w-screen-xl mx-auto mt-20">
-        <div className="flex text-black justify-end mb-4">
+
+        <div className="flex justify-end mb-4">
             <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
               <option value="none">Sort by</option>
               <option value="lowToHigh">Price: Low to High</option>
@@ -87,7 +108,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
         {products.length > 0 ? (
           <>
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 product-grid">
-              {filteredProducts.slice(0, visibleProducts).map((product) => (
+              {sortedAndFilteredProducts.slice(0, visibleProducts).map((product) => (
                 <ProductSection
                   key={product.product_id}
                   name={product.product_name}
