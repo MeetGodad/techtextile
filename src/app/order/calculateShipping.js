@@ -85,7 +85,14 @@ const calculateShippingCost = async (buyerAddress, cartItems) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json'},
           body: JSON.stringify({
-            sellerAddress,
+            sellerAddress: {
+                street: sellerAddress.street,
+                city: sellerAddress.city,
+                state: sellerAddress.state,
+                zipCode: sellerAddress.postal_code, // Ensure this uses sellerAddress.zipCode
+                country: sellerAddress.country,
+                phone: sellerAddress.phone_num || '1234567890', // Also corrected to use phone_num from sellerAddress
+              },
             buyerAddress: {
               street: buyerAddress.street,
               city: buyerAddress.city,

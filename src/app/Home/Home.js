@@ -95,6 +95,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   return (
     <div className="flex flex-col w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden">
       <main className="max-w-screen-xl mx-auto mt-20">
+
         <div className="flex justify-end mb-4">
             <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
               <option value="none">Sort by</option>

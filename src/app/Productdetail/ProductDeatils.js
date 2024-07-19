@@ -447,7 +447,7 @@ const uniqueColors = product.variants
                             <h3 className="font-semibold mb-2">Denier:</h3>
                             <select
                               value={selectedDenier || ''}
-                              // onChange={(e) => handleDenierSelection(e.target.value)}
+                              onChange={(e) => handleDenierSelection(e.target.value)}
                               disabled={!selectedColor}
                               className="w-full p-2 border rounded">
                               <option value="">Select Denier</option>
