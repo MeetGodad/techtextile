@@ -389,90 +389,106 @@ const uniqueColors = product.variants
             <h2 className="text-3xl font-bold text-gray-800 my-4">${product.price}</h2>
             <div className="flex space-x-6 mb-6">
               <div className="flex-grow">
-                <div className="mb-6">
-                  <h3 className="font-semibold mb-2">Color:</h3>
-                  <div className="flex space-x-2">
-                    {uniqueColors.map(color => (
-                      <button
-                        key={color}
-                        onClick={() => setSelectedColor(color)}
-                        className={`w-8 h-8 rounded-full transition-transform duration-300 hover:scale-110 ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
-                        style={{ backgroundColor: color }}
-                        title={color}/>
-                    ))}
-                  </div>
-                </div>
-                {product.product_type === 'yarn' && (
-                  <div className="flex items-center mb-6 space-x-24">
-                    <div className="flex flex-col">
-                      <h3 className="font-semibold mb-2">Denier:</h3>
-                      <select
-                        value={selectedDenier || ''}
-                        onChange={(e) => setSelectedDenier(e.target.value)}
-                        disabled={!selectedColor}
-                        className="w-48 p-2 border rounded focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
-                      >
-                        <option value="">Select Denier</option>
-                        {availableDeniers.map(denier => (
-                          <option key={denier} value={denier}>{denier}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex flex-col ml-2">
-                      <label htmlFor="quantity" className="font-semibold mb-2">Quantity:</label>
-                      <input
-                        type="number"
-                        id="quantity"
-                        className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
-                        min="1"
-                        value={quantity}
-                        onChange={handleQuantityChange}
-                      />
-                    </div>
-                  </div>
-                )}
-                {product.product_type === 'fabric' && (
-                  <div className="flex flex-col mb-6">
-                    <label htmlFor="fabric-quantity" className="font-semibold mb-2">Quantity:</label>
-                    <input
-                      type="number"
-                      id="fabric-quantity"
-                      className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
-                      min="1"
-                      value={quantity}
-                      onChange={handleQuantityChange}
-                    />
-                  </div>
-                )}
-                <div className="flex flex-row space-x-40">
-                  <button
-                    className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
-                    onClick={() => addToCart(product)}>
-                    Add to cart
-                  </button>
-                  <button 
-                    className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
-                    onClick={handleReviewAdd}>
-                    Add Review
-                  </button>
-                </div>
+                        <div className="mb-6">
+                          <h3 className="font-semibold mb-2">Color:</h3>
+                          <div className="flex space-x-2">
+                            {uniqueColors.map(color => (
+                              <button
+                                key={color}
+                                onClick={() => setSelectedColor(color)}
+                                className={`w-8 h-8 rounded-full transition-transform duration-300 hover:scale-110 ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
+                                style={{ backgroundColor: color }}
+                                title={color}/>
+                            ))}
+                          </div>
+                        </div>
+                      {/* div */}
+                          {product.product_type === 'yarn' && (
+                          <div className="mb-4">
+                            <h3 className="font-semibold mb-2">Denier:</h3>
+                            <select
+                              value={selectedDenier || ''}
+                              onChange={(e) => handleDenierSelection(e.target.value)}
+                              disabled={!selectedColor}
+                              className="w-full p-2 border rounded">
+                              <option value="">Select Denier</option>
+                              {availableDeniers.map(denier => (
+                                <option key={denier} value={denier}>{denier}</option>
+                              ))}
+                            </select>
+                          </div>
+                          )}
+                          {selectedDenier && product.product_type === 'yarn' && (
+                          <div className="mb-4">
+                            <h3 className="font-semibold mb-2">Available Quantity:</h3>
+                            <p>
+                              {getSelectedVariantQuantity() || 'N/A'}
+                            </p>
+                          </div>
+                          )}
+                          {selectedColor && product.product_type === 'fabric' && (
+                            <div className="mb-4">
+                              <h3 className="font-semibold mb-2">Available Quantity:</h3>
+                              <p>
+                                {getSelectedVariantQuantity() || 'N/A'}
+                              </p>
+                            </div>
+                          )}
+                          {selectedDenier && product.product_type === 'yarn' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
+                          <div className="mb-4">
+                            <p className="text-red-600">Warning: Low quantity available!</p>
+                          </div>
+                          )}
+                          {selectedColor && product.product_type === 'fabric' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
+                        <div className="mb-4">
+                          <p className="text-red-600">Warning: Low quantity available!</p>
+                        </div>
+                              )}
+                  {/*</div>*/}
+                            <div>
+                                              <div className="flex flex-col ml-2">
+                                                <label htmlFor="quantity" className="font-semibold mb-2">Quantity:</label>
+                                                  <input
+                                                    type="number"
+                                                    id="quantity"
+                                                    className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300"
+                                                    min="1"
+                                                    max={getSelectedVariantQuantity()}
+                                                    value={quantity}
+                                                    onChange={handleQuantityChange}
+                                                  />
+                                              </div>
+                                              <>{Message && <p className="text-red-600">{Message}</p>}</>
+                                              <div className="flex flex-row space-x-40">
+  
+                                                <button   
+                                                  className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
+                                                  onClick={() => addToCart(product)}>
+                                                  Add to cart
+                                                </button>
+                                                <button 
+                                                  className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
+                                                  onClick={handleReviewAdd}>
+                                                  Add Review
+                                                </button>
+                                              </div>
+                            </div>
+                      {product.yarn_material && (
+                        <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
+                      )}
+                      {product.fabric_print_tech && (
+                        <p className="text-lg mb-4"> <strong>Fabric Print Technology: </strong>  {product.fabric_print_tech}</p>
+                      )}
+                      {product.fabric_material && (
+                        <p className="text-lg mb-4"> <strong>Fabric Material: </strong>  {product.fabric_material}</p>
+                      )}
+                      <p className="text-lg mb-4"><strong>Description:</strong> {product.product_description}</p>
               </div>
             </div>
-
-            {product.yarn_material && (
-              <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
-            )}
-            {product.fabric_print_tech && (
-              <p className="text-lg mb-4"> <strong>Fabric Print Technology: </strong>  {product.fabric_print_tech}</p>
-            )}
-            {product.fabric_material && (
-              <p className="text-lg mb-4"> <strong>Fabric Material: </strong>  {product.fabric_material}</p>
-            )}
-            <p className="text-lg mb-4"><strong>Description:</strong> {product.product_description}</p>
-        </div>
-      </div>
-            {/* Related Products Section */}
-            <div className="mt-16">
+            </div>
+          </div>
+                      {/* Related Products Section */}
+                      <div className="mt-16">
               <h2 className="text-3xl text-center italic font-bold mb-8">Related Products</h2>
               <div className="relative">
                 <div className="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-6 pb-4">

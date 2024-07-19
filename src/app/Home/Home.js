@@ -75,6 +75,15 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   return (
     <div className="flex flex-col w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden">
       <main className="max-w-screen-xl mx-auto mt-20">
+        <div className="flex text-black justify-end mb-4">
+            <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
+              <option value="none">Sort by</option>
+              <option value="lowToHigh">Price: Low to High</option>
+              <option value="highToLow">Price: High to Low</option>
+              <option value="latest">Latest Product</option>
+              <option value="oldest">Oldest Product</option>
+            </select>
+          </div>
         {products.length > 0 ? (
           <>
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 product-grid">

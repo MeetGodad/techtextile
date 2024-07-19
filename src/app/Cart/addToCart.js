@@ -142,9 +142,8 @@ export default function Cart({ children }) {
               {cart.map((item, index) => (
                 <div 
                   key={item.product_id} 
-                  className="bg-gray-100 rounded-2xl p-6 shadow-lg transform transition duration-500 hover:bg-gray-200"
-                >
-                  <div className="relative mb-6 group overflow-hidden rounded-xl">
+                  className="bg-gray-200 rounded-2xl p-6 shadow-x2 transform transition duration-500 hover:bg-gray-600 hover:-rotate-1 hover:text-white">
+                  <div className="relative mb-6 group">
                     <img 
                       src={item.image_url.split(',')[0]}  
                       alt={item.product_name} 
