@@ -69,7 +69,6 @@ const ProductReviews = ({ userId }) => {
               </div>
             </div>
             <div className="mt-2">
-              <h3 className="text-lg font-semibold">Product Info</h3>
               <p className="text-gray-500">{review.product_description}</p>
             </div>
           </div>

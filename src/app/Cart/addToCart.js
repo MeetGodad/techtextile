@@ -129,6 +129,9 @@ export default function Cart({ children }) {
       alert('Please remove out-of-stock items or items with zero quantity before proceeding to checkout.');
     }
   };
+  const handleProductClick = (productId) => {
+    router.push(`Productdetail?productId=${productId}`);
+  };
 
   return (
     <div className="bg-gray-600 p-8 min-h-screen">
@@ -158,14 +161,19 @@ export default function Cart({ children }) {
                   </div>
                   <div className="text-3xl font-bold mb-4 text-gray-800">${parseFloat(item.price).toFixed(2)}</div>
                   {item.selected_variant && (
-                    <div className="mb-4">
-                      <label className="block text-gray-600 mb-2">Variant:</label>
-                      <div className="text-gray-800 mb-2">
-                        {item.selected_variant.color && (
-                          <div className='flex items-center'>
-                            <span className="font-semibold">Color: </span>
-                            <span 
-                              className="inline-block w-6 h-6 rounded-full ml-2 border-2 border-gray-300 transition-all duration-300 hover:scale-125 hover:border-white hover:shadow-lg"
+                      <div className="mb-4">
+                        <label className="block text-black-300 mb-2">Variant:</label>
+                        <div className="text-black-600 mb-2">
+                          {item.selected_variant.color && (
+                            <div className='flex items-center'>
+                              <span className="font-semibold">Color: </span>
+                              <span className="
+                                  inline-block w-5 h-5 rounded-full ml-2
+                                  bg-black-500 p-2
+                                  transform transition duration-300 ease-in-out
+                                  hover:scale-110 hover:border-white
+                                  border-2 border-black
+                                " 
                               style={{ 
                                 backgroundColor: item.selected_variant.color.split(':')[1]?.trim() || item.selected_variant.color,
                               }}

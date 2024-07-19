@@ -3,6 +3,10 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 const MySwal = withReactContent(Swal);
 
+export const fetchCache = 'force-no-store'
+export const revalidate = 0 // seconds
+export const dynamic = 'force-dynamic'
+
 export async function GET(req, { params }) {
   const userId = params.id;
   const databaseUrl = process.env.DATABASE_URL || "";
