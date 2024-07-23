@@ -31,8 +31,7 @@ export async function POST(req) {
     try {
         console.log("Parsing request data");
         const requestData = await req.json();
-
-        console.log("Requested Data:", requestData);
+        console.log("Requested Data2:", requestData);
 
         const databaseUrl = process.env.DATABASE_URL || "";
         console.log("Database URL:", databaseUrl);
@@ -40,28 +39,49 @@ export async function POST(req) {
         const sql = neon(databaseUrl);
         console.log("Executing SQL queries");
 
-        const productVariantResult = await sql`
-            INSERT INTO ProductVariant (yarnBrand, yarnDanier, fabricMaterial, fabricPrintTech, color)
-            VALUES (${requestData.yarnBrand}, ${requestData.yarnDanier}, ${requestData.fabricMaterial}, ${requestData.fabricPrintTech}, ${requestData.color})
-            RETURNING variantid;
-        `;
-        const variantId = productVariantResult[0].variantid;
-        console.log("ProductVariant inserted with ID:", variantId);
+        const seller_id = await sql`
+        SELECT seller_id FROM sellers WHERE user_id = ${requestData.userId};`;
 
-        const categoryResult = await sql`
-            INSERT INTO Category (categoryName, parentCategory_id)
-            VALUES (${requestData.categoryName}, ${requestData.parentCategory_id})
-            RETURNING category_id;
+        const product_details = await sql`
+            INSERT INTO Products (product_name, product_description, price, image_url, seller_id, product_type)
+            VALUES (${requestData.product_name}, ${requestData.description}, ${requestData.price}, ${requestData.image_url},             
+                 ${seller_id[0].seller_id}, ${requestData.product_type})
+            RETURNING product_id;
         `;
-        const categoryId = categoryResult[0].category_id;
-        console.log("Category inserted with ID:", categoryId);
+        const productId = product_details[0].product_id;
+        console.log("Product inserted with ID:", productId);
 
-        const marketplaceResult = await sql`
-            INSERT INTO Marketplace (product_name, product_details, product_image, product_price, category_id, variantId, userId)
-            VALUES (${requestData.product_name}, ${requestData.product_details}, ${requestData.product_image}, ${requestData.product_price}, ${categoryId}, ${variantId}, ${requestData.userId})
-            RETURNING *;
-        `;
-        console.log("Marketplace data inserted successfully", marketplaceResult);
+        if (requestData.product_type === 'yarn') {
+            const Yarn = await sql`
+                INSERT INTO YarnProducts (product_id, yarn_material)
+                VALUES (${productId}, ${requestData.yarn_material})
+                RETURNING yarn_id;
+            `;
+
+            for (let variant of requestData.yarn_variants) {
+                for (let denier of variant.deniers) {
+                    const variantAttributes = `Color: ${variant.color}, Denier: ${denier.denier}`;
+                    await sql`
+                        INSERT INTO ProductVariant (product_id, variant_attributes, quantity)
+                        VALUES (${productId}, ${variantAttributes}, ${denier.quantity});
+                    `;
+                }
+            }
+        } else if (requestData.product_type === 'fabric') {
+            const Fabric = await sql`
+                INSERT INTO FabricProducts (product_id, fabric_print_tech, fabric_material)
+                VALUES (${productId}, ${requestData.fabric_print_tech}, ${requestData.fabric_material})
+                RETURNING fabric_id;
+            `;
+
+            for (let variant of requestData.fabric_variants) {
+                const variantAttributes = `Color: ${variant.color}`;
+                await sql`
+                    INSERT INTO ProductVariant (product_id, variant_attributes, quantity)
+                    VALUES (${productId}, ${variantAttributes}, ${variant.quantity});
+                `;
+            }
+        }
 
         return new Response(JSON.stringify({ message: "Data inserted successfully" }), { status: 200 });
     } catch (error) {
