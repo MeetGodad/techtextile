@@ -21,16 +21,19 @@ CREATE TABLE Addresses (
     address_type VARCHAR(10) CHECK (address_type IN ('billing', 'shipping')),
     address_first_name VARCHAR(50),
     address_last_name VARCHAR(50),
+    address_email VARCHAR(50),
+    phone_num BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
     street VARCHAR(255),
     city VARCHAR(100),
     state VARCHAR(100),
-    postal_code VARCHAR(20)
+    postal_code VARCHAR(20),
+    country VARCHAR (20)
 );
 
 CREATE TABLE Buyers (
     buyer_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
-    phone_num   BIGINT UNIQUE CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
+    phone_num   BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
     user_address INT REFERENCES Addresses(address_id)
 );
 
@@ -38,9 +41,8 @@ CREATE TABLE Sellers (
     seller_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
     business_name VARCHAR(100),
-    phone_num   BIGINT UNIQUE CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
-    business_address INT REFERENCES Addresses(address_id)
-   
+    phone_num   BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
+    business_address INT REFERENCES Addresses(address_id) 
 );
 
 CREATE TABLE Products (
@@ -70,7 +72,7 @@ CREATE TABLE ProductVariant (
     variant_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES Products(product_id),
     variant_attributes VARCHAR(100),
-    quantity INT NOT NULL
+    quantity INT NOT NULL CHECK (quantity >= 1)
 );
 
 CREATE TABLE Feedback (
@@ -101,17 +103,24 @@ CREATE TABLE CartItems (
 CREATE TABLE Orders (
     order_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
-    payment_method VARCHAR(50),
-    payment_id INT REFERENCES Payments(payment_id),
     shipping_address_id INT REFERENCES Addresses(address_id),
-    order_status VARCHAR(20) CHECK (order_status IN ('pending', 'confirmed', 'shipped', 'delivered', 'canceled'));
-    payment_status_check VARCHAR(20) CHECK (payment_status IN ('pending', 'confirmed' , 'refunded'));
+    order_status VARCHAR(20) CHECK (order_status IN ('pending', 'confirmed', 'shipped', 'delivered', 'canceled')),
+    payment_status_check VARCHAR(20) CHECK (payment_status_check IN ('pending', 'confirmed' , 'refunded')),
     original_shipping_cost DECIMAL(10, 2),
     original_total_price DECIMAL(10, 2),
     current_shipping_cost DECIMAL(10, 2),
-    current_total_price DECIMAL(10, 2);
+    current_total_price DECIMAL(10, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE Payments (
+    payment_id SERIAL PRIMARY KEY,
+    payment_method VARCHAR(50),
+    payment_amount DECIMAL(10, 2) NOT NULL,
+    order_id INT REFERENCES orders(order_id),
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    stripe_payment_intent_id SERIAL
+);
+
 
 CREATE TABLE OrderItems (
     order_item_id SERIAL PRIMARY KEY,
@@ -119,8 +128,9 @@ CREATE TABLE OrderItems (
     product_id INT REFERENCES Products(product_id),
     quantity INT NOT NULL,
     item_price DECIMAL(10, 2) NOT NULL,
-    variant_id INT REFERENCES ProductVariant(variant_id)
-    item_status VARCHAR(20) CHECK (item_status IN ('active', 'cancelled', 'refunded'));
+    variant_id INT REFERENCES ProductVariant(variant_id),
+    item_status VARCHAR(20) CHECK (item_status IN ('active', 'canceled', 'refunded')),
+    item_subtotal DECIMAL(10, 2) GENERATED ALWAYS AS (quantity * item_price) STORED
 );
 
 CREATE TABLE OrderCancellations (
@@ -140,14 +150,7 @@ CREATE TABLE OrderItemCancellations (
     canceled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Payments (
-    payment_id SERIAL PRIMARY KEY,
-    payment_method VARCHAR(50),
-    payment_amount DECIMAL(10, 2) NOT NULL,
-    order_id INT REFERENCES orders(order_id),
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP=
-    stripe_payment_intent_id SERIAL,
-);
+
 
 CREATE TABLE ShippingDetails (
   shipping_id SERIAL PRIMARY KEY,
@@ -158,8 +161,8 @@ CREATE TABLE ShippingDetails (
   shipping_cost DECIMAL(10, 2),
   rate_id VARCHAR(100),
   shipment_id VARCHAR(100),
-  estimated_delivery_days DATE,
+  estimated_delivery_days INT,
   is_central_warehouse BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  status VARCHAR(20) chk_status CHECK (status IN ('pending', 'shipped', 'delivered', 'canceled'));
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR(20) CHECK (status IN ('pending', 'shipped', 'delivered', 'canceled'))
 );
