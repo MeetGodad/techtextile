@@ -89,7 +89,7 @@ export async function POST(request) {
       } else {
         cartItem = await sql`
           UPDATE CartItems 
-          SET quantity = quantity + ${requestData.quantity} 
+          SET quantity = ${requestData.quantity} 
           WHERE cart_id = ${cart[0].cart_id} 
           AND product_id = ${requestData.productId}
           AND variant_id = ${requestData.variantId}

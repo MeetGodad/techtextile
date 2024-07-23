@@ -2,6 +2,7 @@ import { neon } from '@neondatabase/serverless';
 
 export async function POST(request) {
     const { orderId, userId, cancellationReason } = await request.json();
+    console.log(orderId, userId, cancellationReason);
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
 
@@ -14,15 +15,31 @@ export async function POST(request) {
                 WHERE order_id = ${orderId} AND user_id = ${userId}
                 RETURNING *
             `,
+
             sql`
                 INSERT INTO OrderCancellations (order_id, canceled_by, cancellation_reason)
                 VALUES (${orderId}, ${userId}, ${cancellationReason})
             `,
+
             sql`
                 UPDATE Orders
                 SET payment_status_check = 'refunded'
                 WHERE order_id = ${orderId} AND payment_status_check = 'confirmed' 
             `,
+
+            sql`
+                UPDATE OrderItems
+                SET item_status = 'cancelled'
+                WHERE order_id = ${orderId}
+            `,
+
+            sql`
+              INSERT INTO OrderItemCancellations (order_item_id, canceled_by, cancellation_reason)
+                SELECT order_item_id, ${userId}, ${cancellationReason} || ' - Due to order cancellation'
+                FROM OrderItems
+                WHERE order_id = ${orderId}
+            `,
+
             sql`
                 UPDATE ProductVariant pv
                 SET quantity = pv.quantity + oi.quantity
@@ -30,8 +47,10 @@ export async function POST(request) {
                 WHERE oi.order_id = ${orderId}
                 AND oi.variant_id = pv.variant_id
             `,
+
             sql`
-                DELETE FROM ShippingDetails
+                UPDATE ShippingDetails
+                SET status = 'canceled'
                 WHERE order_id = ${orderId}
             `
         ]);

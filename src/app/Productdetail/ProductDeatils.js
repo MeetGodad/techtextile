@@ -169,62 +169,63 @@ useEffect(() => {
 
 
   const addToCart = async () => {
-  if (!user) {
-    alert('Please sign up or log in first.');
-    return;
-  }
-  let variantId = null;
-  
-  switch (product.product_type) {
-    case 'yarn':
-      if (selectedColor && selectedDenier) {
-        // Assuming selectedColor and selectedDenier have variant_id properties
-        variantId = selectedDenier.variant_id;
-      } else {
-        alert('Please select both color and denier for yarn products.');
-        return;
-      }
-      break;
-    case 'fabric':
-      if (selectedColor) {
-        // Assuming selectedColor has variant_id property
-        variantId = selectedColor.variant_id;
-      } else {
-        alert('Please select a color for fabric products.');
-        return;
-      }
-      break;
-    default:
-      alert('Product type not supported.');
+    if (!user) {
+      alert('Please sign up or log in first.');
       return;
-  }
-  try {
-    const response = await fetch('/api/cart', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId: user.uid,
-        productId: product.product_id,
-        quantity: quantity,
-        variantId: selectedVariantId,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to add product to cart');
     }
-    const cartItem = await response.json();
-    setCart([...cart, cartItem]);
-    const eventData = { productId: product.product_id, quantity: quantity };
-    const event = new CustomEvent('cartUpdated', { detail: eventData });
-    window.dispatchEvent(event);
+    let variantId = null;
+    
+    switch (product.product_type) {
+      case 'yarn':
+        if (selectedColor && selectedDenier) {
+          // Assuming selectedColor and selectedDenier have variant_id properties
+          variantId = selectedDenier.variant_id;
+        } else {
+          alert('Please select both color and denier for yarn products.');
+          return;
+        }
+        break;
+      case 'fabric':
+        if (selectedColor) {
+          // Assuming selectedColor has variant_id property
+          variantId = selectedColor.variant_id;
+        } else {
+          alert('Please select a color for fabric products.');
+          return;
+        }
+        break;
+      default:
+        alert('Product type not supported.');
+        return;
+    }
+    try {
+      const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          productId: product.product_id,
+          quantity: quantity,
+          variantId: selectedVariantId,
+        }),
+      });
 
-    } catch (error) {
-    alert(error.message);
-  }
-};
+      if (!response.ok) {
+        throw new Error('Failed to add product to cart');
+      }
+      const cartItem = await response.json();
+      setCart([...cart, cartItem]);
+      const eventData = { productId: product.product_id, quantity: quantity };
+      const event = new CustomEvent('cartUpdated', { detail: eventData });
+      window.dispatchEvent(event);
+
+      } catch (error) {
+      alert(error.message);
+    }
+  };
+  
 const handleQuantityChange = (event) => {
   const maxQuantity = getSelectedVariantQuantity();
   const newQuantity = parseInt(event.target.value);

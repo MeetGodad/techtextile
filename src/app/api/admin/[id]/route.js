@@ -30,8 +30,8 @@ export async function GET(req, { params }) {
       SELECT 
         o.order_id,
         o.order_status,
-        o.order_total_price,
-        o.order_shhipping_cost,
+        o.original_total_price,
+        o.original_shipping_cost,
         o.created_at AS order_date,
         oi.quantity,
         oi.item_price,

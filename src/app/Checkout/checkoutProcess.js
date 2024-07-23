@@ -99,7 +99,7 @@ const Checkout = () => {
         city: signupAddress.city || '',
         state: signupAddress.state || '',
         zip: signupAddress.postal_code || '',
-        country: signupAddress.countryCode || '',
+        country: signupAddress.country || '',
         email: signupAddress.address_email || '',
         phone: signupAddress.phone_num || '',
       });
@@ -162,7 +162,7 @@ const Checkout = () => {
           city: shippingInfo.city,
           state: shippingInfo.state,
           zip: shippingInfo.zip,
-          country: shippingInfo.countryCode,
+          country: shippingInfo.country,
           email: shippingInfo.email,
           cart,
           shippingDetails,
@@ -215,7 +215,8 @@ const handleSuccess = async () => {
       };
 
       console.log('Attempting to send confirmation email');
-      const emailSent = await sendOrderConfirmationEmails(orderDetails);
+      // const emailSent = await sendOrderConfirmationEmails(orderDetails);
+      const emailSent = true ; // For testing purposes
       if (emailSent) {
         console.log('Confirmation email sent successfully');
       } else {
@@ -240,7 +241,7 @@ const handleAddressChange = (address) => {
       city: address.city || '',
       state: address.state || '',
       zip: address.postal_code || '',
-      country: address.countryCode || '',
+      country: address.country || '',
       email: address.address_email || '',
       phone: address.phone_num || '',
     });
@@ -288,7 +289,7 @@ const renderStep = () => {
                         value={address.address_id}
                         className="truncate"
                       >
-                        {`${address.address_first_name} ${address.address_last_name}, ${address.street}, ${address.city}`}
+                        {`${address.address_first_name} ${address.address_last_name}, ${address.street}, ${address.city} ${address.postal_code}, ${address.country}`}
                       </option>
                     ))}
                   </select>
@@ -332,12 +333,12 @@ const renderStep = () => {
                 city={shippingInfo.city}
                 state={shippingInfo.state}
                 postalCode={shippingInfo.zip}
-                country={shippingInfo.countryCode}
+                country={shippingInfo.country}
                 setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
                 setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
-                setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
-                setCountry={(value) => setShippingInfo(prev => ({ ...prev, country: value }))}
+                setState={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
+                setCountry={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
                 setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
                 setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
                 inputClassName="w-full p-4 text-black border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
@@ -421,9 +422,9 @@ const renderStep = () => {
                     lastName: shippingInfo.lastName,
                     street: shippingInfo.street,
                     city: shippingInfo.city,
-                    state: shippingInfo.stateCode,
+                    state: shippingInfo.state,
                     zip: shippingInfo.zip,
-                    country: shippingInfo.countryCode,
+                    country: shippingInfo.country,
                     email: shippingInfo.email,
                     phone: shippingInfo.phone,
                   }}

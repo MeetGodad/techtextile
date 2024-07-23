@@ -21,15 +21,15 @@ export async function POST(request) {
         RETURNING *
       `,
 
-      tx`
-      UPDATE Orders o
-    SET order_total_price = GREATEST(0, (
-        (SELECT order_total_price FROM Orders WHERE order_id = o.order_id) - 
-        (SELECT item_price * quantity FROM OrderItems WHERE order_item_id = ${orderItemId})
-    ))
-    WHERE order_id = (SELECT order_id FROM OrderItems WHERE order_item_id = ${orderItemId})
-    RETURNING *
-      `
+    //   tx`
+    //   UPDATE Orders o
+    // SET order_total_price = GREATEST(0, (
+    //     (SELECT order_total_price FROM Orders WHERE order_id = o.order_id) - 
+    //     (SELECT item_price * quantity FROM OrderItems WHERE order_item_id = ${orderItemId})
+    // ))
+    // WHERE order_id = (SELECT order_id FROM OrderItems WHERE order_item_id = ${orderItemId})
+    // RETURNING *
+    //   `
     ]);
 
     console.log('Transaction results:', JSON.stringify(result, null, 2));
