@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useUserAuth} from '../auth/auth-context';
 import { auth } from '../auth/firebase';
 import { sendEmailVerification , deleteUser , reload} from 'firebase/auth';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import AddressInput from '../components/AddressInput';
 
@@ -28,14 +30,23 @@ export default function SignUp() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [companyName, setCompanyName] = useState("");
     const [passwordError, setPasswordError] = useState(false);
+    const [requirements, setRequirements] = useState({
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        number: false,
+        special: false,
+        match: false
+      });
+      const [showPassword, setShowPassword] = useState(false);
+      const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const user = useUserAuth();
     const router = useRouter();
 
 
     useEffect(() => {
-        // This will call validatePassword every time password or confirmPassword changes
         validatePassword();
-      }, [confirmPassword]); // Add other dependencies if necessary
+      }, [password, confirmPassword]);
       
 
       const handleSubmit = async (event) => {
@@ -225,31 +236,73 @@ export default function SignUp() {
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
                         </div>
-                        <div className="flex flex-col mb-4">
-                            <label className="block text-sm font-semibold mb-2 text-black" for="password">Password</label>
-                            <input 
-                            type="password" 
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            value={password}
-                            disabled={role === ""}
-                            className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2  focus:ring-black focus:border-transparent" />
-                        </div>
-                        <div className="flex flex-col mb-4">
-                            <label className="block text-sm font-semibold mb-2 text-black" for="confirm-password">Confirm Password </label>
-                            <input 
-                            type="password" 
-                            required
-                            value={confirmPassword}
-                            disabled={role === ""}
-                            onChange={(e) => {
-                                setConfirmPassword(e.target.value);
-                                validatePassword(); // This assumes validatePassword will now correctly set passwordError based on the current and confirm passwords
-                              }}
-                            className="w-full m-1 p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2  focus:ring-black focus:border-transparent" />
-                            {passwordError && <p className="text-red-500 text-sm">Passwords do not match</p>}
+                        <div className="flex flex-col mb-4 relative">
+                        <label className="block text-sm font-semibold mb-2 text-black" htmlFor="password">
+                        Password
+                        </label>
+                        <input
+                        type={showPassword ? 'text' : 'password'}
+                        id="password"
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        value={password}
+                        disabled={role === ''}
+                        className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        />
+                        <button
+                        type="button"
+                        className="absolute right-2 top-8 text-gray-500"
+                        onClick={() => setShowPassword(!showPassword)}
+                        >
+                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                        </button>
+                        <div className="mt-2">
+                        <p className={`text-sm ${requirements.length ? 'text-green-500' : 'text-red-500'}`}>
+                            At least 8 characters long
+                        </p>
+                        <p className={`text-sm ${requirements.uppercase ? 'text-green-500' : 'text-red-500'}`}>
+                            Contains an uppercase letter
+                        </p>
+                        <p className={`text-sm ${requirements.lowercase ? 'text-green-500' : 'text-red-500'}`}>
+                            Contains a lowercase letter
+                        </p>
+                        <p className={`text-sm ${requirements.number ? 'text-green-500' : 'text-red-500'}`}>
+                            Contains a number
+                        </p>
+                        <p className={`text-sm ${requirements.special ? 'text-green-500' : 'text-red-500'}`}>
+                            Contains a special character
+                        </p>
                         </div>
                     </div>
+
+                    <div className="flex flex-col mb-4 relative">
+                        <label className="block text-sm font-semibold mb-2 text-black" htmlFor="confirm-password">
+                        Confirm Password
+                        </label>
+                        <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        id="confirm-password"
+                        required
+                        value={confirmPassword}
+                        disabled={role === ''}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full m-1 p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        />
+                        <button
+                        type="button"
+                        className="absolute right-2 top-8 text-gray-500"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                        <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                        </button>
+                        <p className={`text-sm ${requirements.match ? 'text-green-500' : 'text-red-500'}`}>
+                        Passwords match
+                        </p>
+                    </div>
+
+                            {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+                    </div>
+
                 ); 
                 case 2:
                     if(role === "buyer") { 
@@ -384,38 +437,48 @@ export default function SignUp() {
 
 
     const validatePassword = () => {
-        if (password === confirmPassword) {
-          // Assuming passwordError is a boolean
-          setPasswordError(false); // Or use an empty string if it's a string state
-          return true;
+        const newRequirements = {
+          length: password.length >= 8,
+          uppercase: /[A-Z]/.test(password),
+          lowercase: /[a-z]/.test(password),
+          number: /\d/.test(password),
+          special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(password),
+          match: password === confirmPassword && password !== '',
+        };
+    
+        setRequirements(newRequirements);
+    
+        const allRequirementsMet = Object.values(newRequirements).every(Boolean);
+    
+        if (!allRequirementsMet) {
+          setPasswordError('Please meet all password requirements');
         } else {
-          // Set to true or a descriptive error message
-          setPasswordError(true);     
-          return false;  
+          setPasswordError('');
         }
+    
+        return allRequirementsMet;
       };
-
     const validateStep = () => {
 
-            if (!validatePassword()) {
-                // If password validation fails, stop further validation and show the password error
-                return false;
-            }
-
-
-                switch (currentStep) {
-                    case 1:
-                        return role !== "" && email !== "" && password !== "" && confirmPassword !== "";
-                    case 2:
-                        if(role === "buyer") {
-                            return firstName !== "" && LastName !== "" && phone !== "" && street !== "" && city !== "" && state !== "" && postalCode !== "";
-                        } else if(role === "seller") {
-                            return firstName !== "" && LastName !== "" && phone !== "" && street !== "" && city !== "" && state !== "" && postalCode !== "" ;
-                        }
-                        default:
-                            return false;    
-                }
+        if (!validatePassword()) {
+            // If password validation fails, stop further validation and show the password error
+            return false;
         }
+
+
+            switch (currentStep) {
+                case 1:
+                    return role !== "" && email !== "" && password !== "" && confirmPassword !== "";
+                case 2:
+                    if(role === "buyer") {
+                        return firstName !== "" && LastName !== "" && phone !== "" && street !== "" && city !== "" && state !== "" && postalCode !== "";
+                    } else if(role === "seller") {
+                        return firstName !== "" && LastName !== "" && phone !== "" && street !== "" && city !== "" && state !== "" && postalCode !== "" ;
+                    }
+                    default:
+                        return false;    
+        }
+    }
 
     const handleNext = () => {
 
