@@ -58,7 +58,7 @@ export async function GET(req, { params }) {
     `;
 
     const averageOrderValue = await sql`
-      SELECT AVG(o.order_total_price) AS avg_order_value
+      SELECT AVG(o.original_total_price) AS avg_order_value
       FROM Orders o
       JOIN OrderItems oi ON o.order_id = oi.order_id
       JOIN Products p ON oi.product_id = p.product_id

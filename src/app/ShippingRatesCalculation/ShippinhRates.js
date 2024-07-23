@@ -30,6 +30,9 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
 
   const AVERAGE_FABRIC_WEIGHT = 0.15;
 
+
+  console.log('buyer address:', buyerAddress);
+
   const calculateProductWeight = useCallback((item) => {
     if (item.product_type === 'fabric') {
       return parseFloat((item.quantity * AVERAGE_FABRIC_WEIGHT).toFixed(2));

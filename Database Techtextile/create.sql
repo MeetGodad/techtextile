@@ -106,8 +106,10 @@ CREATE TABLE Orders (
     shipping_address_id INT REFERENCES Addresses(address_id),
     order_status VARCHAR(20) CHECK (order_status IN ('pending', 'confirmed', 'shipped', 'delivered', 'canceled'));
     payment_status_check VARCHAR(20) CHECK (payment_status IN ('pending', 'confirmed' , 'refunded'));
-    order_shhipping_cost DECIMAL(10, 2) NOT NULL,
-    order_total_price DECIMAL(10, 2) NOT NULL,
+    original_shipping_cost DECIMAL(10, 2),
+    original_total_price DECIMAL(10, 2),
+    current_shipping_cost DECIMAL(10, 2),
+    current_total_price DECIMAL(10, 2);
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -161,36 +163,3 @@ CREATE TABLE ShippingDetails (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   status VARCHAR(20) chk_status CHECK (status IN ('pending', 'shipped', 'delivered', 'canceled'));
 );
-
-
-
-
-
-
-
--- CREATE OR REPLACE PROCEDURE CancelOrder(
---     p_order_id INT,
---     p_canceled_by VARCHAR(200),
---     p_cancellation_reason TEXT
--- )
--- LANGUAGE plpgsql
--- AS $$
--- BEGIN
---     -- Check if the order is in a pending state
---     IF EXISTS (SELECT 1 FROM Orders WHERE order_id = p_order_id AND order_status = 'pending') THEN
---         -- Update the order status to 'canceled'
---         UPDATE Orders
---         SET order_status = 'canceled'
---         WHERE order_id = p_order_id;
-
---         -- Insert a record into the OrderCancellations table
---         INSERT INTO OrderCancellations (order_id, canceled_by, cancellation_reason)
---         VALUES (p_order_id, p_canceled_by, p_cancellation_reason);
-
---         RAISE NOTICE 'Order % has been canceled', p_order_id;
---     ELSE
---         RAISE NOTICE 'Order % cannot be canceled because it is not pending', p_order_id;
---     END IF;
--- END;
--- $$
--- ;

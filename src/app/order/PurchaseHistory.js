@@ -185,6 +185,19 @@ const PurchaseHistory = ({ userId }) => {
     });
   };
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'CAD' }).format(amount);
+  };
+
+
+  if(!user) {
+    return (
+      <div className="w-full min-h-screen bg-gray-100 p-8 text-center text-gray-500">
+        Please log in to view your purchase history
+      </div>
+    );
+  }
+
   return (
     <div className="w-full min-h-screen bg-gray-100 p-8">
       <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Purchase History</h2>
@@ -210,11 +223,21 @@ const PurchaseHistory = ({ userId }) => {
               </div>
               <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                 <p><span className="font-medium">Order Date:</span> {formatDate(order.created_at)}</p>
-                <p><span className="font-medium">Total Price:</span> ${order.order_total_price}</p>
-                <p><span className="font-medium">Shipping Cost:</span> ${order.order_shipping_cost}</p>
                 <p><span className="font-medium">Payment Status:</span> {order.payment_status || 'N/A'}</p>
+                <p><span className="font-medium"> Original Total Price:</span> {formatCurrency(order.original_total_price)}</p>
+                <p><span className="font-medium">Original Shipping Cost:</span> {formatCurrency(order.original_shipping_cost)}</p>
+                
+                {/* Display current prices only if they differ from original prices */}
+                {(order.current_total_price !== order.original_total_price ||
+                  order.current_shipping_cost !== order.original_shipping_cost) && (
+                  <>
+                    <p><span className="font-medium">Current Total Price:</span> {formatCurrency(order.current_total_price)}</p>
+                    <p><span className="font-medium">Current Shipping Cost:</span> {formatCurrency(order.current_shipping_cost)}</p>
+                  </>
+                )}
               </div>
-              {order.order_cancellation_reason && (
+      
+             {order.order_cancellation_reason && (
                 <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
                   <p className="font-medium">Cancellation Reason:</p>
                   <p>{order.order_cancellation_reason}</p>
