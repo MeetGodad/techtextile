@@ -40,9 +40,8 @@ CREATE TABLE Sellers (
     business_name VARCHAR(100),
     phone_num   BIGINT UNIQUE CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
     business_address INT REFERENCES Addresses(address_id)
-   
-);
 
+);
 CREATE TABLE Products (
     product_id SERIAL PRIMARY KEY,
     product_name VARCHAR(100) NOT NULL,
