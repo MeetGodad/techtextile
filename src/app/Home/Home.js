@@ -52,6 +52,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   const showMoreProducts = () => {
     setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 12);
   };
+
   const filteredProducts = Array.isArray(products) ? products.filter(product => {
     // Filter by category unless it's 'all'
     if (category !== 'all' && product.product_type !== category) return false;
@@ -71,8 +72,8 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
 
   const handleProductClick = (productId , averageRating) => {
     router.push(`/productdetail?productId=${productId}&averageRating=${averageRating}`);
-
   };
+
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
   };
@@ -84,28 +85,41 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
         case 'highToLow':
           return [...products].sort((a, b) => b.price - a.price);
         case 'latest':
-        return [...products].sort((a, b) => Number(b.product_id) - Number(a.product_id));
+          return [...products].sort((a, b) => Number(b.product_id) - Number(a.product_id));
         case 'oldest':
           return [...products].sort((a, b) => Number(a.product_id) - Number(b.product_id));
         default:
-        return products;
+          return products;
       }
-    };
-    const sortedAndFilteredProducts = sortProducts(filteredProducts);
+  };
+
+  const sortedAndFilteredProducts = sortProducts(filteredProducts);
+
   return (
-    <div className="flex flex-col w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden">
-      <main className="max-w-screen-xl mx-auto mt-20">        
+    <div className="relative flex flex-col w-full min-h-0 bg-white overflow-x-auto z-20 overflow-hidden">
+      {/* Background Image Section */}
+      <div className="relative h-screen w-full bg-cover bg-center" style={{ backgroundImage: `url('../Images/Choosing clothes.gif')` }}>
+        <div className="flex flex-col items-center justify-center h-full bg-black bg-opacity-50 text-white">
+          <h1 className="text-5xl font-bold mb-4">Fabric Sourcing. Simplified.</h1>
+          <p className="text-2xl">Tech-enabled Sourcing-to-Production</p>
+          <p className="text-2xl">AI-enabled Fabric-to-Garment Visualization</p>
+          <p className="text-2xl">Trusted by 400+ Private Labels Globally</p>
+        </div>
+      </div>
+
+      {/* Product Listing Section */}
+      <main className="max-w-screen-xl mx-auto mt-20">
+        <div className="flex justify-end mb-4">
+          <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
+            <option value="none">Sort by</option>
+            <option value="lowToHigh">Price: Low to High</option>
+            <option value="highToLow">Price: High to Low</option>
+            <option value="latest">Latest Product</option>
+            <option value="oldest">Oldest Product</option>
+          </select>
+        </div>
         {products.length > 0 ? (
           <>
-            <div className="flex justify-end mb-4">
-            <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
-              <option value="none">Sort by</option>
-              <option value="lowToHigh">Price: Low to High</option>
-              <option value="highToLow">Price: High to Low</option>
-              <option value="latest">Latest Product</option>
-              <option value="oldest">Oldest Product</option>
-            </select>
-          </div>
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 product-grid">
               {sortedAndFilteredProducts.slice(0, visibleProducts).map((product) => (
                 <ProductSection
@@ -115,7 +129,8 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
                   image={product.image_url}
                   product={product}
                   averageRating={product.average_rating}
-                  onProductClick={() => handleProductClick(product.product_id , product.average_rating)} />
+                  onProductClick={() => handleProductClick(product.product_id, product.average_rating)}
+                />
               ))}
             </section>
             {visibleProducts < filteredProducts.length && (
@@ -129,7 +144,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
             )}
           </>
         ) : (
-          <Loder/>
+          <Loder />
         )}
       </main>
     </div>
