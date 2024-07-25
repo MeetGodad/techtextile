@@ -69,6 +69,11 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
       .catch(error => console.error('Error fetching sales trends:', error));
   }, [userId]);
 
+  const truncateProductName = (name) => {
+    return name.length > 12 ? name.slice(0, 12) + '...' : name;
+  };
+  
+
   const handleTimeViewChange = (event) => {
     setTimeView(event.target.value);
   };

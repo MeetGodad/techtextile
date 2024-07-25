@@ -6,7 +6,7 @@ export async function GET(req) {
         const sql = neon(databaseUrl);
         const url = new URL(req.url);
         const userId = url.pathname.split('/').pop();
-        console.log("Seller ID:", userId);
+        // console.log("Seller ID:", userId);
 
         if (!userId) {
             console.error("User ID is missing in the request");
@@ -22,7 +22,7 @@ export async function GET(req) {
         }
 
         const sellerId = sellerResult[0].seller_id;
-        console.log("Seller ID found:", sellerId);
+        // console.log("Seller ID found:", sellerId);
 
         const products = await sql`
             SELECT 
@@ -47,7 +47,7 @@ export async function GET(req) {
             return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
         }
 
-        console.log("Products found:", products);
+        // console.log("Products found:", products);
         return new Response(JSON.stringify(products), { status: 200 });
 
     } catch (error) {
