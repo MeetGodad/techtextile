@@ -1,3 +1,4 @@
+//reference : Github Copilot
 // hooks/usePasswordValidation.js
 import { useState, useEffect } from 'react';
 
