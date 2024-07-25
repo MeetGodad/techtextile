@@ -2,7 +2,7 @@ import { neon } from '@neondatabase/serverless';
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const term = searchParams.get('term') || '';
 
     if (!term) {

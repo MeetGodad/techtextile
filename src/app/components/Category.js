@@ -29,23 +29,30 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
     { value: 'Polyster', label: 'Polyster' },
     { value: 'Nylon', label: 'Nylon' },
     { value: 'Silk', label: 'Silk' },
+    { value: 'Acrylic', label: 'Acrylic' },
+    { value: 'All Yarns', label: 'All Yarns' },
   ];
 
   const subSubCategories = {
     fabric: {
       fabric_print_tech: [
-        { value: 'machin', label: 'Marble Print' },
-        { value: 'Handblock & Dyed', label: 'Handblock & Dyed' },
-        { value: 'Screen Print', label: 'Screen Print' },
-        { value: 'Digital Print', label: 'Digital Print' },
-
+     { value: 'Handblock & Dyed', label: 'Handblock & Dyed' },
+      { value: 'Screen Print', label: 'Screen Print' },
+      { value: 'Digital Print', label: 'Digital Print' },
+      { value: 'Marble Print', label: 'Marble Print' },
+      { value : 'Plain', label: 'Plain'},
+      { value: 'Other', label: 'Other' },
       ],
       fabric_material: [
-        { value: 'Cotton', label: 'Cotton' },
         { value: 'Viscose', label: 'Viscose' },
+        { value: 'Cotton', label: 'Cotton' },
         { value: 'Silk & Blends', label: 'Silk & Blends' },
-        { value: 'Polyster', label: 'Polyster' },
         { value: 'Linen', label: 'Linen' },
+        { value: 'Polyester', label: 'Polyester' },
+        { value: 'Sustainable', label: 'Sustainable' },
+        { value: 'Wool', label: 'Wool' },
+        { value: 'Nylon', label: 'Nylon' },
+        { value: 'All Fabrics', label: 'All Fabrics' },
       ],
     },
   };

@@ -93,9 +93,10 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
     const sortedAndFilteredProducts = sortProducts(filteredProducts);
   return (
     <div className="flex flex-col w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden">
-      <main className="max-w-screen-xl mx-auto mt-20">
-
-        <div className="flex justify-end mb-4">
+      <main className="max-w-screen-xl mx-auto mt-20">        
+        {products.length > 0 ? (
+          <>
+            <div className="flex justify-end mb-4">
             <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
               <option value="none">Sort by</option>
               <option value="lowToHigh">Price: Low to High</option>
@@ -104,8 +105,6 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
               <option value="oldest">Oldest Product</option>
             </select>
           </div>
-        {products.length > 0 ? (
-          <>
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 product-grid">
               {sortedAndFilteredProducts.slice(0, visibleProducts).map((product) => (
                 <ProductSection
