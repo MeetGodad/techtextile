@@ -6,6 +6,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes swapOut {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(-90deg); }
+}
+
+@keyframes swapIn {
+  0% { transform: rotateY(90deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+.swap-out {
+  animation: swapOut 0.3s ease-out forwards;
+}
+
+.swap-in {
+  animation: swapIn 0.3s ease-in forwards;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
