@@ -8,6 +8,8 @@ import { AiOutlineEdit } from 'react-icons/ai';
 import { FiMenu, FiX } from 'react-icons/fi';
 import BusinessStats from '../seller/BusinessStats';
 import ProductReviews from '../seller/ProductReviews';
+import SellerViewItem from '../seller/SellerViewItem';
+import ListProduct from '../seller/ListProduct';
 
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
