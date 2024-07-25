@@ -30,11 +30,12 @@ export default function ListProduct() {
     }, [user]);
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    const urls = await handleUpload();
-    const urlsString = urls.join(",");
-    const updatedProductData = { ...productData, image_url: urlsString, userId: sellerId };
-    try {
+        e.preventDefault();
+         try {
+        const urls = await handleUpload();
+        const urlsString = urls.join(",");
+        const updatedProductData = { ...productData, image_url: urlsString, userId: sellerId };
+   
         const response = await fetch('/api/products', {
             method: 'POST',
             headers: {
@@ -223,6 +224,8 @@ export default function ListProduct() {
                                     <option value="Wool">Wool</option>
                                     <option value="Nylon">Nylon</option>    
                                     <option value="Linen">Linen</option>
+                                    <option value="Acrylic">Acrylic</option>
+                                    <option value="All Yarns">Other</option>
                                 </select>
                             </div>
                             <div>
@@ -296,12 +299,12 @@ export default function ListProduct() {
                                     className="w-full p-3 border border-gray-300 rounded-lg"
                                 >
                                     <option value="" disabled>Select Fabric Print Technology</option>
-                                    <option value="Screen Printing">Screen Printing</option>
-                                    <option value="Digital Printing">Digital Printing</option>
-                                    <option value="Sublimation Printing">Sublimation Printing</option>
-                                    <option value="Heat Transfer Printing">Heat Transfer Printing</option>
-                                    <option value="Block Printing">Block Printing</option>
-                                    <option value="Rotary Printing">Rotary Printing</option>
+                                    <option value="Handblock & Dyed">Handblock & Dyed</option>
+                                    <option value="Screen Print">Screen Print</option>
+                                    <option value="Digital Print">Digital Print</option>
+                                    <option value="Marble Print">Marble Print</option>
+                                    <option value="Plain">Plain</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                             <div>
@@ -316,11 +319,15 @@ export default function ListProduct() {
                                 >
                                     <option value="" disabled>Select Fabric Material</option>
                                     <option value="Cotton">Cotton</option>
-                                    <option value="Polyester">Polyester</option>
-                                    <option value="Silk">Silk</option>
-                                    <option value="Wool">Wool</option>
-                                    <option value="Nylon">Nylon</option>    
                                     <option value="Linen">Linen</option>
+                                    <option value="Silk & Blends">Silk & Blends</option>
+                                    <option value="Polyester">Polyester</option>
+                                    <option value="Sustainable">Sustainable</option>
+                                    <option value="Wool">Wool</option>
+                                    <option value="Nylon">Nylon</option> 
+                                    <option value="Viscose">Viscose</option>
+                                    <option value="All Fabrics">Other</option>
+                                    
                                 </select>
                             </div>
                             <div>

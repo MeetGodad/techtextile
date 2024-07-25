@@ -8,7 +8,7 @@ import { RiShoppingBag4Fill } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
 
 
-const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSubCategoryChange, onSubSubCategoryChange,onSearchResults }) => {
+const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSubCategoryChange, onSubSubCategoryChange }) => {
   const { user } = useUserAuth();
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -31,9 +31,6 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
             },
           })
             .then(response => {
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
-              }
               return response.json();
             })
             .then(data => {
@@ -56,8 +53,6 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
       fetchCart();
     };
 
-    fetchCart();
-
     window.addEventListener('cartUpdated', handleCartUpdate);
 
     return () => {
@@ -68,7 +63,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
   const handleSearch = async () => {
     try {
       if (!searchText) {
-      onSearchResults([]); 
+        onSearchResults([]);
       return;
     }
 
@@ -86,8 +81,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
     }
   };
   const resetSearchResults = () => {
-    setSearchText('');
-    onSearchResults([]);
+    setSearchText('') ;
   };
 
 
