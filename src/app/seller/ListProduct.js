@@ -4,7 +4,7 @@ import { useUserAuth } from "../auth/auth-context";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { MdDeleteForever } from "react-icons/md";
-
+import Swal from 'sweetalert2';
 export default function ListProduct() {
     const { user } = useUserAuth();
     const [image, setImage] = useState([]);
@@ -22,6 +22,7 @@ export default function ListProduct() {
         fabric_material: '',
         fabric_variants: [{ color: '', quantity: 0 }]
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -30,23 +31,47 @@ export default function ListProduct() {
     }, [user]);
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    const urls = await handleUpload();
-    const urlsString = urls.join(",");
-    const updatedProductData = { ...productData, image_url: urlsString, userId: sellerId };
-    try {
-        const response = await fetch('/api/products', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedProductData),
+        e.preventDefault();
+        if (isSubmitting) return; // Prevent multiple submissions
+    
+        setIsSubmitting(true);
+    
+        // Show loading state
+        Swal.fire({
+            title: 'Saving product...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
-        if (!response.ok) {
-            alert('An error occurred while saving the product');
-        } else {
-            alert('Product saved successfully');
-            // Reset form fields and image state
+    
+        try {
+            const urls = await handleUpload();
+            const urlsString = urls.join(",");
+            const updatedProductData = { ...productData, image_url: urlsString, userId: sellerId };
+    
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedProductData),
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'An error occurred while saving the product');
+            }
+    
+            // Success message
+            Swal.fire({
+                title: 'Product listed successfully',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            });
+    
+            // Reset form
             setProductData({
                 product_name: '',
                 description: '',
@@ -61,11 +86,19 @@ export default function ListProduct() {
                 fabric_variants: [{ color: '', quantity: 0 }]
             });
             setImage(['']);
+    
+        } catch (error) {
+            console.error('Error saving product:', error);
+            Swal.fire({
+                title: 'Error',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        } finally {
+            setIsSubmitting(false);
         }
-    } catch (error) {
-        console.error('Unexpected server response:', error);
-    }
-};
+    };
 
     const handleYarnVariantChange = (index, field, value) => {
         const newVariants = [...productData.yarn_variants];
@@ -355,26 +388,31 @@ export default function ListProduct() {
                 </button>
             )}
         </div>
-    </div>
-))}
-<button
-    type="button"
-    onClick={addFabricVariant}
-    className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500"
->
-    Add Fabric Variant
-</button>
- </div>
+        </div>
+        ))}
+            <button
+                type="button"
+                onClick={addFabricVariant}
+                className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500"
+            >
+                Add Fabric Variant
+            </button>
+                    </div>
                         </div>
                     )}
                     <div className="text-center">
-                        <button 
-                            type="submit" 
-                            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                        >
-                            Submit
-                        </button>
-                    </div>
+                    <button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className={`px-6 py-3 text-white rounded-lg transition-colors duration-300 ${
+                            isSubmitting 
+                            ? 'bg-gray-400 cursor-not-allowed' 
+                            : 'bg-blue-500 hover:bg-blue-600'   
+                        }`}
+                    >
+                        {isSubmitting ? 'Saving...' : 'Submit'}
+                    </button>
+                </div>
                 </form>
             </div>
         ) : (

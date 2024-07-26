@@ -7,6 +7,8 @@ import ShippingRateCalculator from '../ShippingRatesCalculation/ShippinhRates';
 import AddressInput from '../components/AddressInput';
 import { sendOrderConfirmationEmails } from './emailService';
 import  StripeForm  from './stripePayment';
+import Swal from 'sweetalert2';
+
 
 const Checkout = () => {
   const router = useRouter();
@@ -33,6 +35,7 @@ const Checkout = () => {
   const [totalShippingCost, setTotalShippingCost] = useState(0);
   const [shippingDetails, setShippingDetails] = useState([]);
   const [existingAddresses, setExistingAddresses] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleShippingDetailsChange = (details) => {
     setShippingDetails(details);
@@ -146,44 +149,84 @@ const Checkout = () => {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
+
     try {
-      console.log('Shipping Info:', shippingInfo);
-      console.log(cart);
-      const response = await fetch('/api/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.uid,
-          firstName: shippingInfo.firstName,
-          lastName: shippingInfo.lastName,
-          street: shippingInfo.street,
-          city: shippingInfo.city,
-          state: shippingInfo.state,
-          zip: shippingInfo.zip,
-          country: shippingInfo.country,
-          email: shippingInfo.email,
-          cart,
-          shippingDetails,
-          totalShippingCost: totalShippingCost.toFixed(2),
-          totalPrice: totalPrice.toFixed(2),
-        }),
-        
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setOrderId(data.orderId); // Save the orderId to state
-        return data.orderId;
-      } else {
-        console.error('Failed to submit order:', data.error);
-        return null;
-      }
+        console.log('Shipping Info:', shippingInfo);
+        console.log('Cart:', cart);
+
+        // Show loading state
+        Swal.fire({
+            title: 'Placing your order...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const response = await fetch('/api/order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: user.uid,
+                firstName: shippingInfo.firstName,
+                lastName: shippingInfo.lastName,
+                street: shippingInfo.street,
+                city: shippingInfo.city,
+                state: shippingInfo.state,
+                zip: shippingInfo.zip,
+                country: shippingInfo.country,
+                email: shippingInfo.email,
+                phone: shippingInfo.phone,
+                cart,
+                shippingDetails,
+                totalShippingCost: totalShippingCost.toFixed(2),
+                totalPrice: totalPrice.toFixed(2),
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            setOrderId(data.orderId);
+            Swal.fire({
+                title: 'Order has been Placed Successfully! 🎉 Please Complete The Payment',
+                text: `Your order ID is: ${data.orderId}`,
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            return data.orderId;
+        } else {
+            throw new Error(data.message || 'Failed to submit order');
+        }
     } catch (error) {
-      console.error('Error submitting order:', error);
-      return null;
+        console.error('Error submitting order:', error);
+
+        let errorMessage = 'An unexpected error occurred. Please try again.';
+
+        // Handle specific error messages from the backend
+        if (error.message.includes('Duplicate entry')) {
+            errorMessage = 'This order has already been placed. Please check your orders.';
+        } else if (error.message.includes('Invalid data')) {
+            errorMessage = 'Some of the order information is invalid. Please check and try again.';
+        } else if (error.message.includes('Missing required field')) {
+            errorMessage = 'Please fill in all required fields and try again.';
+        }
+
+        Swal.fire({
+            title: 'Order Placement Failed',
+            text: errorMessage,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+
+        return null;
+    } finally {
+        setIsSubmitting(false);
     }
-  };
+};
 
   const handlePayAndSubmit = async () => {
     try {
