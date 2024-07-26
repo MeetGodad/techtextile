@@ -219,57 +219,56 @@ try {
       };
 
     
-      return (
-        <div className="relative flex flex-col items-center justify-center min-h-screen w-full bg-gray-50 p-4">
-          <div className="absolute top-4 left-4 text-5xl text-black font-semibold">UP</div>
-          
-          <form 
-            onSubmit={handleSubmit} 
-            className="w-3/5 max-w-lg bg-white rounded-lg shadow-2xl p-8 mb-8 flex flex-col"
-          >
-            <div className={`flex-grow transition-transform duration-500 ease-in-out ${slideDirection}`}>
-              {renderStep()}
-            </div>
-            <div className="mt-auto flex justify-between w-full">
-              {currentStep > 1 ? (
-                <button
-                  type="button"
-                  onClick={handlePrevious}
-                  className="w-[48%] px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300"
-                >
-                  Previous
-                </button>
-              ) : (
-                <div className="w-[48%]"></div> // Placeholder to maintain layout
-              )}
-              {currentStep < totalSteps ? (
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
-                >
-                  Next
-                </button>
-              ) : (
-                <button 
-                  type="submit" 
-                  className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
-                >
-                  Create Account
-                </button>
-              )}
-            </div>
-          </form>
-      
-          <div className="w-full text-center">
-            <button 
-              onClick={() => onSwitch('login')} 
-              className="text-black text-xl hover:underline transition duration-300"
-            >
-              Already Have An Account? Login Then
-            </button>
+   return (
+    <div className="relative flex flex-col items-center justify-center min-h-screen w-full bg-gray-50 p-4">
+      <div className="absolute top-4 left-4 text-3xl md:text-5xl text-black font-semibold z-10">UP</div>
+  
+      <div className="w-full mt-10 max-w-lg p-4">
+        <form onSubmit={handleSubmit} className="w-full bg-white rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[50vh]"> {/* Adjusted height */}
+          <div className={`flex-grow transition-all duration-500 ease-in-out ${slideDirection}`}>
+            {renderStep()}
           </div>
-        </div>
-      );
-    
-}
+          <div className="mt-2 flex justify-between w-full">
+            {currentStep > 1 ? (
+              <button
+                type="button"
+                onClick={handlePrevious}
+                className="w-[48%] px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300 text-sm md:text-base"
+              >
+                Previous
+              </button>
+            ) : (
+              <div className="w-[48%]"></div>
+            )}
+            {currentStep < totalSteps ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300 text-sm md:text-base"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300 text-sm md:text-base"
+              >
+                Create Account
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+  
+      <div className="w-full text-center mt-2">
+        <button
+          onClick={() => onSwitch('login')}
+          className="text-black font-bold text-sm md:text-base hover:underline transition duration-300"
+        >
+          Already Have An Account? Sign In<br />
+        </button>
+      </div>
+    </div>
+  );
+  
+}  

@@ -45,6 +45,8 @@ CREATE TABLE Sellers (
     business_address INT REFERENCES Addresses(address_id) 
 );
 
+
+);
 CREATE TABLE Products (
     product_id SERIAL PRIMARY KEY,
     product_name VARCHAR(100) NOT NULL,

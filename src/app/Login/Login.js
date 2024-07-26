@@ -57,42 +57,43 @@ export default function Login( {onSwitch} ) {
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full bg-white">
-      <div className="absolute top-4 right-3 text-5xl text-black font-semibold mb-8">LOG</div>
+    <div className="flex h-screen">
+      <div className="relative flex-col flex items-center justify-center w-1/2 bg-white">
+        <div className="absolute  text-black top-0 right-6 text-5xl font-semibold mb-8">LOG</div>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-8 pt-12 bg-white rounded-md shadow-2xl w-96">
-        <div className="w-full max-w-md">
-          <div className="mb-4">
-            <label className="block text-black text-sm font-semibold mb-2">EMAIL</label>
-            <input
-              type="email"
+
+        <form  onSubmit={handleSubmit}  className="max-w-2xl mx-auto p-8 pt-12 bg-white rounded-md shadow-2xl w-96">
+         <div className="w-full max-w-md">
+
+            <div className="mb-4">
+              <label className="block text-black text-sm font-semibold mb-2">EMAIL</label>
+              <input 
+              type="email" 
               required
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-            />
-          </div>
+              className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"/>
+            </div>
 
-          <div className="mb-4">
-            <label className="block text-black text-sm font-semibold mb-2">PASSWORD</label>
-            <input
-              required
-              type="password"
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-            />
-          </div>
+            <div className="mb-4">
+              <label className="block text-black text-sm font-semibold mb-2">PASSWORD</label>
+              <input
+              required  
+              type="password" 
+                onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
+            </div>
 
-          <button className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
+          <button className="w-full p-3 bg-black text-white rounded-md font-semibold text-xl">
             CONTINUE
           </button>
         </div>
       </form>
-      <div className="absolute bottom-28 left-0 w-full text-center mb-4">
-        <button onClick={() => onSwitch('signup')} class="text-black text-xl hover:underline transition duration-300">
+      <div className="absolute bottom-28 left-0 w-full text-center mb-10">
+        <button onClick={() => onSwitch('signup')} className="text-black font-bold text-xl hover:underline transition duration-300">
           Don’t have an account?
         </button>
       </div>
     </div>
+    </div>
   );
-
 }

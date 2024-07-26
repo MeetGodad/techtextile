@@ -1,3 +1,9 @@
+// References
+// ChatGpt: https://chatgpt.com/c/fd190831-d95b-42ba-9f37-2847b4796d64
+// Styling: https://www.w3schools.com/react/react_css_styling.asp
+// CSS: https://tailwindcss.com/docs/installation
+// Email Service: https://dashboard.emailjs.com/admin/account
+// Next.js: https://nextjs.org/learn/dashboard-app
 
 import emailjs from '@emailjs/browser';
 
