@@ -219,55 +219,57 @@ try {
       };
 
     
-    return (
+      return (
         <div className="relative flex flex-col items-center justify-center min-h-screen w-full bg-gray-50 p-4">
-        <div className="absolute top-4 left-4 text-5xl text-black font-semibold">UP</div>
-        
-        <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-lg shadow-2xl p-8 mb-8 flex flex-col" style={{ height: '800px' }}>
+          <div className="absolute top-4 left-4 text-5xl text-black font-semibold">UP</div>
+          
+          <form 
+            onSubmit={handleSubmit} 
+            className="w-3/5 max-w-lg bg-white rounded-lg shadow-2xl p-8 mb-8 flex flex-col"
+          >
             <div className={`flex-grow transition-transform duration-500 ease-in-out ${slideDirection}`}>
-                {renderStep()}
+              {renderStep()}
             </div>
             <div className="mt-auto flex justify-between w-full">
-                {currentStep > 1 ? (
+              {currentStep > 1 ? (
                 <button
-                    type="button"
-                    onClick={handlePrevious}
-                    className="w-[48%] px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300"
+                  type="button"
+                  onClick={handlePrevious}
+                  className="w-[48%] px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300"
                 >
-                    Previous
+                  Previous
                 </button>
-                ) : (
+              ) : (
                 <div className="w-[48%]"></div> // Placeholder to maintain layout
-                )}
-                {currentStep < totalSteps ? (
+              )}
+              {currentStep < totalSteps ? (
                 <button
-                    type="button"
-                    onClick={handleNext}
-                    className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
+                  type="button"
+                  onClick={handleNext}
+                  className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
                 >
-                    Next
+                  Next
                 </button>
-                ) : (
+              ) : (
                 <button 
-                    type="submit" 
-                    className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
+                  type="submit" 
+                  className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300"
                 >
-                    Create Account
+                  Create Account
                 </button>
-                )}
+              )}
             </div>
-            </form>
-
-        
-        <div className="w-full text-center">
-          <button 
-            onClick={() => onSwitch('login')} 
-            className="text-black text-xl hover:underline transition duration-300"
-          >
-            Already Have An Account? Login Then
-          </button>
+          </form>
+      
+          <div className="w-full text-center">
+            <button 
+              onClick={() => onSwitch('login')} 
+              className="text-black text-xl hover:underline transition duration-300"
+            >
+              Already Have An Account? Login Then
+            </button>
+          </div>
         </div>
-      </div>
-    );
+      );
     
 }

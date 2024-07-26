@@ -27,65 +27,106 @@ export async function GET() {
     }
 }
 
+
 export async function POST(req) {
+    const databaseUrl = process.env.DATABASE_URL || "";
+    const sql = neon(databaseUrl);
+    
     try {
-        console.log("Parsing request data");
         const requestData = await req.json();
-        console.log("Requested Data2:", requestData);
+        console.log("Requested Data:", requestData);
 
-        const databaseUrl = process.env.DATABASE_URL || "";
-        console.log("Database URL:", databaseUrl);
+        // Start the transaction
+        await sql`BEGIN`;
 
-        const sql = neon(databaseUrl);
-        console.log("Executing SQL queries");
-
-        const seller_id = await sql`
-        SELECT seller_id FROM sellers WHERE user_id = ${requestData.userId};`;
-
-        const product_details = await sql`
-            INSERT INTO Products (product_name, product_description, price, image_url, seller_id, product_type)
-            VALUES (${requestData.product_name}, ${requestData.description}, ${requestData.price}, ${requestData.image_url},             
-                 ${seller_id[0].seller_id}, ${requestData.product_type})
-            RETURNING product_id;
-        `;
-        const productId = product_details[0].product_id;
-        console.log("Product inserted with ID:", productId);
-
-        if (requestData.product_type === 'yarn') {
-            const Yarn = await sql`
-                INSERT INTO YarnProducts (product_id, yarn_material)
-                VALUES (${productId}, ${requestData.yarn_material})
-                RETURNING yarn_id;
+        try {
+            // Get seller_id
+            const seller = await sql`
+                SELECT seller_id FROM sellers WHERE user_id = ${requestData.userId};
             `;
 
-            for (let variant of requestData.yarn_variants) {
-                for (let denier of variant.deniers) {
-                    const variantAttributes = `Color: ${variant.color}, Denier: ${denier.denier}`;
+            if (seller.length === 0) {
+                throw new Error("Seller not found");
+            }
+
+            const seller_id = seller[0].seller_id;
+
+            // Insert product
+            const product_details = await sql`
+                INSERT INTO Products (product_name, product_description, price, image_url, seller_id, product_type)
+                VALUES (${requestData.product_name}, ${requestData.description}, ${requestData.price}, ${requestData.image_url}, ${seller_id}, ${requestData.product_type})
+                RETURNING product_id;
+            `;
+
+            const productId = product_details[0].product_id;
+
+            if (requestData.product_type === 'yarn') {
+                await sql`
+                    INSERT INTO YarnProducts (product_id, yarn_material)
+                    VALUES (${productId}, ${requestData.yarn_material});
+                `;
+
+                for (let variant of requestData.yarn_variants) {
+                    for (let denier of variant.deniers) {
+                        const variantAttributes = `Color: ${variant.color}, Denier: ${denier.denier}`;
+                        await sql`
+                            INSERT INTO ProductVariant (product_id, variant_attributes, quantity)
+                            VALUES (${productId}, ${variantAttributes}, ${denier.quantity});
+                        `;
+                    }
+                }
+            } else if (requestData.product_type === 'fabric') {
+                await sql`
+                    INSERT INTO FabricProducts (product_id, fabric_print_tech, fabric_material)
+                    VALUES (${productId}, ${requestData.fabric_print_tech}, ${requestData.fabric_material});
+                `;
+
+                for (let variant of requestData.fabric_variants) {
+                    const variantAttributes = `Color: ${variant.color}`;
                     await sql`
                         INSERT INTO ProductVariant (product_id, variant_attributes, quantity)
-                        VALUES (${productId}, ${variantAttributes}, ${denier.quantity});
+                        VALUES (${productId}, ${variantAttributes}, ${variant.quantity});
                     `;
                 }
+            } else {
+                throw new Error("Invalid product type");
             }
-        } else if (requestData.product_type === 'fabric') {
-            const Fabric = await sql`
-                INSERT INTO FabricProducts (product_id, fabric_print_tech, fabric_material)
-                VALUES (${productId}, ${requestData.fabric_print_tech}, ${requestData.fabric_material})
-                RETURNING fabric_id;
-            `;
 
-            for (let variant of requestData.fabric_variants) {
-                const variantAttributes = `Color: ${variant.color}`;
-                await sql`
-                    INSERT INTO ProductVariant (product_id, variant_attributes, quantity)
-                    VALUES (${productId}, ${variantAttributes}, ${variant.quantity});
-                `;
-            }
+            // Commit the transaction
+            await sql`COMMIT`;
+
+            return new Response(JSON.stringify({ message: "Product added successfully", productId: productId }), { status: 200 });
+        } catch (transactionError) {
+            // Rollback the transaction in case of error
+            await sql`ROLLBACK`;
+            console.error('Transaction error:', transactionError);
+            return new Response(JSON.stringify({ message: "Failed to add product", error: transactionError.message }), { status: 400 });
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+
+        let errorMessage = "Internal server error";
+        let statusCode = 500;
+
+        // Handle specific PostgreSQL error codes
+        switch (error.code) {
+            case '23505': // unique_violation
+                errorMessage = "Duplicate entry. This product might already exist.";
+                statusCode = 409; // Conflict
+                break;
+            case '23514': // check_violation
+                errorMessage = "Invalid data. Please check your input.";
+                statusCode = 400; // Bad Request
+                break;
+            case '23502': // not_null_violation
+                errorMessage = `Missing required field: ${error.column}`;
+                statusCode = 400;
+                break;
+            default:
+                // For any other errors, keep the generic message
+                break;
         }
 
-        return new Response(JSON.stringify({ message: "Data inserted successfully" }), { status: 200 });
-    } catch (error) {
-        console.error('An error occurred: Internal server error', error);
-        return new Response(JSON.stringify({ message: "Internal server error" }), { status: 500 });
+        return new Response(JSON.stringify({ message: errorMessage, error: error.message }), { status: statusCode });
     }
 }

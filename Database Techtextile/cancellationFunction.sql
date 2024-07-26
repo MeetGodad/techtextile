@@ -23,7 +23,7 @@ BEGIN
         SELECT 1
         FROM OrderItems
         WHERE order_id = NEW.order_id
-        AND item_status <> 'cancelled'
+        AND item_status <> 'canceled'
     ) THEN
         -- Update Orders table
         UPDATE Orders
@@ -83,5 +83,5 @@ DROP TRIGGER IF EXISTS update_order_status_on_item_cancellation ON OrderItems;
 CREATE TRIGGER update_order_status_on_item_cancellation
 AFTER UPDATE OF item_status ON OrderItems
 FOR EACH ROW
-WHEN (NEW.item_status = 'cancelled')
+WHEN (NEW.item_status = 'canceled')
 EXECUTE FUNCTION update_order_and_shipping_status_if_all_items_canceled();

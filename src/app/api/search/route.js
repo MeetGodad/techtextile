@@ -9,6 +9,7 @@ export async function GET(request) {
     if (!term) {
       return new Response(JSON.stringify({ message: "Search term is required" }), { status: 400 });
     }
+    console.log('Search term:', term);
 
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);

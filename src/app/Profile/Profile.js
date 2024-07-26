@@ -10,6 +10,8 @@ import BusinessStats from '../seller/BusinessStats';
 import ProductReviews from '../seller/ProductReviews';
 import SellerViewItem from '../seller/SellerViewItem';
 import ListProduct from '../seller/ListProduct';
+import Loder from '../components/Loder';
+
 
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
@@ -104,7 +106,9 @@ export default function Profile() {
 
   return (
 
-    user && userDetails && (
+
+
+    (user && userDetails) ? (
 
       <div className="min-h-screen bg-gray-100 flex">
         <aside className={`transition-transform duration-500 ease-in-out ${sidebarVisible ? 'translate-x-0' : '-translate-x-full'} bg-gray-900 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform lg:relative lg:translate-x-0`}>
@@ -119,6 +123,13 @@ export default function Profile() {
                   Profile
                 </button>
               </li>
+              {userDetails && (
+                <li>
+                  <button onClick={handleViewPurchaseHistory} className={`block py-2.5 px-4 rounded transition duration-200 ${showPurchaseHistory ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                    View Purchase History
+                  </button>
+                </li>
+              )}
               {userDetails.user_type === 'seller' && (
                 <>
                   <li>
@@ -127,13 +138,6 @@ export default function Profile() {
                     </button>
                   </li>
                 </>
-              )}
-              {userDetails.user_type === 'buyer' && (
-                <li>
-                  <button onClick={handleViewPurchaseHistory} className={`block py-2.5 px-4 rounded transition duration-200 ${showPurchaseHistory ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
-                    View Purchase History
-                  </button>
-                </li>
               )}
               <li>
                 <button onClick={handleUpdateUserInfo} className={`block py-2.5 px-4 rounded transition duration-200 ${showUpdateUser ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
@@ -210,7 +214,7 @@ export default function Profile() {
             </div>
 
             <div className={`transition-opacity duration-500 ${showPurchaseHistory ? 'opacity-100' : 'opacity-0 hidden'}`}>
-              {showPurchaseHistory && userDetails.user_type === 'buyer' && (
+              {showPurchaseHistory && userDetails && (
                 <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
                   <PurchaseHistory userId={user.uid} onClose={() => setShowPurchaseHistory(false)} />
                 </aside>
@@ -228,5 +232,12 @@ export default function Profile() {
       </div>
     </div>
     )
+    :
+    (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loder />
+      </div>
+    )
+
   );
 }
