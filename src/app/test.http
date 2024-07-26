@@ -47,11 +47,9 @@ Content-Type: application/json
 
 
 
+####
+GET http://localhost:3000/api/search?term=Lavita HTTP/1.1
 
-GET http://localhost:3000//api/products/25
-=======
-GET http://localhost:3000/api/payment/UOOkFNPe2vUFwcJLObqRDgjPrBJ3  HTTP/1.1
-GET http://localhost:3000/api/  HTTP/1.1
 
 #######
 
@@ -185,6 +183,5 @@ content-type: application/json
 
 GET  http://localhost:3000/api/cart/ftTlS3bbXnbha2zG5Sd68FLA3IF2 HTTP/1.1
 
-
-GET http://localhost:3000/api/searc?searchTerm=dewefgh HTTP/1.1
-GET http://localhost:3000/api/products/21 HTTP/1.1
+####
+GET http://localhost:3000/api/search?term=LaVita HTTP/1.1

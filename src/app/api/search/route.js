@@ -1,8 +1,9 @@
 import { neon } from '@neondatabase/serverless';
 
+export const dynamic  = 'force-dynamic';
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const term = searchParams.get('term') || '';
 
     if (!term) {
