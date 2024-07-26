@@ -6,6 +6,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes swapOut {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(-90deg); }
+}
+
+@keyframes swapIn {
+  0% { transform: rotateY(90deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+.swap-out {
+  animation: swapOut 0.3s ease-out forwards;
+}
+
+.swap-in {
+  animation: swapIn 0.3s ease-in forwards;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -95,6 +113,7 @@ body {
 .hover-box:hover span {
   color: #fff; /* Change the color as needed */
 }
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust minmax as needed */
@@ -126,4 +145,203 @@ body {
 
 .scroll-smooth {
   scroll-behavior: smooth;
+}
+
+.filled-star {
+  color: gold;
+}
+
+.empty-star {
+  color: lightgray;
+}
+
+.share-modal-content button {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  text-align: left;
+}
+
+.share-modal-content button span {
+  margin-left: 10px;
+}
+
+/* Product header styles */
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.product-title {
+  margin: 0;
+}
+
+.icon-container {
+  display: flex;
+  gap: 10px;
+  margin-right: 20px;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button:hover {
+  background-color: #f0f0f0;
+  border-radius: 50%;
+}
+
+/* Updated styles for the share dropdown */
+.share-dropdown-container {
+  position: relative;
+}
+
+.share-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-button:hover {
+  background-color: #f0f0f0;
+  border-radius: 50%;
+}
+
+.share-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.share-dropdown button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+
+/* https://chatgpt.com/c/1594564d-c434-4e44-8cd9-e0efa34f4736 apart from the color variants I have taken help from this website to make the code perfect and working */
+.product-detail-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.product-images {
+  display: flex;
+  align-items: center;
+}
+
+.product-images img {
+  max-width: 100%;
+}
+
+.product-details {
+  margin-top: 20px;
+}
+
+.price-and-cart {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.quantity-input {
+  width: 60px;
+  margin: 10px 0;
+}
+
+.rating-container {
+  display: flex;
+  align-items: center;
+}
+
+.product-variants {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.share-button {
+  margin-top: 20px;
+  cursor: pointer;
+  position: relative;
+}
+
+.share-dropdown {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 10px;
+  position: absolute;
+  left: 0; /* Adjust to align horizontally with the button */
+  top: 40px; /* Adjust to align vertically below the button */
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.share-option {
+  cursor: pointer;
+}
+
+.related-products {
+  margin-top: 40px;
+}
+
+.related-products-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.related-product-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: calc(33.333% - 20px);
+  box-sizing: border-box;
+}
+
+.reviews-section {
+  margin-top: 40px;
+}
+
+.reviews-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.reviews-section li {
+  margin-bottom: 20px;
+}
+
+.reviews-section strong {
+  display: block;
+  margin-bottom: 5px;
 }

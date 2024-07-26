@@ -15,6 +15,8 @@ import ShippingRateCalculator from '../ShippingRatesCalculation/ShippinhRates';
 import AddressInput from '../components/AddressInput';
 import { sendOrderConfirmationEmails } from './emailService';
 import  StripeForm  from './stripePayment';
+import Swal from 'sweetalert2';
+
 
 const Checkout = () => {
   const router = useRouter();
@@ -41,6 +43,7 @@ const Checkout = () => {
   const [totalShippingCost, setTotalShippingCost] = useState(0);
   const [shippingDetails, setShippingDetails] = useState([]);
   const [existingAddresses, setExistingAddresses] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleShippingDetailsChange = (details) => {
     setShippingDetails(details);
@@ -107,7 +110,7 @@ const Checkout = () => {
         city: signupAddress.city || '',
         state: signupAddress.state || '',
         zip: signupAddress.postal_code || '',
-        country: signupAddress.countryCode || '',
+        country: signupAddress.country || '',
         email: signupAddress.address_email || '',
         phone: signupAddress.phone_num || '',
       });
@@ -154,42 +157,84 @@ const Checkout = () => {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
+
     try {
-      const response = await fetch('/api/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.uid,
-          firstName: shippingInfo.firstName,
-          lastName: shippingInfo.lastName,
-          street: shippingInfo.street,
-          city: shippingInfo.city,
-          state: shippingInfo.state,
-          zip: shippingInfo.zip,
-          country: shippingInfo.countryCode,
-          email: shippingInfo.email,
-          cart,
-          shippingDetails,
-          totalShippingCost: totalShippingCost.toFixed(2),
-          totalPrice: totalPrice.toFixed(2),
-        }),
-        
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setOrderId(data.orderId);
-        return data.orderId;
-      } else {
-        console.error('Failed to submit order:', data.error);
-        return null;
-      }
+        console.log('Shipping Info:', shippingInfo);
+        console.log('Cart:', cart);
+
+        // Show loading state
+        Swal.fire({
+            title: 'Placing your order...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const response = await fetch('/api/order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: user.uid,
+                firstName: shippingInfo.firstName,
+                lastName: shippingInfo.lastName,
+                street: shippingInfo.street,
+                city: shippingInfo.city,
+                state: shippingInfo.state,
+                zip: shippingInfo.zip,
+                country: shippingInfo.country,
+                email: shippingInfo.email,
+                phone: shippingInfo.phone,
+                cart,
+                shippingDetails,
+                totalShippingCost: totalShippingCost.toFixed(2),
+                totalPrice: totalPrice.toFixed(2),
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            setOrderId(data.orderId);
+            Swal.fire({
+                title: 'Order has been Placed Successfully! 🎉 Please Complete The Payment',
+                text: `Your order ID is: ${data.orderId}`,
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            return data.orderId;
+        } else {
+            throw new Error(data.message || 'Failed to submit order');
+        }
     } catch (error) {
-      console.error('Error submitting order:', error);
-      return null;
+        console.error('Error submitting order:', error);
+
+        let errorMessage = 'An unexpected error occurred. Please try again.';
+
+        // Handle specific error messages from the backend
+        if (error.message.includes('Duplicate entry')) {
+            errorMessage = 'This order has already been placed. Please check your orders.';
+        } else if (error.message.includes('Invalid data')) {
+            errorMessage = 'Some of the order information is invalid. Please check and try again.';
+        } else if (error.message.includes('Missing required field')) {
+            errorMessage = 'Please fill in all required fields and try again.';
+        }
+
+        Swal.fire({
+            title: 'Order Placement Failed',
+            text: errorMessage,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+
+        return null;
+    } finally {
+        setIsSubmitting(false);
     }
-  };
+};
 
   const handlePayAndSubmit = async () => {
     try {
@@ -217,8 +262,8 @@ const handleSuccess = async () => {
         totalShippingCost: totalShippingCost.toFixed(2),
         totalPrice: totalPrice.toFixed(2),
       };
-
       const emailSent = await sendOrderConfirmationEmails(orderDetails);
+
       if (emailSent) {
         console.log('Confirmation email sent successfully');
       } else {
@@ -243,7 +288,7 @@ const handleAddressChange = (address) => {
       city: address.city || '',
       state: address.state || '',
       zip: address.postal_code || '',
-      country: address.countryCode || '',
+      country: address.country || '',
       email: address.address_email || '',
       phone: address.phone_num || '',
     });
@@ -291,7 +336,7 @@ const renderStep = () => {
                         value={address.address_id}
                         className="truncate"
                       >
-                        {`${address.address_first_name} ${address.address_last_name}, ${address.street}, ${address.city}`}
+                        {`${address.address_first_name} ${address.address_last_name}, ${address.street}, ${address.city} ${address.postal_code}, ${address.country}`}
                       </option>
                     ))}
                   </select>
@@ -347,12 +392,12 @@ const renderStep = () => {
                 city={shippingInfo.city}
                 state={shippingInfo.state}
                 postalCode={shippingInfo.zip}
-                country={shippingInfo.countryCode}
+                country={shippingInfo.country}
                 setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
                 setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
                 setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
-                setState={(value) => setShippingInfo(prev => ({ ...prev, state: value }))}
-                setCountry={(value) => setShippingInfo(prev => ({ ...prev, country: value }))}
+                setState={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
+                setCountry={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
                 setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
                 setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
                 inputClassName="w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white"
@@ -445,9 +490,9 @@ const renderStep = () => {
                     lastName: shippingInfo.lastName,
                     street: shippingInfo.street,
                     city: shippingInfo.city,
-                    state: shippingInfo.stateCode,
+                    state: shippingInfo.state,
                     zip: shippingInfo.zip,
-                    country: shippingInfo.countryCode,
+                    country: shippingInfo.country,
                     email: shippingInfo.email,
                     phone: shippingInfo.phone,
                   }}

@@ -1,5 +1,11 @@
 import { neon } from "@neondatabase/serverless";
 
+
+export const fetchCache = 'force-no-store'
+export const revalidate = 0 // seconds
+export const dynamic = 'force-dynamic'
+
+
 export async function GET(request, { params }) {
   const userId = params.id;
 
@@ -18,6 +24,8 @@ export async function GET(request, { params }) {
       SELECT * FROM addresses
       WHERE user_id = ${userId};
     `;
+
+    console.log('Fetched addresses:', addresses);
 
     return new Response(JSON.stringify(addresses), { 
       status: 200, 

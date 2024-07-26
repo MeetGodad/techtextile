@@ -21,16 +21,19 @@ CREATE TABLE Addresses (
     address_type VARCHAR(10) CHECK (address_type IN ('billing', 'shipping')),
     address_first_name VARCHAR(50),
     address_last_name VARCHAR(50),
+    address_email VARCHAR(50),
+    phone_num BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
     street VARCHAR(255),
     city VARCHAR(100),
     state VARCHAR(100),
-    postal_code VARCHAR(20)
+    postal_code VARCHAR(20),
+    country VARCHAR (20)
 );
 
 CREATE TABLE Buyers (
     buyer_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
-    phone_num   BIGINT UNIQUE CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
+    phone_num   BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
     user_address INT REFERENCES Addresses(address_id)
 );
 
@@ -38,8 +41,10 @@ CREATE TABLE Sellers (
     seller_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
     business_name VARCHAR(100),
-    phone_num   BIGINT UNIQUE CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
-    business_address INT REFERENCES Addresses(address_id)
+    phone_num   BIGINT CHECK (phone_num >= 1000000000 AND phone_num <= 9999999999),
+    business_address INT REFERENCES Addresses(address_id) 
+);
+
 
 );
 CREATE TABLE Products (
@@ -69,7 +74,7 @@ CREATE TABLE ProductVariant (
     variant_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES Products(product_id),
     variant_attributes VARCHAR(100),
-    quantity INT NOT NULL
+    quantity INT NOT NULL CHECK (quantity >= 1)
 );
 
 CREATE TABLE Feedback (
@@ -100,15 +105,24 @@ CREATE TABLE CartItems (
 CREATE TABLE Orders (
     order_id SERIAL PRIMARY KEY,
     user_id VARCHAR(200) REFERENCES UserAccounts(user_id),
-    payment_method VARCHAR(50),
-    payment_id INT REFERENCES Payments(payment_id),
     shipping_address_id INT REFERENCES Addresses(address_id),
-    order_status VARCHAR(20) CHECK (order_status IN ('pending', 'confirmed', 'shipped', 'delivered', 'canceled'));
-    payment_status_check VARCHAR(20) CHECK (payment_status IN ('pending', 'confirmed'));
-    order_shhipping_cost DECIMAL(10, 2) NOT NULL,
-    order_total_price DECIMAL(10, 2) NOT NULL,
+    order_status VARCHAR(20) CHECK (order_status IN ('pending', 'confirmed', 'shipped', 'delivered', 'canceled')),
+    payment_status_check VARCHAR(20) CHECK (payment_status_check IN ('pending', 'confirmed' , 'refunded')),
+    original_shipping_cost DECIMAL(10, 2),
+    original_total_price DECIMAL(10, 2),
+    current_shipping_cost DECIMAL(10, 2),
+    current_total_price DECIMAL(10, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE Payments (
+    payment_id SERIAL PRIMARY KEY,
+    payment_method VARCHAR(50),
+    payment_amount DECIMAL(10, 2) NOT NULL,
+    order_id INT REFERENCES orders(order_id),
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    stripe_payment_intent_id SERIAL
+);
+
 
 CREATE TABLE OrderItems (
     order_item_id SERIAL PRIMARY KEY,
@@ -116,24 +130,29 @@ CREATE TABLE OrderItems (
     product_id INT REFERENCES Products(product_id),
     quantity INT NOT NULL,
     item_price DECIMAL(10, 2) NOT NULL,
-    variant_id INT REFERENCES ProductVariant(variant_id)
+    variant_id INT REFERENCES ProductVariant(variant_id),
+    item_status VARCHAR(20) CHECK (item_status IN ('active', 'canceled', 'refunded')),
+    item_subtotal DECIMAL(10, 2) GENERATED ALWAYS AS (quantity * item_price) STORED
 );
 
 CREATE TABLE OrderCancellations (
     cancellation_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES Orders(order_id),
     canceled_by VARCHAR(200),
     cancellation_reason TEXT,
     canceled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Payments (
-    payment_id SERIAL PRIMARY KEY,
-    payment_method VARCHAR(50),
-    payment_amount DECIMAL(10, 2) NOT NULL,
-    order_id INT REFERENCES orders(order_id),
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    stripe_payment_intent_id SERIAL,
+
+CREATE TABLE OrderItemCancellations (
+    cancellation_id SERIAL PRIMARY KEY,
+    order_item_id INT REFERENCES OrderItems(order_item_id),
+    canceled_by VARCHAR(200),
+    cancellation_reason TEXT,
+    canceled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
 
 CREATE TABLE ShippingDetails (
   shipping_id SERIAL PRIMARY KEY,
@@ -142,51 +161,10 @@ CREATE TABLE ShippingDetails (
   carrier_id VARCHAR(100),
   service_code VARCHAR(100),
   shipping_cost DECIMAL(10, 2),
-  estimated_delivery_days DATE,
+  rate_id VARCHAR(100),
+  shipment_id VARCHAR(100),
+  estimated_delivery_days INT,
   is_central_warehouse BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR(20) CHECK (status IN ('pending', 'shipped', 'delivered', 'canceled'))
 );
-
-
-
-
-
--- ALTER TABLE Orders
---     ADD CONSTRAINT order_status_check CHECK (order_status IN ('pending', 'shipped', 'delivered', 'canceled'));
-
--- CREATE TABLE OrderCancellations (
---     cancellation_id SERIAL PRIMARY KEY,
---     order_id INT REFERENCES Orders(order_id),
---     canceled_by VARCHAR(200), -- This could be a user_id or an admin_id
---     cancellation_reason TEXT,
---     canceled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
-
-
-
--- CREATE OR REPLACE PROCEDURE CancelOrder(
---     p_order_id INT,
---     p_canceled_by VARCHAR(200),
---     p_cancellation_reason TEXT
--- )
--- LANGUAGE plpgsql
--- AS $$
--- BEGIN
---     -- Check if the order is in a pending state
---     IF EXISTS (SELECT 1 FROM Orders WHERE order_id = p_order_id AND order_status = 'pending') THEN
---         -- Update the order status to 'canceled'
---         UPDATE Orders
---         SET order_status = 'canceled'
---         WHERE order_id = p_order_id;
-
---         -- Insert a record into the OrderCancellations table
---         INSERT INTO OrderCancellations (order_id, canceled_by, cancellation_reason)
---         VALUES (p_order_id, p_canceled_by, p_cancellation_reason);
-
---         RAISE NOTICE 'Order % has been canceled', p_order_id;
---     ELSE
---         RAISE NOTICE 'Order % cannot be canceled because it is not pending', p_order_id;
---     END IF;
--- END;
--- $$
--- ;

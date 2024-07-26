@@ -15,39 +15,41 @@ export async function POST(request) {
                 WHERE order_id = ${orderId} AND user_id = ${userId}
                 RETURNING *
             `,
-
+        
             sql`
                 INSERT INTO OrderCancellations (order_id, canceled_by, cancellation_reason)
                 VALUES (${orderId}, ${userId}, ${cancellationReason})
             `,
-
+        
             sql`
                 UPDATE Orders
                 SET payment_status_check = 'refunded'
                 WHERE order_id = ${orderId} AND payment_status_check = 'confirmed' 
             `,
-
+        
             sql`
                 UPDATE OrderItems
                 SET item_status = 'canceled'
-                WHERE order_id = ${orderId}
+                WHERE order_id = ${orderId} AND item_status != 'canceled'
             `,
-
+            
             sql`
-              INSERT INTO OrderItemCancellations (order_item_id, canceled_by, cancellation_reason)
-                SELECT order_item_id, ${userId}, ${cancellationReason} || ' - Due to order cancellation'
-                FROM OrderItems
-                WHERE order_id = ${orderId}
+                INSERT INTO OrderItemCancellations (order_item_id, canceled_by, cancellation_reason)
+                SELECT oi.order_item_id, ${userId}, ${cancellationReason} || ' - Due to order cancellation'
+                FROM OrderItems oi
+                LEFT JOIN OrderItemCancellations oic ON oi.order_item_id = oic.order_item_id
+                WHERE oi.order_id = ${orderId} AND oic.order_item_id IS NULL
             `,
-
+        
             sql`
                 UPDATE ProductVariant pv
                 SET quantity = pv.quantity + oi.quantity
                 FROM OrderItems oi
                 WHERE oi.order_id = ${orderId}
                 AND oi.variant_id = pv.variant_id
+                AND oi.item_status != 'canceled'
             `,
-
+        
             sql`
                 UPDATE ShippingDetails
                 SET status = 'canceled'

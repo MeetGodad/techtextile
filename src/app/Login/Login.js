@@ -3,7 +3,11 @@ import  { useState } from "react";
 import { redirect, useRouter } from "next/navigation";
 import { useUserAuth } from "../auth/auth-context";
 import Link from "next/link";
-export default function Login() {
+import Swal from "sweetalert2";
+
+
+
+export default function Login( {onSwitch} ) {
  
   const { user, emailSignIn } = useUserAuth();
   const [email, setEmail] = useState("");
@@ -19,22 +23,36 @@ export default function Login() {
 
         console.log('User ID:', userId);
         
-        const response = await fetch(`api/auth/${userId}`, {
+        const response = await fetch(`/api/auth/${userId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
         });
 
+        const responseData = await response.json();
+
         if (!response.ok) {
-          const errorData = await response.json();
-          alert(`Error: ${errorData.message}`);
+          alert(`Error: ${responseData.message}`);
         } else {
-          router.push('/Home');
+          Swal.fire({
+            title: 'Login Successful',
+            text: 'Welcome back!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            router.push('/Home');
+          });
         }
 
       } catch (error) {
         console.error('Unexpected server response:', error);
+        Swal.fire({
+          title: 'Login Failed',
+          text: 'Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       }
   }
 

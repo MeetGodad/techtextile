@@ -18,6 +18,7 @@ const nextConfig = {
             value: '0',
           },
         ],
+
       },
     ];
   },
