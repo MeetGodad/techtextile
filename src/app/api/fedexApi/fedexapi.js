@@ -43,7 +43,7 @@ export async function shippingRates(sellerAddress, buyerAddress, packages) {
       cache: 'no-store', 
       method: 'POST',
       headers: {
-        'API-Key': process.env.SHIPENGINE_API_KEY,
+        'API-Key': process.env.NEXT_PUBLIC_SHIPENGINE_API_KEY,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

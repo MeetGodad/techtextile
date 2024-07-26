@@ -1,3 +1,10 @@
+// References
+// ChatGpt: https://chatgpt.com/c/fd190831-d95b-42ba-9f37-2847b4796d64
+// Styling: https://www.w3schools.com/react/react_css_styling.asp
+// CSS: https://tailwindcss.com/docs/installation
+// Stripe: https://dashboard.stripe.com/test/apikeys
+// Next.js: https://nextjs.org/learn/dashboard-app
+
 "use client";
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
@@ -59,8 +66,6 @@ const StripeFormContent = ({ orderId, totalPrice, onSuccess }) => {
         if (confirmError) {
           setError(confirmError.message);
         } else {
-          // Payment succeeded
-          console.log('Payment succeeded');
           onSuccess();
         }
       }

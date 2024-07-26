@@ -1,501 +1,268 @@
+// SignUp.js
 "use client";
 import Link from 'next/link';
-import { useState , useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUserAuth} from '../auth/auth-context';
+import { useUserAuth } from '../auth/auth-context';
 import { auth } from '../auth/firebase';
 import { sendEmailVerification , deleteUser , reload} from 'firebase/auth';
 import Swal from 'sweetalert2';
-import AddressInput from '../components/AddressInput';
+import { deleteUser } from 'firebase/auth';
+import { useSignUpForm } from './useSignUpForm';
+import { usePasswordValidation } from './usePasswordValidation';
+import { useErrorHandler } from './useErrorHandler';
+import { Step1Form } from './Step1Form';
+import { Step2Form } from './Step2Form';
+import { EmailVerification } from './EmailVerification';
 
-export default function SignUp() {
+export default function SignUp({ onSwitch }) {
+  const { emailSignUp } = useUserAuth();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [totalSteps, setTotalSteps] = useState(2); // adjust this value based on your total steps
+  const [slideDirection, setSlideDirection] = useState(''); // add this state to track slide direction
+  const { formData, handleChange } = useSignUpForm();
+  const { error, handleError } = useErrorHandler();
+  const { requirements, passwordError } = usePasswordValidation(formData.password, formData.confirmPassword);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const user = useUserAuth();
+  const router = useRouter();
 
-    const { emailSignUp} = useUserAuth();
-    const [currentStep, setCurrentStep] = useState(1);
-    const [totalSteps, setTotalSteps] = useState(2); // adjust this value based on your total steps
-    const [slideDirection, setSlideDirection] = useState(''); // add this state to track slide direction
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [LastName, setLastName] = useState("");
-    const [phone, setPhone] = useState("");
-    const [role, setRole] = useState("");
-    const [street , setStreet] = useState("");
-    const [city , setCity] = useState("");
-    const [state , setState] = useState("");
-    const [postalCode , setPostalCode] = useState("");
-    const [country , setCountry] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [companyName, setCompanyName] = useState("");
-    const [passwordError, setPasswordError] = useState(false);
-    const user = useUserAuth();
-    const router = useRouter();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
+    if (!validateStep()) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Please fill in all the required fields and ensure password requirements are met',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
 
-    useEffect(() => {
-        // This will call validatePassword every time password or confirmPassword changes
-        validatePassword();
-      }, [confirmPassword]); // Add other dependencies if necessary
-      
+    try {
+      const userId = await emailSignUp(formData.email, formData.password);
 
-      const handleSubmit = async (event) => {
-        event.preventDefault();
-    
-        try {
-            const userId = await emailSignUp(email, password);
-    
-            const checkUserAvailable = async () => {
-                return new Promise((resolve, reject) => {
-                    const intervalId = setInterval(() => {
-                        if (user) {
-                            clearInterval(intervalId);
-                            resolve(user);
-                        }
-                    }, 1000);
-    
-                    setTimeout(() => {
-                        clearInterval(intervalId);
-                        reject(new Error('User not available'));
-                    }, 10000); // Timeout for user availability check
-                });
-            };
-    
-            await checkUserAvailable();
-    
+      const checkUserAvailable = async () => {
+        return new Promise((resolve, reject) => {
+          const intervalId = setInterval(() => {
             if (user) {
-                try {
-                    await sendEmailVerification(auth.currentUser);
-                    Swal.fire({
-                        title: 'Verification Email Sent',
-                        text: 'Please verify your email to complete the sign-up process',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
-    
-                    // Function to check if the email is verified
-                    const checkEmailVerified = async () => {
-                        let timeoutId;
-                        const timeoutPromise = new Promise((_, reject) => {
-                            timeoutId = setTimeout(() => reject(new Error('Email verification timeout')), 60000); // 1 minute timeout
-                        });
-    
-                        const checkPromise = new Promise((resolve, reject) => {
-                            const check = async () => {
-                                await auth.currentUser.reload();
-                                const user = auth.currentUser;
-                                if (user.emailVerified) {
-                                    clearTimeout(timeoutId); // Clear the timeout if the email is verified
-                                    resolve();
-                                } else {
-                                    setTimeout(check, 2000);
-                                }
-                            };
-                            check();
-                        });
-    
-                        // Wait for either the checkPromise or timeoutPromise to settle
-                        return Promise.race([checkPromise, timeoutPromise]);
-                    };
-    
-                    // Wait for the email to be verified
-                    try {
-                        await checkEmailVerified();
-    
-                        // Register user in the database
-                        try {
-                            let data = {
-                                userId,
-                                role,
-                                firstName,
-                                LastName,
-                                email,
-                                phone,
-                                address: {
-                                    street,
-                                    city,
-                                    state,
-                                    postalCode,
-                                    country,
-                                },
-                            };
-    
-                            if (role === "seller") {
-                                data = {
-                                    ...data,
-                                    companyName,
-                                };
-                            }
-    
-                            const response = await fetch('/api/auth', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(data),
-                            });
-    
-                            if (!response.ok) {
-                                const errorData = await response.json();
-                                Swal.fire({
-                                    title: 'Database Error',
-                                    text: errorData.message,
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                                await deleteUser(auth.currentUser);
-                            } else {
-                                router.push('/Home');
-                            }
-                        } catch (error) {
-                            console.error("Failed to create user", error);
-                            await deleteUser(auth.currentUser);
-                            Swal.fire({
-                                title: 'Failed to create user',
-                                text: 'Please try again.',
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    } catch (error) {
-                        await deleteUser(auth.currentUser);
-                        Swal.fire({
-                            title: 'Email verification timeout',
-                            text: 'You did not verify your email in time. Please sign up again.',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                } catch (error) {
-                    console.error("Verification Failed:", error);
-                    Swal.fire({
-                        title: 'Failed to send verification email',
-                        text: 'Please sign up again with a valid email address.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                    await deleteUser(auth.currentUser);
-                }
+              clearInterval(intervalId);
+              resolve(user);
             }
-        } catch (error) {
-            if (error.code === "auth/email-already-in-use") {
-                Swal.fire({
-                    title: 'Email already in use',
-                    text: 'Please sign up with a different email address.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            } else {
-                console.error("Failed to sign up:", error);
-                Swal.fire({
-                    title: 'Failed to sign up',
-                    text: 'Please sign up again with correct credentials. Something went unexpected.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        }
-    };
-    
-    
+          }, 1000);
 
-    const renderStep = () => { 
-        switch (currentStep) {
-            case 1:
-                return (
-                    <div>
-                         <div className="flex flex-col mb-4">
-                            <label className="block text-sm font-semibold mb-2 text-black" for="interested-as">INTERESTED AS</label>
-                            <select 
-                            required
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                            className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
-                            <option className='justify-self-start' value="">Select an option</option>
-                            <option value="buyer">As a Buyer</option>
-                            <option value="seller">As a Business Partner</option>
-                            </select>
-                        </div>
-                        <div className="flex flex-col mb-4">
-                            <label className="block text-sm font-semibold mb-2 text-black" for="email">Email</label>
-                            <input 
-                            type="email"
-                            required
-                            value={email}
-                            disabled={role === ""}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
-                        </div>
-                        <div className="flex flex-col mb-4">
-                            <label className="block text-sm font-semibold mb-2 text-black" for="password">Password</label>
-                            <input 
-                            type="password" 
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            value={password}
-                            disabled={role === ""}
-                            className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2  focus:ring-black focus:border-transparent" />
-                        </div>
-                        <div className="flex flex-col mb-4">
-                            <label className="block text-sm font-semibold mb-2 text-black" for="confirm-password">Confirm Password </label>
-                            <input 
-                            type="password" 
-                            required
-                            value={confirmPassword}
-                            disabled={role === ""}
-                            onChange={(e) => {
-                                setConfirmPassword(e.target.value);
-                                validatePassword(); // This assumes validatePassword will now correctly set passwordError based on the current and confirm passwords
-                              }}
-                            className="w-full m-1 p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2  focus:ring-black focus:border-transparent" />
-                            {passwordError && <p className="text-red-500 text-sm">Passwords do not match</p>}
-                        </div>
-                    </div>
-                ); 
-                case 2:
-                    if(role === "buyer") { 
-                            return (
-                                <div>
-                                   <div className="flex flex-wrap mb-4">
-                                    <div className="w-1/2 pr-2">
-                                    <label className="block text-sm font-semibold mb-2 text-black" for="first-name">First Name</label>
-                                    <input 
-                                        type="text" 
-                                        onChange={(e) => setFirstName(e.target.value)}
-                                        required
-                                        value={firstName}
-                                        disabled={role === ""}
-                                        className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
-                                    </div>
-                                    <div className="w-1/2 pl-2">
-                                    <label className="block text-sm font-semibold mb-2 text-black" for="last-name">Last Name</label>
-                                    <input 
-                                        type="text" 
-                                        onChange={(e) => setLastName(e.target.value)}
-                                        required
-                                        value={LastName}
-                                        disabled={role === ""}
-                                        className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
-                                    </div>
-                                </div>
-                                <div className="flex flex-wrap mb-4">
-                                    <div className="w-1/2 pr-2">
-                                    <label className="block text-sm font-semibold mb-2 text-black" for="phone">PHONE</label>
-                                    <input 
-                                        type="tel" 
-                                        required
-                                        value={phone}
-                                        disabled={role === ""}
-                                        pattern="[0-9]{10}"
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
-                                    </div>
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block text-sm font-semibold mb-2 text-black" for="address">ADDRESS</label>
-                                    <AddressInput
-                                        supportedCountries={['CA']}
-                                        role={role}
-                                        street={street}
-                                        city={city}
-                                        state={state}
-                                        postalCode={postalCode}
-                                        country={country}
-                                        setStreet={setStreet}
-                                        setCity={setCity}
-                                        setState={setState}
-                                        setPostalCode={setPostalCode}
-                                        setStateCode={setState}
-                                        setCountryCode={setCountry}
-                                    />
-                                </div>
-                            </div>
-                        );
-                    }
-                    else if(role === "seller") {
-                        return (
-                            <div>
-                               <div className="flex flex-wrap mb-4">
-                                <div className="w-1/2 pr-2">
-                                <label className="block text-sm font-semibold mb-2 text-black" for="first-name">First Name</label>
-                                <input 
-                                    type="text" 
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    required
-                                    disabled={role === ""}
-                                    className="w-full p-2 pl-10 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
-                                </div>
-                                <div className="w-1/2 pr-2">
-                                <label className="block text-sm font-semibold mb-2 text-black" for="last-name">Last Name</label>
-                                <input 
-                                    type="text" 
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    required
-                                    disabled={role === ""}
-                                    className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
-                                </div>
-                            </div>
-                            <div className="flex flex-wrap mb-4">
-                                <div className="w-1/2 pr-2">
-                                <label className="block text-sm font-semibold mb-2 text-black" for="company-phone">Company Phone</label>
-                                <input 
-                                    type="tel" 
-                                    required
-                                    disabled={role === ""}
-                                    pattern="[0-9]{10}"
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
-                                </div>
-                                <div className="w-1/2 pr-2">
-                                    <label className="block text-sm font-semibold mb-2 text-black" for="company-name">Company Name</label>
-                                    <input 
-                                    type="text" 
-                                    required
-                                    disabled={role === ""}
-                                    onChange={(e) => setCompanyName(e.target.value)}
-                                    className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
-                                </div>
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold mb-2 text-black" for="company-address">Company Address</label>
-                                <AddressInput
-                                        supportedCountries={['CA' , 'IN']}
-                                        role={role}
-                                        street={street}
-                                        city={city}
-                                        state={state}
-                                        postalCode={postalCode}
-                                        country={country}
-                                        setStreet={setStreet}
-                                        setCity={setCity}
-                                        setState={setState}
-                                        setPostalCode={setPostalCode}
-                                        setStateCode={setState}
-                                        setCountryCode={setCountry}
-                                    />
-                            </div>              
-                        </div>
-                    );
-                }
-            default:
-                return null;
-        }
-    };
-
-
-
-    const validatePassword = () => {
-        if (password === confirmPassword) {
-          // Assuming passwordError is a boolean
-          setPasswordError(false); // Or use an empty string if it's a string state
-          return true;
-        } else {
-          // Set to true or a descriptive error message
-          setPasswordError(true);     
-          return false;  
-        }
+          setTimeout(() => {
+            clearInterval(intervalId);
+            reject(new Error('User not available'));
+          }, 10000);
+        });
       };
 
-    const validateStep = () => {
+      await checkUserAvailable();
 
-            if (!validatePassword()) {
-                // If password validation fails, stop further validation and show the password error
-                return false;
+      if (user) {
+        const isVerified = await EmailVerification(user, auth);
+
+        if (isVerified) {
+          try {
+            let data = {
+              userId,
+              role: formData.role,
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email,
+              phone: formData.phone,
+              address: {
+                street: formData.street,
+                city: formData.city,
+                state: formData.state,
+                postalCode: formData.postalCode,
+                country: formData.country,
+              },
+            };
+
+            if (formData.role === "seller") {
+              data = {
+                ...data,
+                companyName: formData.companyName,
+              };
             }
 
+            const response = await fetch('/api/auth', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            });
 
-                switch (currentStep) {
-                    case 1:
-                        return role !== "" && email !== "" && password !== "" && confirmPassword !== "";
-                    case 2:
-                        if(role === "buyer") {
-                            return firstName !== "" && LastName !== "" && phone !== "" && street !== "" && city !== "" && state !== "" && postalCode !== "";
-                        } else if(role === "seller") {
-                            return firstName !== "" && LastName !== "" && phone !== "" && street !== "" && city !== "" && state !== "" && postalCode !== "" ;
-                        }
-                        default:
-                            return false;    
-                }
-        }
-
-    const handleNext = () => {
-
-        if (validateStep()) {
-          setSlideDirection('translate-x-full opacity-0'); // set slide direction to right
-          setTimeout(() => {
-            setCurrentStep((prevStep) => prevStep + 1);
-            setSlideDirection('translate-x-0 opacity-100'); // set slide direction to left after animation
-          }, 500); // adjust the timeout value based on your animation duration
-        } else {
-             Swal.fire({
+            if (!response.ok) {
+              const responseData = await response.json();
+              await deleteUser(auth.currentUser);
+              Swal.fire({
                 title: 'Error',
-                text: 'Please fill in all the required fields' ,
+                text: responseData.message || 'An error occurred',
                 icon: 'error',
                 confirmButtonText: 'OK'
-            });
+              });
+            } else {
+              Swal.fire({
+                title: 'Success',
+                text: 'User created successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+              }).then(() => {
+                router.push('/Home');
+              });
+            }
+          } catch (error) {
+            console.error("Failed to create user", error);
+            await deleteUser(auth.currentUser);
+            handleError("Failed to create user. Please sign up again.");
+          }
         }
-      };
-    
-      const handlePrevious = () => {
-        setSlideDirection('-translate-x-full opacity-0'); // set slide direction to left
-        setTimeout(() => {
-          setCurrentStep((prevStep) => prevStep - 1);
-          setSlideDirection('translate-x-0 opacity-100'); // set slide direction to right after animation
-        }, 500); // adjust the timeout value based on your animation duration
-      };
+      } else {
+        handleError("User not available. Please sign up again.");
+        event.target.reset();
+      }
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        handleError("Email already in use. Please sign up with a different email address.");
+      } else {
+        handleError("Please sign up again with valid credentials. Something went wrong.");
+      }
+    }
+  };
 
-     
-
-        
-        
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="p-4 w-full">
+            <h2 className="block mt-1 text-base leading-tight font-medium text-black mb-2">Account Information</h2>
+            <div className="animate-fadeIn">
+              <Step1Form
+                formData={formData}
+                handleChange={handleChange}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
+                requirements={requirements}
+                passwordError={passwordError}
+              />
+            </div>
+          </div>
+        );
+      case 2:
+        return (
+          <Step2Form
+            formData={formData}
+            handleChange={handleChange}
+            role={formData.role}
+          />
+        );
+      default:
+        return null;
+    }
+  };
   
-    
-    return (
-        <div className="flex h-screen">
-            <div className="flex items-center justify-center w-1/2 bg-black relative">
-                <div className="top-0 text-5xl font-semibold text-white absolute right-3">SIGN</div>
-                <img src="Images/LOGO.png" alt="Logo" className="w-3/4 h-auto" />
-            </div>
-            <div className="relative flex flex-col items-center justify-center w-1/2 bg-white">
-                <div className="absolute top-0 left-3 text-5xl text-black font-semibold mb-8">UP</div>
-        
-
-                <form
-                    onSubmit={handleSubmit}
-                    className={`max-w-2xl mx-auto p-8 pt-12 bg-white rounded-md shadow-2xl w-96 transition duration-500 ease-in-out ${slideDirection}`}>
-                    <div>
-                        {renderStep()}
-                    </div>
-                    <div className="flex justify-between mt-4">
-                        {currentStep > 1 && (
-                        <button
-                            type="button"
-                            onClick={handlePrevious}
-                            className="p-2 bg-gray-300 text-black rounded-md"
-                        >
-                            Previous
-                        </button>
-                        )}
-                        {currentStep < totalSteps ? (
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="p-2 justify-center justify-self-center bg-black text-white rounded-md"
-                        >
-                            Next
-                        </button>
-                        ) : (
-                        <button type="submit" className="p-2 bg-black text-white rounded-md">
-                            Create Account
-                        </button>
-                        )}
-                    </div>
-                    </form>
-                    <div className="absolute bottom-14 left-0 w-full text-center mb-4">
-                        <Link href="/Login" className="text-black text-2xl">
-                            <span>Already Have An Account? Login Then</span>
-                        </Link>
-                    </div>
-            </div>
-        </div>
-    );
-}
+  const validateStep = () => {
+    if (passwordError) {
+      return false;
+    }
+  
+    switch (currentStep) {
+      case 1:
+        return formData.role !== "" && formData.email !== "" && formData.password !== "" && formData.confirmPassword !== "";
+      case 2:
+        if (formData.role === "buyer" || formData.role === "seller") {
+          return formData.firstName !== "" && formData.lastName !== "" && formData.phone !== "" &&
+            formData.street !== "" && formData.city !== "" && formData.state !== "" && formData.postalCode !== "";
+        }
+        return false;
+      default:
+        return false;
+    }
+  }
+  
+  const handleNext = () => {
+    if (validateStep()) {
+      setSlideDirection('translate-x-full opacity-0');
+      setTimeout(() => {
+        setCurrentStep((prevStep) => prevStep + 1);
+        setSlideDirection('translate-x-0 opacity-100');
+      }, 500);
+    } else {
+      Swal.fire({
+        title: 'Error',
+        text: 'Please fill in all the required fields and ensure password requirements are met',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    }
+  };
+  
+  const handlePrevious = () => {
+    setSlideDirection('translate-x-full opacity-0');
+    setTimeout(() => {
+      setCurrentStep((prevStep) => prevStep - 1);
+      setSlideDirection('translate-x-0 opacity-100');
+    }, 500);
+  };
+  
+  return (
+    <div className="relative flex flex-col items-center justify-center min-h-screen w-full bg-gray-50 p-4">
+      <div className="absolute top-4 left-4 text-3xl md:text-5xl text-black font-semibold z-10">UP</div>
+  
+      <div className="w-full mt-10 max-w-lg p-4">
+        <form onSubmit={handleSubmit} className="w-full bg-white rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[50vh]"> {/* Adjusted height */}
+          <div className={`flex-grow transition-all duration-500 ease-in-out ${slideDirection}`}>
+            {renderStep()}
+          </div>
+          <div className="mt-2 flex justify-between w-full">
+            {currentStep > 1 ? (
+              <button
+                type="button"
+                onClick={handlePrevious}
+                className="w-[48%] px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300 text-sm md:text-base"
+              >
+                Previous
+              </button>
+            ) : (
+              <div className="w-[48%]"></div>
+            )}
+            {currentStep < totalSteps ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300 text-sm md:text-base"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300 text-sm md:text-base"
+              >
+                Create Account
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+  
+      <div className="w-full text-center mt-2">
+        <button
+          onClick={() => onSwitch('login')}
+          className="text-black font-bold text-sm md:text-base hover:underline transition duration-300"
+        >
+          Already Have An Account? Sign In<br />
+        </button>
+      </div>
+    </div>
+  );
+  
+}  

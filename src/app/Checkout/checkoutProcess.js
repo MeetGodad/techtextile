@@ -1,3 +1,11 @@
+// References
+// ChatGpt: https://chatgpt.com/c/fd190831-d95b-42ba-9f37-2847b4796d64
+// Styling: https://www.w3schools.com/react/react_css_styling.asp
+// CSS: https://tailwindcss.com/docs/installation
+// Email Service: https://dashboard.emailjs.com/admin/account
+// Stripe: https://dashboard.stripe.com/test/apikeys
+// Next.js: https://nextjs.org/learn/dashboard-app
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -129,8 +137,8 @@ const Checkout = () => {
 
   // Function to validate step 1 (shipping details)
   const validateStep1 = () => {
-    const { firstName, lastName, street, city, state, zip, email } = shippingInfo;
-    setIsStepValid(firstName && lastName && street && city && state && zip && email);
+    const { firstName, lastName, street, city, state, zip, email, country } = shippingInfo;
+    setIsStepValid(firstName && lastName && street && city && state && zip && email && country);
   };
 
   // Handler to move to previous step
@@ -147,8 +155,6 @@ const Checkout = () => {
 
   const handleSubmit = async () => {
     try {
-      console.log('Shipping Info:', shippingInfo);
-      console.log(cart);
       const response = await fetch('/api/order', {
         method: 'POST',
         headers: {
@@ -173,7 +179,7 @@ const Checkout = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        setOrderId(data.orderId); // Save the orderId to state
+        setOrderId(data.orderId);
         return data.orderId;
       } else {
         console.error('Failed to submit order:', data.error);
@@ -189,7 +195,7 @@ const Checkout = () => {
     try {
       const orderId = await handleSubmit();
       if (orderId) {
-        setStep(3); // Move to the payment step if order submission is successful
+        setStep(3);
       }
     } catch (error) {
       console.error('Failed to create order:', error);
@@ -199,11 +205,9 @@ const Checkout = () => {
 
 const handleSuccess = async () => {
   try {
-    // Assume payment success logic here (handled in your StripeForm component or similar)
-    console.log('Payment successful');
-    setStep(4); // Move to Step 4 after successful payment
+    setStep(4);
 
-    // Send confirmation emails upon moving to Step 4+
+    // Send confirmation emails upon moving to Step 4
     try {
       const orderDetails = {
         userId: user.uid,
@@ -214,7 +218,6 @@ const handleSuccess = async () => {
         totalPrice: totalPrice.toFixed(2),
       };
 
-      console.log('Attempting to send confirmation email');
       const emailSent = await sendOrderConfirmationEmails(orderDetails);
       if (emailSent) {
         console.log('Confirmation email sent successfully');
@@ -252,24 +255,24 @@ const renderStep = () => {
       return (
         <div className="animate-fade-in-down">
           <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">Shipping Details</h2>
-          <form className="space-y-6 bg-white p-8 rounded-xl shadow-lg max-w-2xl mx-auto">
-          <div className="flex items-center">
+          <form className="space-y-6 bg-white p-8 rounded-xl shadow-lg max-w-2xl mx-auto transform transition duration-500 hover:shadow-2xl hover:scale-105">
+            <div className="flex items-center">
               <input
                 type="checkbox"
                 id="useSignupAddress"
                 name="useSignupAddress"
                 checked={useSignupAddress}
                 onChange={handleCheckboxChange}
-                className="form-checkbox h-5 w-5 text-blue-500"
+                className="form-checkbox h-5 w-5 text-blue-500 transition duration-300 ease-in-out transform hover:scale-110"
               />
               <label htmlFor="useSignupAddress" className="ml-2 text-black">
                 Use the same address as signup address
               </label>
-            </div> 
+            </div>
             <div className="w-full max-w-md mx-auto">
               <h2 className="text-lg font-semibold mb-4">Existing Shipping Addresses</h2>
               {existingAddresses.length > 0 ? (
-                <div className="relative mb-6">
+                <div className="relative mb-10">
                   <select
                     onChange={(e) => {
                       const selectedAddress = existingAddresses.find(
@@ -277,7 +280,7 @@ const renderStep = () => {
                       );
                       handleAddressChange(selectedAddress);
                     }}
-                    className="block w-full p-4 pr-8 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none bg-white text-gray-700"
+                    className="block w-full p-4 pr-8 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none bg-white text-gray-700 hover:bg-gray-50"
                   >
                     <option value="" disabled selected className="text-gray-500">
                       Select an existing shipping address
@@ -301,30 +304,42 @@ const renderStep = () => {
               ) : (
                 <p className="text-gray-600">No existing addresses found.</p>
               )}
-            </div>         
+            </div>        
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="text"
                   name="firstName"
-                  placeholder="First Name"
+                  placeholder=" "
                   value={shippingInfo.firstName}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
                 />
+                <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
+                  First Name
+                </label>
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                  <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
+                </svg>
               </div>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="text"
                   name="lastName"
-                  placeholder="Last Name"
+                  placeholder=" "
                   value={shippingInfo.lastName}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
                 />
+                <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
+                  Last Name
+                </label>
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                  <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
+                </svg>
               </div>
             </div>
-            <div className="relative">
+            <div className="relative group">
               <AddressInput
                 supportedCountries={['CA']}
                 role="shipping"
@@ -340,52 +355,63 @@ const renderStep = () => {
                 setCountry={(value) => setShippingInfo(prev => ({ ...prev, country: value }))}
                 setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
                 setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
-                inputClassName="w-full p-4 text-black border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
-                containerClassName="relative mb-4"
-                iconClassName="absolute  left-3 top-4 text-gray-400"
+                inputClassName="w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white"
+                containerClassName="relative mb-4 group"
+                iconClassName="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
               />
             </div>
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder=" "
                   value={shippingInfo.email}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
                 />
+                <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
+                  Email
+                </label>
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                  <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm2.5 0v.8l5.5 3.3 5.5-3.3V5H4.5zM4 15h12V7.5l-5.5 3.3-5.5-3.3V15z" />
+                </svg>
               </div>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="Phone Number"
+                  placeholder=" "
                   pattern="[0-9]{10}"
                   value={shippingInfo.phone}
                   onChange={handleShippingChange}
-                  className="w-full p-4 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
-                />
+                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
+                  />
+                  <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
+                    Phone Number
+                  </label>
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                  <path d="M2.003 5.884l2.122-2.122a1 1 0 011.415 0l1.414 1.414a1 1 0 010 1.415l-1.293 1.293a12.042 12.042 0 005.657 5.657l1.293-1.293a1 1 0 011.415 0l1.414 1.414a1 1 0 010 1.415l-2.122 2.122a1 1 0 01-1.415 0C6.403 16.835 3.165 13.597 2.003 9.3a1 1 0 010-1.415z" />
+                </svg>
               </div>
             </div>
-
-              {console.log("Buyer Address " , shippingInfo)}
-
           </form>
         </div>
-      );
+  );
       case 2:
         return (
-          <div className="animate-fade-in-down">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Review Your Order</h2>
+          <div className="animate-fade-in-down max-w-4xl mx-auto px-4">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Review Your Order</h2>
             <div className="bg-white p-6 rounded-lg shadow-md space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-gray-100 p-4 rounded-md transition-all duration-300 hover:shadow-md">
-                  <h3 className="font-bold text-lg mb-2 text-gray-800">Shipping Information</h3>
-                  <p className="text-gray-700 break-words">{shippingInfo.firstName} {shippingInfo.lastName}</p>
-                  <p className="text-gray-700 break-words">{shippingInfo.street}</p>
-                  <p className="text-gray-700 break-words">{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zip}</p>
-                  <p className="text-gray-700 break-words">{shippingInfo.email}</p>
+              <div className="max-w-md mx-auto">
+                <div className="bg-gray-50 p-4 rounded-md transition-all duration-300 hover:shadow-md border border-gray-200">
+                  <h3 className="font-bold text-lg mb-3 text-gray-800">Shipping Information</h3>
+                  <div className="space-y-1 text-sm">
+                    <p className="text-gray-700">{shippingInfo.firstName} {shippingInfo.lastName}</p>
+                    <p className="text-gray-700">{shippingInfo.street}</p>
+                    <p className="text-gray-700">{shippingInfo.city}, {shippingInfo.state}, {shippingInfo.zip}</p>
+                    <p className="text-gray-700">{shippingInfo.email}</p>
+                  </div>
                 </div>
               </div>
               <div>
@@ -393,12 +419,12 @@ const renderStep = () => {
                 {cart.length > 0 ? (
                   <div className="space-y-4">
                     {cart.map((item, index) => (
-                      <div key={index} className="flex justify-between items-center border-b pb-4 transition-all duration-300 hover:bg-gray-50">
-                        <div className="flex items-center space-x-4">
-                        <img src={item.image_url.split(',')[[0]]} alt={item.product_name} className="w-16 h-16 object-cover rounded-md shadow-sm" />
+                      <div key={index} className="flex justify-between items-center border-b pb-4 transition-all duration-300 hover:bg-gray-50 rounded-md p-2">
+                        <div className="flex items-center space-x-3">
+                          <img src={item.image_url.split(',')[0]} alt={item.product_name} className="w-16 h-16 object-cover rounded-md shadow-sm" />
                           <div>
                             <p className="font-semibold text-gray-800">{item.product_name}</p>
-                            <p className="text-gray-600">Quantity: {item.quantity}</p>
+                            <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                           </div>
                         </div>
                         <div>
@@ -407,14 +433,12 @@ const renderStep = () => {
                       </div>
                     ))}
                   </div>
-
                 ) : (
-                  <p className="text-gray-500 italic">No items in cart</p>
+                  <p className="text-gray-500 italic text-center">Your cart is empty</p>
                 )}
               </div>
-              <div className="flex justify-between font-bold text-black text-lg border-t pt-4">  
-                {console.log("Buyer Address " , shippingInfo)}
-            <ShippingRateCalculator 
+              <div className="flex justify-between font-bold text-black text-base border-t pt-4">  
+                <ShippingRateCalculator
                   cartItems={cart} 
                   buyerAddress={{
                     firstName: shippingInfo.firstName,
@@ -440,30 +464,64 @@ const renderStep = () => {
         );
         case 3:
           return (
-            <div className="animate-fade-in-down max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Complete Your Order</h2>
-              <StripeForm 
-                orderId={orderId} 
-                totalPrice={totalPrice} 
-                onSuccess={handleSuccess}
-              />
+            <div className="animate-fade-in-down max-w-md mx-auto mt-8">
+              <div className="bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
+                  <h2 className="text-3xl font-bold text-white mb-2">Complete Your Order</h2>
+                  <p className="text-blue-100">You're just one step away from your purchase!</p>
+                </div>
+                <div className="p-6">
+                  <div className="mb-6">
+                    <p className="text-gray-600 mb-2">Order Total:</p>
+                    <p className="text-3xl font-bold text-gray-800">${totalPrice.toFixed(2)}</p>
+                  </div>
+                  <StripeForm 
+                    orderId={orderId} 
+                    totalPrice={totalPrice} 
+                    onSuccess={handleSuccess}
+                  />
+                </div>
+              </div>
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  Secure payment powered by{' '}
+                  <span className="font-semibold text-blue-600">Stripe</span>
+                </p>
+              </div>
             </div>
           );
   
         case 4:
           return (
-            <div className="animate-fade-in-down max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md text-center">
-              <h2 className="text-3xl font-bold text-green-600 mb-4">Order Successful!</h2>
-              <p className="text-xl text-gray-700 mb-6">Thank you for your purchase.</p>
-              <svg className="w-16 h-16 mx-auto text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <button 
-                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 ease-in-out"
-                onClick={() => router.push('/Home')}
-              >
-                Back to Home
-              </button>
+            <div className="animate-fade-in-down max-w-md mx-auto mt-8">
+              <div className="bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 ease-in-out">
+                <div className="bg-gradient-to-r from-green-400 to-blue-500 p-6">
+                  <h2 className="text-3xl font-extrabold text-white mb-2">Order Successful!</h2>
+                  <p className="text-xl text-white opacity-90">Thank you for your purchase.</p>
+                </div>
+                <div className="p-8">
+                  <div className="mb-8 relative">
+                    <svg className="w-24 h-24 mx-auto text-green-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                      <div className="w-32 h-32 border-4 border-green-500 rounded-full animate-ping opacity-75"></div>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 mb-8">Your order has been processed and will be shipped soon.</p>
+                  <button 
+                    className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 animate-pulse"
+                    onClick={() => router.push('/Home')}
+                  >
+                    Continue Shopping
+                  </button>
+                </div>
+              </div>
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-500">
+                  Order confirmation sent to your email
+                </p>
+              </div>
             </div>
           );
   
@@ -488,7 +546,7 @@ const renderStep = () => {
               ></div>
             </div>
           </div>
-  
+    
           <div className="space-y-10">
             <div className="animate-fade-in transform transition-all duration-500 ease-in-out">
               {renderStep()}
@@ -509,7 +567,7 @@ const renderStep = () => {
                     Previous
                   </button>
                 )}
-                {step < 3 && (
+                {step < 2 && (
                   <button
                     onClick={handleNextStep}
                     disabled={!isStepValid}
@@ -540,7 +598,7 @@ const renderStep = () => {
           </div>
         </div>
       </div>
-    );
-  };
-  
-  export default Checkout;
+  );
+};
+    
+export default Checkout;

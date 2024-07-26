@@ -65,22 +65,17 @@ export default function Login() {
               className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
             </div>
 
-            <button className="w-full p-4 bg-black text-white rounded-md font-semibold text-xl">
-              CONTINUE
-            </button>
-          </div>
-        </form>
-        <div className="absolute bottom-28 left-0 w-full text-center mb-4">
-          <Link className="mt-4 text-black text-2xl" href="/SignUp">
-            <span>Don’t have an account?</span>
-          </Link>
+          <button className="w-full p-3 bg-black text-white rounded-md font-semibold text-xl">
+            CONTINUE
+          </button>
         </div>
+      </form>
+      <div className="absolute bottom-28 left-0 w-full text-center mb-10">
+        <button onClick={() => onSwitch('signup')} className="text-black font-bold text-xl hover:underline transition duration-300">
+          Don’t have an account?
+        </button>
       </div>
-
-      <div className="flex items-center justify-center w-1/2 bg-black relative">
-        <div className="top-0 text-5xl font-semibold text-white absolute left-7">IN</div>
-        <img src="Images/LOGO.png" alt="Logo" className="w-3/4 h-auto" />
-      </div>
+    </div>
     </div>
   );
 }

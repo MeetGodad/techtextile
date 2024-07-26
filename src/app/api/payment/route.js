@@ -1,4 +1,4 @@
-// pages/api/process-payment.js
+
 import { neon } from "@neondatabase/serverless";
 import Stripe from 'stripe';
 
@@ -16,17 +16,15 @@ export async function POST(request) {
 
     // Create a PaymentIntent with Stripe
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(totalPrice * 100), // This should be in cents
+      amount: Math.round(totalPrice * 100),
       currency: 'cad',
       payment_method: paymentMethod,
       confirm: true,
-      // Add the following line to specify automatic payment methods
+
       automatic_payment_methods: {
         enabled: true,
         allow_redirects: 'never'
       },
-      // Alternatively, if you want to allow redirects, use this instead:
-      // return_url: 'https://your-website.com/payment-success',
     });
 
     console.log('PaymentIntent created:', paymentIntent);

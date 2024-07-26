@@ -222,7 +222,6 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
         ratesToUse = rateData.rate_response.rates;
       } else if (rateData.rate_response && rateData.rate_response.invalid_rates && rateData.rate_response.invalid_rates.length > 0) {
         ratesToUse = rateData.rate_response.invalid_rates;
-        console.warn(`Using invalid rates for seller. These rates may not be accurate.`);
       } else {
         console.log(`No shipping rates available for seller. Full response:`, rateData);
         throw new Error('No shipping rates available');
@@ -259,8 +258,6 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
     
           // Log warnings if using invalid rates
           if (cheapestRate.validation_status === 'invalid') {
-            console.warn(`Warning for central warehouse:`, cheapestRate.warning_messages);
-            console.error(`Errors for central warehouse:`, cheapestRate.error_messages);
           }
       } else {
           throw new Error('Unable to find a valid shipping rate');
@@ -299,19 +296,31 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
   }
 
   return (
-    <div className='text-black'>
-      {Object.entries(errors).map(([sellerId, errorMessage]) => (
-        <div key={sellerId} className="text-red-500">
-          <p>Error for Seller {sellerId}: {errorMessage}</p>
+    <div className='text-black bg-gray-50 p-6 rounded-lg shadow-md'>
+      {Object.entries(errors).length > 0 && (
+        <div className="mb-4 p-4 bg-red-100 rounded-md">
+          {Object.entries(errors).map(([sellerId, errorMessage]) => (
+            <div key={sellerId} className="text-red-700 flex items-center mb-2 last:mb-0">
+              <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              <p>Error for Seller {sellerId}: {errorMessage}</p>
+            </div>
+          ))}
         </div>
-      ))}
-      <div className="flex justify-between font-bold text-lg border-t pt-4">
-        <p className="text-gray-800">Estimated Shipping Rate:</p>
-        <p className="text-blue-700"> ${totalShippingCost.toFixed(2)}</p> 
+      )}
+      <div className="flex justify-between items-center font-bold text-lg border-gray-200 pt-4">
+        <p className="text-gray-800">Estimated Shipping Rate: </p>
+        <p className="text-blue-700 text-xl"> ${totalShippingCost.toFixed(2)}</p> 
       </div>
-      {hasInternationalShippingRef.current &&  (
-        <div className= "text-red-500">
-          <p>Due to International shipping from India, the cost is higher.</p>
+      {hasInternationalShippingRef.current && (
+        <div className="mt-4 p-4 bg-yellow-100 rounded-md">
+          <div className="flex items-center text-yellow-700">
+            <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <p>Due to International shipping from India, the cost is higher.</p>
+          </div>
         </div>
       )}
     </div>

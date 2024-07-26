@@ -68,7 +68,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
   const handleSearch = async () => {
     try {
       if (!searchText) {
-      onSearchResults([]); 
+ 
       return;
     }
 
@@ -87,7 +87,6 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
   };
   const resetSearchResults = () => {
     setSearchText('');
-    onSearchResults([]);
   };
 
 

@@ -4,7 +4,7 @@ export async function POST(request) {
   try {
     const requestData = await request.json();
     const shippingDetails = requestData.shippingDetails;
-    const { userId, firstName, lastName, street, city, state, zip, email, country , selectedPaymentMethod, cart } = requestData;
+    const { userId, firstName, lastName, street, city, state, zip, email, country , cart } = requestData;
     const databaseUrl = process.env.DATABASE_URL || "";
     const sql = neon(databaseUrl);
 
@@ -53,8 +53,8 @@ export async function POST(request) {
     let orderId;
     try {
       const result = await sql`
-        INSERT INTO orders (user_id, shipping_address_id, payment_method, order_status, order_shhipping_cost, order_total_price, payment_status_check)
-        VALUES (${userId}, ${shippingAddressId}, ${selectedPaymentMethod}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice}, 'pending')
+        INSERT INTO orders (user_id, shipping_address_id, order_status, original_shipping_cost, original_total_price, payment_status_check)
+        VALUES (${userId}, ${shippingAddressId}, 'pending', ${requestData.totalShippingCost}  , ${requestData.totalPrice}, 'pending')
 
         RETURNING order_id;
       `;
@@ -72,8 +72,8 @@ export async function POST(request) {
     try {
        const orderItemsPromises = cart.map(async (item) => {
     await sql`
-      INSERT INTO orderitems (order_id, product_id, quantity, item_price, variant_id)
-      VALUES (${orderId}, ${item.product_id}, ${item.quantity}, ${item.price}, ${item.selected_variant.variant_id});
+      INSERT INTO orderitems (order_id, product_id, quantity, item_price, variant_id, item_status)
+      VALUES (${orderId}, ${item.product_id}, ${item.quantity}, ${item.price}, ${item.selected_variant.variant_id}, 'active');
     `;
 
     await sql`
