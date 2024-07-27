@@ -181,6 +181,7 @@ export default function ListProduct() {
             <div className="w-full min-h-screen bg-white p-8 text-black">
                 <h2 className="text-2xl font-bold mb-6 text-center">List Product</h2>
                 <form onSubmit={handleSubmit} className="space-y-6 text-black">
+                    <div className='grid grid-cols-2 gap-8'>
                     <div className="space-y-2">
                         <label className="block font-semibold">Product Name</label>
                         <input 
@@ -190,38 +191,6 @@ export default function ListProduct() {
                             value={productData.product_name} 
                             onChange={handleChange} 
                             className="w-full p-3 border border-gray-300 rounded-lg"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Description</label>
-                        <textarea 
-                            required 
-                            name="description" 
-                            value={productData.description} 
-                            onChange={handleChange} 
-                            className="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none"
-                        ></textarea>
-                    </div>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Price</label>
-                        <input 
-                            type="text" 
-                            required 
-                            name="price" 
-                            value={productData.price} 
-                            onChange={handleChange} 
-                            className="w-full p-3 border border-gray-300 rounded-lg"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Upload Images</label>
-                        <input 
-                            type="file" 
-                            required 
-                            multiple
-                            name="image_url" 
-                            onChange={handleImageChange} 
-                            className="w-full "
                         />
                     </div>
                     <div className="space-y-2">
@@ -237,6 +206,41 @@ export default function ListProduct() {
                             <option value="yarn">Yarn</option>
                             <option value="fabric">Fabric</option>
                         </select>
+                        </div>
+                        </div>
+                    <div className="space-y-2">
+                        <label className="block font-semibold">Description</label>
+                        <textarea 
+                            required 
+                            name="description" 
+                            value={productData.description} 
+                            onChange={handleChange} 
+                            className="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none"
+                        ></textarea>
+                    </div>
+                    <div className='grid grid-cols-2 gap-9'>
+                    <div className="space-y-2">
+                        <label className="block font-semibold">Price</label>
+                        <input 
+                            type="text" 
+                            required 
+                            name="price" 
+                            value={productData.price} 
+                            onChange={handleChange} 
+                            className="w-2/3 p-3 border border-gray-300 rounded-lg"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="block font-semibold">Upload Images</label>
+                        <input 
+                            type="file" 
+                            required 
+                            multiple
+                            name="image_url" 
+                            onChange={handleImageChange} 
+                            className="w-full "
+                        />
+                    </div>
                     </div>
                     {productData.product_type === 'yarn' && (
                         <div className="space-y-2">
@@ -269,6 +273,7 @@ export default function ListProduct() {
                                         <input
                                             type="color"
                                             placeholder="Color"
+                                            required
                                             value={variant.color}
                                             onChange={(e) => handleYarnVariantChange(index, 'color', e.target.value)}
                                             className="w-1/3 h-12 my-2 p-1 border border-black rounded-lg" 
@@ -280,6 +285,7 @@ export default function ListProduct() {
                                                     <input
                                                         type="text"
                                                         placeholder="Denier"
+                                                        required
                                                         value={denier.denier}
                                                         onChange={(e) => handleDeniersChange(index, denierIndex, 'denier', e.target.value)}
                                                         className="w-full p-3 border border-gray-300 rounded-lg"
@@ -290,8 +296,11 @@ export default function ListProduct() {
                                                     <input
                                                         type="number"
                                                         placeholder="Quantity"
+                                                        required
                                                         value={denier.quantity}
-                                                        onChange={(e) => handleDeniersChange(index, denierIndex, 'quantity', e.target.value)}
+                                                        min="1"
+                                                        onChange={
+                                                            (e) => {handleDeniersChange(index, denierIndex, 'quantity', e.target.value) }}
                                                         className="w-full p-3 border border-gray-300 rounded-lg"
                                                     />
                                                 </div>
@@ -320,7 +329,7 @@ export default function ListProduct() {
                         </div>
                     )}
                     {productData.product_type === 'fabric' && (
-                        <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-8">
                             <div>
                                 <label className="block font-semibold">Fabric Print Technology</label>
                                 <select 
@@ -329,7 +338,7 @@ export default function ListProduct() {
                                     name="fabric_print_tech" 
                                     value={productData.fabric_print_tech} 
                                     onChange={handleChange} 
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
+                                    className="w-2/3 mt-4 p-3 border border-gray-300 rounded-lg"
                                 >
                                     <option value="" disabled>Select Fabric Print Technology</option>
                                     <option value="Handblock & Dyed">Handblock & Dyed</option>
@@ -348,7 +357,7 @@ export default function ListProduct() {
                                     name="fabric_material" 
                                     value={productData.fabric_material}  
                                     onChange={handleChange} 
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
+                                    className="w-2/4 mt-4 p-3 border border-gray-300 rounded-lg"
                                 >
                                     <option value="" disabled>Select Fabric Material</option>
                                     <option value="Cotton">Cotton</option>
@@ -364,14 +373,15 @@ export default function ListProduct() {
                                 </select>
                             </div>
                             <div>
-                                <label className="block font-semibold">Fabric Variants</label>
+                                <label className="block font-semibold mb-2">Fabric Variants</label>
                                 {productData.fabric_variants.map((variant, index) => (
             <div key={index} className="mb-4">
                  <div className="flex items-center mb-4">
-                    <div className="mr-4">
+                    <div className="mr-8">
                         <label className="block mb-2 font-semibold">Color</label>
                         <input
                             type="color"
+                            required
                             placeholder="Color"
                             value={variant.color}
                             onChange={(e) => handleFabricVariantChange(index, 'color', e.target.value)}
@@ -384,16 +394,19 @@ export default function ListProduct() {
                 <input
                     type="number"
                     placeholder="Quantity"
+                    required
+                    min='1'
                     value={variant.quantity}
                     onChange={(e) => handleFabricVariantChange(index, 'quantity', e.target.value)}
                     className="w-1/3 p-3 border border-gray-300 rounded-lg"
                 />
-            </div>
+            
             {productData.fabric_variants.length > 1 && (
-                <button type="button" onClick={() => removeFabricVariant(index)} className="text-red-500">
+                <button type="button" onClick={() => removeFabricVariant(index)} className=" ml-4 text-red-500">
                     <MdDeleteForever size={24} />
                 </button>
-            )}
+                                                )}
+                                                </div>
         </div>
         </div>
         ))}
