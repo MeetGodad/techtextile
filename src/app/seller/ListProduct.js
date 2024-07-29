@@ -341,7 +341,7 @@ export default function ListProduct() {
                                     className="w-2/3 mt-4 p-3 border border-gray-300 rounded-lg"
                                 >
                                     <option value="" disabled>Select Fabric Print Technology</option>
-                                    <option value="Handblock & Dyed">Handblock & Dyed</option>
+                                    <option value="Handbook & Dyed">Handblock & Dyed</option>
                                     <option value="Screen Print">Screen Print</option>
                                     <option value="Digital Print">Digital Print</option>
                                     <option value="Marble Print">Marble Print</option>
