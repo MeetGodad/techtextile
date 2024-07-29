@@ -1,4 +1,4 @@
-// https://chatgpt.com/c/430cb78b-6262-406a-bd65-8e3203424fa8 // for the show more option, for search option
+// Home.js
 "use client";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -29,7 +29,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
           const response = await fetch('/api/products', {
             headers: {
               'Cache-Control': 'no-cache',
-          }});
+            }});
           const data = await response.json();
           setProducts(data);
         } catch (error) {
@@ -79,18 +79,18 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   };
 
   const sortProducts = (products) => {
-      switch (sortOrder) {
-        case 'lowToHigh':
-          return [...products].sort((a, b) => a.price - b.price);
-        case 'highToLow':
-          return [...products].sort((a, b) => b.price - a.price);
-        case 'latest':
-          return [...products].sort((a, b) => Number(b.product_id) - Number(a.product_id));
-        case 'oldest':
-          return [...products].sort((a, b) => Number(a.product_id) - Number(b.product_id));
-        default:
-          return products;
-      }
+    switch (sortOrder) {
+      case 'lowToHigh':
+        return [...products].sort((a, b) => a.price - b.price);
+      case 'highToLow':
+        return [...products].sort((a, b) => b.price - a.price);
+      case 'latest':
+        return [...products].sort((a, b) => Number(b.product_id) - Number(a.product_id));
+      case 'oldest':
+        return [...products].sort((a, b) => Number(a.product_id) - Number(b.product_id));
+      default:
+        return products;
+    }
   };
 
   const sortedAndFilteredProducts = sortProducts(filteredProducts);
@@ -106,7 +106,6 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
           <p className="text-2xl">Trusted by 400+ Private Labels Globally</p>
         </div>
       </div>
-
       {/* Product Listing Section */}
       <main className="max-w-screen-xl mx-auto mt-20">
         <div className="flex justify-end mb-4">

@@ -1,3 +1,4 @@
+// taken  a help from my team mates to write this page(meet)
 import { neon } from "@neondatabase/serverless";
 
 export async function GET(req , { params }) {
