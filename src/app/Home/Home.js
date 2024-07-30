@@ -7,6 +7,7 @@ import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 import { useRouter } from 'next/navigation';
 import styled, { keyframes } from 'styled-components';
+import Image from 'next/image';
 
 export default function Home({ category, subCategory, subSubCategory, searchResults }) {
   const { user } = useUserAuth();
