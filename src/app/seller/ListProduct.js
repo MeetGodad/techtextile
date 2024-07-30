@@ -5,6 +5,9 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { MdDeleteForever } from "react-icons/md";
 import Swal from 'sweetalert2';
+import YarnVariants from './YarnVariants';
+import FabricVariants from './FabricVariants';
+import { Fab } from '@mui/material';
 export default function ListProduct() {
     const { user } = useUserAuth();
     const [image, setImage] = useState([]);
@@ -176,267 +179,114 @@ export default function ListProduct() {
         return urls;
     };
 
-    return (
-        user ? (
-            <div className="w-full min-h-screen bg-white p-8 text-black">
-                <h2 className="text-2xl font-bold mb-6 text-center">List Product</h2>
-                <form onSubmit={handleSubmit} className="space-y-6 text-black">
-                    <div className='grid grid-cols-2 gap-8'>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Product Name</label>
-                        <input 
-                            type="text" 
-                            required 
-                            name="product_name" 
-                            value={productData.product_name} 
-                            onChange={handleChange} 
-                            className="w-full p-3 border border-gray-300 rounded-lg"
-                        />
+return (
+    user ? (
+        <div className="w-full min-h-screen bg-gradient-to-r from-gray-100 via-gray-300 to-gray-400 p-8 text-gray-800">
+                <h2 className="text-3xl font-bold mb-6 text-center text-black-600">List Product</h2>
+                <form onSubmit={handleSubmit} className="space-y-8 text-gray-700">
+                    <div className="relative bg-gradient-to-r from-gray-300 via-gray-200 to-gray-100 p-4 border border-gray-200 rounded-lg shadow-sm mb-4">
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-4'>
+                        <div className="space-y-2">
+                            <label className="block text-lg font-semibold">Product Name</label>
+                            <input 
+                                type="text" 
+                                required 
+                                name="product_name" 
+                                value={productData.product_name} 
+                                onChange={handleChange} 
+                                className="w-full p-4 border  border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-lg font-semibold">Product Type</label>
+                            <select 
+                                name="product_type" 
+                                value={productData.product_type} 
+                                onChange={handleChange} 
+                                required 
+                                className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Select Type</option>
+                                <option value="yarn">Yarn</option>
+                                <option value="fabric">Fabric</option>
+                            </select>
+                        </div>
                     </div>
                     <div className="space-y-2">
-                        <label className="block font-semibold">Product Type</label>
-                        <select 
-                            name="product_type" 
-                            value={productData.product_type} 
-                            onChange={handleChange} 
-                            required 
-                            className="w-full p-3 border border-gray-300 rounded-lg"
-                        >
-                            <option value="">Select Type</option>
-                            <option value="yarn">Yarn</option>
-                            <option value="fabric">Fabric</option>
-                        </select>
-                        </div>
-                        </div>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Description</label>
+                        <label className="block text-lg font-semibold">Description</label>
                         <textarea 
                             required 
                             name="description" 
                             value={productData.description} 
                             onChange={handleChange} 
-                            className="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none"
+                            className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 resize-none"
                         ></textarea>
                     </div>
-                    <div className='grid grid-cols-2 gap-9'>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Price</label>
-                        <input 
-                            type="text" 
-                            required 
-                            name="price" 
-                            value={productData.price} 
-                            onChange={handleChange} 
-                            className="w-2/3 p-3 border border-gray-300 rounded-lg"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Upload Images</label>
-                        <input 
-                            type="file" 
-                            required 
-                            multiple
-                            name="image_url" 
-                            onChange={handleImageChange} 
-                            className="w-full "
-                        />
+                    <div className='grid grid-cols-1 mt-4 md:grid-cols-2 gap-8'>
+                        <div className="space-y-2">
+                            <label className="block text-lg font-semibold">Price</label>
+                            <input 
+                                type="text" 
+                                required 
+                                name="price" 
+                                value={productData.price} 
+                                onChange={handleChange} 
+                                className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-lg font-semibold">Upload Images</label>
+                            <input 
+                                type="file" 
+                                required 
+                                multiple
+                                name="image_url" 
+                                onChange={handleImageChange} 
+                                className="w-full border border-gray-300 rounded-lg p-2 text-gray-800"
+                            />
+                        </div>
                     </div>
                     </div>
                     {productData.product_type === 'yarn' && (
-                        <div className="space-y-2">
-                            <div>
-                                <label className="block font-semibold">Yarn Material</label>
-                                <select 
-                                    type="text" 
-                                    required 
-                                    name="yarn_material" 
-                                    value={productData.yarn_material}  
-                                    onChange={handleChange} 
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                >
-                                    <option value="" disabled>Select Yarn Material</option>
-                                    <option value="Cotton">Cotton</option>
-                                    <option value="Polyester">Polyester</option>
-                                    <option value="Silk">Silk</option>
-                                    <option value="Wool">Wool</option>
-                                    <option value="Nylon">Nylon</option>    
-                                    <option value="Linen">Linen</option>
-                                    <option value="Acrylic">Acrylic</option>
-                                    <option value="All Yarns">Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block font-semibold">Yarn Variants</label>
-                                {productData.yarn_variants.map((variant, index) => (
-                                    <div key={index} className="relative w-80 mr-2">
-                                        <label className="block font-semibold">Color</label>
-                                        <input
-                                            type="color"
-                                            placeholder="Color"
-                                            required
-                                            value={variant.color}
-                                            onChange={(e) => handleYarnVariantChange(index, 'color', e.target.value)}
-                                            className="w-1/3 h-12 my-2 p-1 border border-black rounded-lg" 
-                                        />
-                                        {variant.deniers.map((denier, denierIndex) => (
-                                            <div key={denierIndex} className="flex items-center mb-4">
-                                                <div className="flex-1 mr-2">
-                                                    <label className="block font-semibold">Denier</label>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Denier"
-                                                        required
-                                                        value={denier.denier}
-                                                        onChange={(e) => handleDeniersChange(index, denierIndex, 'denier', e.target.value)}
-                                                        className="w-full p-3 border border-gray-300 rounded-lg"
-                                                    />
-                                                </div>
-                                                <div className="flex-1 mr-2">
-                                                    <label className="block font-semibold">Quantity</label>
-                                                    <input
-                                                        type="number"
-                                                        placeholder="Quantity"
-                                                        required
-                                                        value={denier.quantity}
-                                                        min="1"
-                                                        onChange={
-                                                            (e) => {handleDeniersChange(index, denierIndex, 'quantity', e.target.value) }}
-                                                        className="w-full p-3 border border-gray-300 rounded-lg"
-                                                    />
-                                                </div>
-                                                {variant.deniers.length > 1 && (
-                                                    <button type="button" onClick={() => removeDenier(index, denierIndex)} className="text-red-500">
-                                                        <MdDeleteForever size={24} />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
-                                            <button
-                                                    type="button"
-                                                    onClick={() => addDenier(index)}
-                                                    className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">
-                                                    Add Denier
-                                                </button>
-                                            {productData.yarn_variants.length > 1 && (
-                                            <button type="button" onClick={() => removeYarnVariant(index)} className="text-red-500">
-                                                <MdDeleteForever size={24} />
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                <button type="button" onClick={addYarnVariant} className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">Add Yarn Variant</button>
-                            </div>
-                        </div>
+                    <YarnVariants
+                        handleChange={handleChange}
+                        productData ={productData}
+                        handleYarnVariantChange ={handleYarnVariantChange} 
+                        handleDeniersChange ={handleDeniersChange}
+                        addDenier ={addDenier}
+                        addYarnVariant ={addYarnVariant}
+                        removeYarnVariant ={removeYarnVariant}
+                        removeDenier ={removeDenier} 
+                    />
                     )}
                     {productData.product_type === 'fabric' && (
-                        <div className="grid grid-cols-2 gap-8">
-                            <div>
-                                <label className="block font-semibold">Fabric Print Technology</label>
-                                <select 
-                                    type="text" 
-                                    required 
-                                    name="fabric_print_tech" 
-                                    value={productData.fabric_print_tech} 
-                                    onChange={handleChange} 
-                                    className="w-2/3 mt-4 p-3 border border-gray-300 rounded-lg"
-                                >
-                                    <option value="" disabled>Select Fabric Print Technology</option>
-                                    <option value="Handbook & Dyed">Handblock & Dyed</option>
-                                    <option value="Screen Print">Screen Print</option>
-                                    <option value="Digital Print">Digital Print</option>
-                                    <option value="Marble Print">Marble Print</option>
-                                    <option value="Plain">Plain</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block font-semibold">Fabric Material</label>
-                                <select 
-                                    type="text" 
-                                    required 
-                                    name="fabric_material" 
-                                    value={productData.fabric_material}  
-                                    onChange={handleChange} 
-                                    className="w-2/4 mt-4 p-3 border border-gray-300 rounded-lg"
-                                >
-                                    <option value="" disabled>Select Fabric Material</option>
-                                    <option value="Cotton">Cotton</option>
-                                    <option value="Linen">Linen</option>
-                                    <option value="Silk & Blends">Silk & Blends</option>
-                                    <option value="Polyester">Polyester</option>
-                                    <option value="Sustainable">Sustainable</option>
-                                    <option value="Wool">Wool</option>
-                                    <option value="Nylon">Nylon</option> 
-                                    <option value="Viscose">Viscose</option>
-                                    <option value="All Fabrics">Other</option>
-                                    
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block font-semibold mb-2">Fabric Variants</label>
-                                {productData.fabric_variants.map((variant, index) => (
-            <div key={index} className="mb-4">
-                 <div className="flex items-center mb-4">
-                    <div className="mr-8">
-                        <label className="block mb-2 font-semibold">Color</label>
-                        <input
-                            type="color"
-                            required
-                            placeholder="Color"
-                            value={variant.color}
-                            onChange={(e) => handleFabricVariantChange(index, 'color', e.target.value)}
-                            className="w-full h-12 p-1 border border-gray-300 rounded-lg"
-            style={{ minWidth: '120px' }}
-                        />
-                    </div>
-            <div className="mr-2">
-                <label className="block mb-2 font-semibold">Quantity</label>
-                <input
-                    type="number"
-                    placeholder="Quantity"
-                    required
-                    min='1'
-                    value={variant.quantity}
-                    onChange={(e) => handleFabricVariantChange(index, 'quantity', e.target.value)}
-                    className="w-1/3 p-3 border border-gray-300 rounded-lg"
-                />
-            
-            {productData.fabric_variants.length > 1 && (
-                <button type="button" onClick={() => removeFabricVariant(index)} className=" ml-4 text-red-500">
-                    <MdDeleteForever size={24} />
-                </button>
-                                                )}
-                                                </div>
-        </div>
-        </div>
-        ))}
-            <button
-                type="button"
-                onClick={addFabricVariant}
-                className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500"
-            >
-                Add Fabric Variant
-            </button>
-                    </div>
-                        </div>
-                    )}
+                    <FabricVariants
+                        productData={productData} 
+                        handleChange={handleChange}
+                        handleFabricVariantChange={handleFabricVariantChange}
+                        addFabricVariant={addFabricVariant}
+                        removeFabricVariant={removeFabricVariant}
+                    />
+                                       )}
                     <div className="text-center">
-                    <button 
-                        type="submit" 
-                        disabled={isSubmitting}
-                        className={`px-6 py-3 text-white rounded-lg transition-colors duration-300 ${
-                            isSubmitting 
-                            ? 'bg-gray-400 cursor-not-allowed' 
-                            : 'bg-blue-500 hover:bg-blue-600'   
-                        }`}
-                    >
-                        {isSubmitting ? 'Saving...' : 'Submit'}
-                    </button>
-                </div>
+                        <button 
+                            type="submit" 
+                            disabled={isSubmitting}
+                            className={`px-6 py-3 text-white rounded-lg transition-colors duration-300 ${
+                                isSubmitting 
+                                ? 'bg-gray-400 cursor-not-allowed' 
+                                : 'bg-blue-500 hover:bg-blue-600'   
+                            }`}
+                        >
+                            {isSubmitting ? 'Saving...' : 'Submit'}
+                        </button>
+                    </div>
                 </form>
-            </div>
-        ) : (
-            <p className="text-center">Please log in to list a product.</p>
+            
+        </div>
+    ) : (
+        <p className="text-center text-gray-800">Please log in to list a product.</p>
         )
     );
 }
