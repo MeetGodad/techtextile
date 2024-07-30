@@ -1,6 +1,4 @@
-// Home.js
 "use client";
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
