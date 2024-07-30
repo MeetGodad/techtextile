@@ -178,90 +178,92 @@ export default function ListProduct() {
 
     return (
         user ? (
-            <div className="w-full min-h-screen bg-white p-8 text-black">
-                <h2 className="text-2xl font-bold mb-6 text-center">List Product</h2>
-                <form onSubmit={handleSubmit} className="space-y-6 text-black">
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Product Name</label>
-                        <input 
-                            type="text" 
-                            required 
-                            name="product_name" 
-                            value={productData.product_name} 
-                            onChange={handleChange} 
-                            className="w-full p-3 border border-gray-300 rounded-lg"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Description</label>
-                        <textarea 
-                            required 
-                            name="description" 
-                            value={productData.description} 
-                            onChange={handleChange} 
-                            className="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none"
-                        ></textarea>
-                    </div>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Price</label>
-                        <input 
-                            type="text" 
-                            required 
-                            name="price" 
-                            value={productData.price} 
-                            onChange={handleChange} 
-                            className="w-full p-3 border border-gray-300 rounded-lg"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Upload Images</label>
-                        <input 
-                            type="file" 
-                            required 
-                            multiple
-                            name="image_url" 
-                            onChange={handleImageChange} 
-                            className="w-full "
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="block font-semibold">Product Type</label>
-                        <select 
-                            name="product_type" 
-                            value={productData.product_type} 
-                            onChange={handleChange} 
-                            required 
-                            className="w-full p-3 border border-gray-300 rounded-lg"
-                        >
-                            <option value="">Select Type</option>
-                            <option value="yarn">Yarn</option>
-                            <option value="fabric">Fabric</option>
-                        </select>
-                    </div>
-                    {productData.product_type === 'yarn' && (
-                        <div className="space-y-2">
-                            <div>
-                                <label className="block font-semibold">Yarn Material</label>
-                                <select 
-                                    type="text" 
-                                    required 
-                                    name="yarn_material" 
-                                    value={productData.yarn_material}  
-                                    onChange={handleChange} 
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                >
-                                    <option value="" disabled>Select Yarn Material</option>
-                                    <option value="Cotton">Cotton</option>
-                                    <option value="Polyester">Polyester</option>
-                                    <option value="Silk">Silk</option>
-                                    <option value="Wool">Wool</option>
-                                    <option value="Nylon">Nylon</option>    
-                                    <option value="Linen">Linen</option>
-                                    <option value="Acrylic">Acrylic</option>
-                                    <option value="All Yarns">Other</option>
-                                </select>
-                            </div>
-                            <div>
+          <div className="w-full min-h-screen bg-white p-8 text-black">
+            <h2 className="text-4xl font-extrabold mb-10 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">List Your Product</h2>
+            <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl mx-auto">
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                <div className="space-y-2 transform transition duration-300">
+                  <label className="block font-semibold text-lg text-gray-700">Product Name</label>
+                  <input 
+                    type="text" 
+                    required 
+                    name="product_name" 
+                    value={productData.product_name} 
+                    onChange={handleChange} 
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300"
+                  />
+                </div>
+                <div className="space-y-2 transform transition duration-300">
+                  <label className="block font-semibold text-lg text-gray-700">Product Type</label>
+                  <select 
+                    name="product_type" 
+                    value={productData.product_type} 
+                    onChange={handleChange} 
+                    required 
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300 appearance-none"
+                  >
+                    <option value="">Select Type</option>
+                    <option value="yarn">Yarn</option>
+                    <option value="fabric">Fabric</option>
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-2 transform transition duration-300">
+                <label className="block font-semibold text-lg text-gray-700">Description</label>
+                <textarea 
+                  required 
+                  name="description" 
+                  value={productData.description} 
+                  onChange={handleChange} 
+                  className="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300"
+                ></textarea>
+              </div>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                <div className="space-y-2 transform transition duration-300">
+                  <label className="block font-semibold text-lg text-gray-700">Price</label>
+                  <input 
+                    type="text" 
+                    required 
+                    name="price" 
+                    value={productData.price} 
+                    onChange={handleChange} 
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300"
+                  />
+                </div>
+                <div className="space-y-2 transform transition duration-300">
+                  <label className="block font-semibold text-lg text-gray-700">Upload Images</label>
+                  <input 
+                    type="file" 
+                    required 
+                    multiple
+                    name="image_url" 
+                    onChange={handleImageChange} 
+                    className="w-full p-2 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-300"
+                  />
+                </div>
+              </div>
+              {productData.product_type === 'yarn' && (
+                <div className="space-y-2 transform transition duration-300">
+                  <label className="block font-semibold text-lg text-gray-700">Yarn Material</label>
+                  <select 
+                    type="text" 
+                    required 
+                    name="yarn_material" 
+                    value={productData.yarn_material}  
+                    onChange={handleChange} 
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300 appearance-none"
+                  >
+                    <option value="" disabled>Select Yarn Material</option>
+                    <option value="Cotton">Cotton</option>
+                    <option value="Polyester">Polyester</option>
+                    <option value="Silk">Silk</option>
+                    <option value="Wool">Wool</option>
+                    <option value="Nylon">Nylon</option>    
+                    <option value="Linen">Linen</option>
+                    <option value="Acrylic">Acrylic</option>
+                    <option value="All Yarns">Other</option>
+                  </select>
+                <div>
                                 <label className="block font-semibold">Yarn Variants</label>
                                 {productData.yarn_variants.map((variant, index) => (
                                     <div key={index} className="relative w-80 mr-2">

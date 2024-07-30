@@ -91,46 +91,56 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
       }
     };
     const sortedAndFilteredProducts = sortProducts(filteredProducts);
-  return (
-    <div className="flex flex-col w-full min-h-0 bg-white p-8 overflow-x-auto z-20 overflow-hidden">
-      <main className="max-w-screen-xl mx-auto mt-20">        
-        {products.length > 0 ? (
-          <>
-            <div className="flex justify-end mb-4">
-            <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
-              <option value="none">Sort by</option>
-              <option value="lowToHigh">Price: Low to High</option>
-              <option value="highToLow">Price: High to Low</option>
-              <option value="latest">Latest Product</option>
-              <option value="oldest">Oldest Product</option>
-            </select>
-          </div>
-            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 product-grid">
-              {sortedAndFilteredProducts.slice(0, visibleProducts).map((product) => (
-                <ProductSection
-                  key={product.product_id}
-                  name={product.product_name}
-                  price={product.price}
-                  image={product.image_url}
-                  product={product}
-                  averageRating={product.average_rating}
-                  onProductClick={() => handleProductClick(product.product_id , product.average_rating)} />
-              ))}
-            </section>
-            {visibleProducts < filteredProducts.length && (
-              <div className="flex justify-center mt-8">
-                <button
-                  onClick={showMoreProducts}
-                  className="bg-black text-white border-black border-2 px-4 py-2 rounded hover:bg-white hover:text-black">
-                  Load More
-                </button>
+    return (
+      <div className="flex flex-col w-full min-h-screen bg-white p-8 overflow-x-auto z-20">
+        <main className="max-w-screen-xl mx-auto mt-20">
+          {products.length > 0 ? (
+            <>
+              <div className="flex justify-end mb-4">
+                <select
+                  value={sortOrder}
+                  onChange={handleSortChange}
+                  className="border p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                >
+                  <option value="none">Sort by</option>
+                  <option value="lowToHigh">Price: Low to High</option>
+                  <option value="highToLow">Price: High to Low</option>
+                  <option value="latest">Latest Product</option>
+                  <option value="oldest">Oldest Product</option>
+                </select>
               </div>
-            )}
-          </>
-        ) : (
-          <Loder/>
-        )}
-      </main>
-    </div>
-  );
+              <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sortedAndFilteredProducts.slice(0, visibleProducts).map((product) => (
+                  <div
+                    key={product.product_id}
+                    className="transform hover:scale-105 transition-transform duration-300"
+                  >
+                    <ProductSection
+                      name={product.product_name}
+                      price={product.price}
+                      image={product.image_url}
+                      product={product}
+                      averageRating={product.average_rating}
+                      onProductClick={() => handleProductClick(product.product_id, product.average_rating)}
+                    />
+                  </div>
+                ))}
+              </section>
+              {visibleProducts < filteredProducts.length && (
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={showMoreProducts}
+                    className="bg-black text-white border-black border-2 px-4 py-2 rounded-md hover:bg-white hover:text-black transition duration-300"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <Loder />
+          )}
+        </main>
+      </div>
+    );
 }
