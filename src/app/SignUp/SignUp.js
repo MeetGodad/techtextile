@@ -220,7 +220,7 @@ try {
 
     
    return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen w-full bg-gray-50 p-4">
+    <div className="relative flex flex-col items-center justify-center max-h-screen w-full bg-gray-50 p-3">
       <div className="absolute top-4 left-4 text-3xl md:text-5xl text-black font-semibold z-10">UP</div>
   
       <div className="w-full mt-10 max-w-lg p-4">
@@ -244,7 +244,7 @@ try {
               <button
                 type="button"
                 onClick={handleNext}
-                className="w-[48%] px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300 text-sm md:text-base"
+                className="w-full px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition duration-300 text-sm md:text-base"
               >
                 Next
               </button>
@@ -260,7 +260,7 @@ try {
         </form>
       </div>
   
-      <div className="w-full text-center mt-2">
+      <div className=" flex-col w-full text-center mt-2">
         <button
           onClick={() => onSwitch('login')}
           className="text-black font-bold text-sm md:text-base hover:underline transition duration-300"
