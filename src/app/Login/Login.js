@@ -5,8 +5,6 @@ import { useUserAuth } from "../auth/auth-context";
 import Link from "next/link";
 import Swal from "sweetalert2";
 
-
-
 export default function Login( {onSwitch} ) {
  
   const { user, emailSignIn } = useUserAuth();
@@ -57,9 +55,8 @@ export default function Login( {onSwitch} ) {
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="relative flex-col flex items-center justify-center w-1/2 bg-white">
-        <div className="absolute  text-black top-0 right-6 text-5xl font-semibold mb-8">LOG</div>
+      <div className="relative flex-col flex items-center justify-center w-full bg-white">
+        <div className="absolute  text-black top-4 right-3 text-5xl font-semibold mb-8">LOG</div>
 
 
         <form  onSubmit={handleSubmit}  className="max-w-2xl mx-auto p-8 pt-12 bg-white rounded-md shadow-2xl w-96">
@@ -88,12 +85,11 @@ export default function Login( {onSwitch} ) {
           </button>
         </div>
       </form>
-      <div className="absolute bottom-28 left-0 w-full text-center mb-10">
+      <div className="absolute bottom-28 left-0 w-full text-center mb-5">
         <button onClick={() => onSwitch('signup')} className="text-black font-bold text-xl hover:underline transition duration-300">
           Don’t have an account?
         </button>
       </div>
-    </div>
     </div>
   );
 }

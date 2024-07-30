@@ -1,3 +1,4 @@
+// https://chatgpt.com/c/1e6ac25a-b670-43dc-b935-9e97e2674510
 import { useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import StarRating from "./starRating";

@@ -1,3 +1,4 @@
+// Navbar.js
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -7,8 +8,7 @@ import CategoryDropdown from '../components/Category';
 import { RiShoppingBag4Fill } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
 
-
-const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSubCategoryChange, onSubSubCategoryChange }) => {
+const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSubCategoryChange, onSubSubCategoryChange, onSearchResults }) => {
   const { user } = useUserAuth();
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -16,10 +16,9 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
   const [cart, setCart] = useState([]);
   const router = usePathname();
   const isHomePage = router === '/Home' || router === '/';
-
+  const [isSticky, setIsSticky] = useState(false);
 
   useEffect(() => {
-
     const fetchCart = async () => {
       try {
         if (user) {
@@ -64,34 +63,81 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
     try {
       if (!searchText) {
         onSearchResults([]);
-      return;
-    }
-
-    
+        return;
+      }
       const response = await fetch(`/api/search?term=${searchText}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      onSearchResults(data); 
+      onSearchResults(data);
       // Navigate to the search results page
       router.push('/search');
     } catch (error) {
       console.error('Error searching products:', error);
     }
   };
+
   const resetSearchResults = () => {
-    setSearchText('') ;
+    setSearchText('');
+    onSearchResults([]);
   };
 
+  const handleScroll = () => {
+    if (window.scrollY > 0) {
+      setIsSticky(true);
+    } else {
+      setIsSticky(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <div className="w-full bg-white overflow-visible flex items-center gap-80 px-3 box-border z-40 sticky top-0 leading-normal tracking-normal text-xl text-black font-sans">
-    <div className="flex flex-auto items-center">
-      <div className="flex items-center justify-center w-20 h-20"></div>
-      <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}><Link href="/Home" onClick={resetSearchResults} >TECH TEXTILE</Link></h3>
-    </div>
+    <header className={`w-full flex items-center gap-80 px-3 box-border z-40 fixed top-0 leading-normal tracking-normal text-xl text-black font-sans ${isSticky ? 'bg-white shadow-md' : 'bg-transparent'}`}>
+      <div className="flex flex-auto items-center">
+        <div className="flex items-center justify-center w-20 h-20"></div>
+        <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}>
+          <Link href="/Home" onClick={resetSearchResults} >TECH TEXTILE</Link>
+        </h3>
+      </div>
       <div className="flex justify-between items-start gap-5">
+        <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[250px] h-10">
+          <input
+            type="text"
+            placeholder="What are you looking for?"
+            className="text-left bg-transparent outline-none text-sm"
+            value={searchText}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+            }}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            style={{ width: 'calc(100% - 24px)' }}
+          />
+          <button
+            onClick={() => { handleSearch(); setSearchText(''); }}
+            style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
+          >
+            {searchText === '' ? (
+              <img
+                className="ml-2 w-8 h-6"
+                alt="Search"
+                src="/Images/Search.png"
+              />
+            ) : (
+              <img
+                className="ml-2 w-8 h-6"
+                alt="Clear"
+                src="/Images/Search.png" // Assuming you have an icon to clear the search
+                onClick={() => setSearchText('')}
+              />
+            )}
+          </button>
+        </div>
+
         {isHomePage && (
           <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[250px] h-10">
   
@@ -167,7 +213,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
               </Link>
             )}
       </div>
-    </div>
+    </header>
   );
 }
 
