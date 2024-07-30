@@ -9,7 +9,7 @@ export default function AboutUs() {
                 
                 <div className="mb-12 p-6 bg-white rounded-lg shadow-lg">
                     <h2 className="text-3xl font-semibold text-gray-800 mb-4">Welcome to TechTextile</h2>
-                    <p className="text-lg text-gray-700 mb-4">At TechTextile, we are passionate about textiles and committed to connecting buyers and sellers in the yarn and fabric industry. Our platform is designed to provide a seamless and efficient marketplace for textile professionals and enthusiasts alike. Whether you're sourcing the finest yarns for your next project or looking to expand your business by reaching new customers, TechTextile is here to support you every step of the way.</p>
+                    <p className="text-lg text-gray-700 mb-4">At TechTextile, we are passionate about textiles and committed to connecting buyers and sellers in the yarn and fabric industry. Our platform is designed to provide a seamless and efficient marketplace for textile professionals and enthusiasts alike. Whether youre sourcing the finest yarns for your next project or looking to expand your business by reaching new customers, TechTextile is here to support you every step of the way.</p>
                 
                     <h2 className="text-3xl font-semibold text-gray-800 mb-4">Our Mission</h2>
                     <p className="text-lg text-gray-700 mb-4">Our mission is to empower the textile community by providing a robust platform that facilitates trade, fosters innovation, and promotes sustainable practices. We strive to bring transparency, convenience, and trust to the yarn and fabric industry, ensuring that both buyers and sellers have a positive and rewarding experience.</p>
@@ -27,7 +27,7 @@ export default function AboutUs() {
                 
                 <div className="mb-12 p-6 bg-white rounded-lg shadow-lg">
                     <h2 className="text-3xl font-semibold text-gray-800 mb-4">Introduction</h2>
-                    <p className="text-lg text-gray-700 mb-4">Welcome to TechTextile. By accessing our platform, you agree to comply with our terms of use. These terms outline the rules and regulations for the use of TechTextile's website.</p>
+                    <p className="text-lg text-gray-700 mb-4">Welcome to TechTextile. By accessing our platform, you agree to comply with our terms of use. These terms outline the rules and regulations for the use of TechTextile website.</p>
              
                     <h2 className="text-3xl font-semibold text-gray-800 mb-4">User Accounts</h2>
                     <p className="text-lg text-gray-700 mb-4">When you create an account on TechTextile, you are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account or password.</p>
