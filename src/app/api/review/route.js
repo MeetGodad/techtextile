@@ -6,13 +6,10 @@ export const revalidate = 0 // seconds
 export const dynamic = 'force-dynamic'
 
 export async function POST(req) {
-
     try {
         const requestData = await req.json();
-
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
-
         const review = await sql`
             INSERT INTO Feedback (
             user_id,
@@ -47,7 +44,7 @@ export async function GET(req) {
 
         if (!productId) {
             return new Response(JSON.stringify({ message: "Product ID is required" }), { status: 400 });
-        }
+        } 
 
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
