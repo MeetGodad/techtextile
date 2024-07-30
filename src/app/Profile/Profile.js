@@ -104,6 +104,11 @@ export default function Profile() {
     setShowAdminDashboard(false);
   };
 
+  const handelSignOut = () => {
+    firebaseSignOut();
+    router.push('/Home');
+  }
+
   return (
 
 
@@ -145,7 +150,7 @@ export default function Profile() {
                 </button>
               </li>
               <li>
-                <button onClick={firebaseSignOut} className="block py-2.5 px-4 rounded hover:bg-gray-700 transition duration-200">
+                <button onClick={handelSignOut} className="block py-2.5 px-4 rounded hover:bg-gray-700 transition duration-200">
                   Sign Out
                 </button>
               </li>
