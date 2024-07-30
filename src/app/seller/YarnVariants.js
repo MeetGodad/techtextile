@@ -21,7 +21,7 @@ const YarnVariants = ({ handleChange,
                                     name="yarn_material" 
                                     value={productData.yarn_material}  
                                     onChange={handleChange} 
-                                    className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                                 >
                                     <option value="" disabled>Select Yarn Material</option>
                                     <option value="Cotton">Cotton</option>
@@ -58,7 +58,7 @@ const YarnVariants = ({ handleChange,
                                                         required
                                                         value={denier.denier}
                                                         onChange={(e) => handleDeniersChange(index, denierIndex, 'denier', e.target.value)}
-                                                        className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                                                     />
                                                 </div>
                                                 <div className="flex-1 mr-4">
@@ -70,11 +70,11 @@ const YarnVariants = ({ handleChange,
                                                         value={denier.quantity}
                                                         min="1"
                                                         onChange={(e) => handleDeniersChange(index, denierIndex, 'quantity', e.target.value)}
-                                                        className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                                                     />
                                                 </div>
                                                 {variant.deniers.length > 1 && (
-                                                    <button type="button" onClick={() => removeDenier(index, denierIndex)} className="text-red-500">
+                                                    <button type="button" onClick={() => removeDenier(index, denierIndex)} className="text-black-500 mt-6">
                                                         <MdDeleteForever size={24} />
                                                     </button>
                                                 )}
@@ -83,12 +83,12 @@ const YarnVariants = ({ handleChange,
                                         <button
                                             type="button"
                                             onClick={() => addDenier(index)}
-                                            className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-blue-600"
+                                            className="px-4 py-2 mt-2 bg-gray-600 text-white rounded-lg border border-gray-500 hover:bg-gray-800"
                                         >
                                             Add Denier
                                         </button>
                                         {productData.yarn_variants.length > 1 && (
-                                            <button type="button" onClick={() => removeYarnVariant(index)} className="text-red-500 ml-4">
+                                            <button type="button" onClick={() => removeYarnVariant(index)} className="text-black-500 ml-4">
                                                 <MdDeleteForever size={24} />
                                             </button>
                                         )}
@@ -97,7 +97,7 @@ const YarnVariants = ({ handleChange,
                                 <button
                                     type="button"
                                     onClick={addYarnVariant}
-                                    className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-blue-600"
+                                    className="px-4 py-2 mt-2 bg-gray-600 text-white rounded-lg border border-gray-500 hover:bg-gray-800"
                                 >
                                     Add Yarn Variant
                                 </button>
