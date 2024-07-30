@@ -99,7 +99,7 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
           ))}
         </div>
       )}
-      {isSubOpen && category === 'fabric' && (
+      {category === 'fabric' && (
         <div className="absolute  ml-2 mt-2 w-48 bg-gray-200 border text-center border-gray-200 rounded shadow-lg z-50" style={{ position: 'absolute', top: '75px', width: '144px', marginLeft: '85px' }}>
           {fabricSubCategories.map((subCat) => (
             <button
@@ -111,9 +111,9 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
               {subCat.label}
             </button>
           ))}
-        </div>
-      )}
-      {isSubOpen && category === 'yarn' && (
+        
+      
+      {category === 'yarn' && (
         <div className="absolute ml-2 mt-2 w-48 bg-gray-200 border border-gray-200 rounded shadow-lg z-50" style={{ position: 'absolute', top: '75px', width: '144px', marginLeft: '85px' }}>
           {yarnSubCategories.map((subCat) => (
             <button
@@ -127,7 +127,7 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
           ))}
         </div>
       )}
-      {isSubSubOpen && subCategory && subSubCategories[category] && subSubCategories[category][subCategory] && (
+      {subCategory && subSubCategories[category] && subSubCategories[category][subCategory] && (
         <div className="absolute  ml-2 mt-2 w-48 bg-gray-200 border border-gray-200 rounded shadow-lg z-50" style={{ position: 'absolute', top: '105px', width: '144px', marginLeft: '230px' }}>
           {subSubCategories[category][subCategory].map((subSubCat) => (
             <button
@@ -140,8 +140,11 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
             </button>
           ))}
         </div>
+          )}
+      </div>
       )}
     </div>
+
   );
 };
 
