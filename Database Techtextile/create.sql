@@ -1,5 +1,4 @@
 
-
 CREATE TABLE UserAccounts (
     user_id VARCHAR(200) PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -39,7 +38,6 @@ CREATE TABLE Sellers (
 );
 
 
-);
 CREATE TABLE Products (
     product_id SERIAL PRIMARY KEY,
     product_name VARCHAR(100) NOT NULL,
@@ -67,7 +65,7 @@ CREATE TABLE ProductVariant (
     variant_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES Products(product_id),
     variant_attributes VARCHAR(100),
-    quantity INT NOT NULL CHECK (quantity >= 1)
+    quantity INT NOT NULL CHECK (quantity >= 0)
 );
 
 CREATE TABLE Feedback (
@@ -79,7 +77,6 @@ CREATE TABLE Feedback (
     feedback_rating INT CHECK (feedback_rating >= 1 AND feedback_rating <= 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 
 CREATE TABLE ShoppingCart (
     cart_id SERIAL PRIMARY KEY,
