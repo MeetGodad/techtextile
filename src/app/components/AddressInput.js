@@ -4,6 +4,7 @@ import { useLoadScript } from '@react-google-maps/api';
 const libraries = ['places'];
 
 const AddressInput = ({ 
+  setIsAddressLoaded,
   supportedCountries,
   role, 
   street, 
@@ -38,8 +39,10 @@ const AddressInput = ({
       });
       autocompleteRef.current = autocompleteInstance;
       autocompleteInstance.addListener('place_changed', handlePlaceSelect);
+      setIsAddressLoaded(true); // Notify parent that Address Input is loaded
     }
-  }, [isLoaded]);
+  }, [isLoaded, setIsAddressLoaded]);
+
 
   const handlePlaceSelect = () => {
     const place = autocompleteRef.current.getPlace();
