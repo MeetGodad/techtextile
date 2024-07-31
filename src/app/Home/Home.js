@@ -59,9 +59,14 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
     // Additional filtering based on category
     switch (category) {
       case 'fabric':
+
+        if (subCategory === 'fabric_print_tech' && !subSubCategory) return true;
+        if (subCategory === 'fabric_material' && !subSubCategory) return true;
+        if (subSubCategory === 'All Fabrics') return true;
         // For 'fabric', check both 'fabricProducts' for 'subCategory' match in 'fabric_print_tech' or 'fabric_material'
         return subCategory ? (product.fabric_print_tech === subSubCategory || product.fabric_material === subSubCategory) : true;
       case 'yarn':
+        if (subCategory === 'yarn') return true;
         // For 'yarn', match 'yarn_material' with 'subCategory'
         return subCategory ? product.yarn_material === subCategory : true;
       default:
@@ -108,17 +113,18 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
       </div>
       {/* Product Listing Section */}
       <main className="max-w-screen-xl mx-auto mt-20">
-        <div className="flex justify-end mb-4">
-          <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
-            <option value="none">Sort by</option>
-            <option value="lowToHigh">Price: Low to High</option>
-            <option value="highToLow">Price: High to Low</option>
-            <option value="latest">Latest Product</option>
-            <option value="oldest">Oldest Product</option>
-          </select>
-        </div>
+        
         {products.length > 0 ? (
           <>
+            <div className="flex justify-end mb-4">
+              <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
+                <option value="none">Sort by</option>
+                <option value="lowToHigh">Price: Low to High</option>
+                <option value="highToLow">Price: High to Low</option>
+                <option value="latest">Latest Product</option>
+                <option value="oldest">Oldest Product</option>
+              </select>
+            </div>
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 product-grid">
               {sortedAndFilteredProducts.slice(0, visibleProducts).map((product) => (
                 <ProductSection
