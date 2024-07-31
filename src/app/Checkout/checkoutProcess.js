@@ -59,7 +59,6 @@ const Checkout = () => {
     setShippingDetails(details);
   };
   
-
   const handleTotalShippingCostChange = (cost) => {
     setTotalShippingCost(cost);
   };
@@ -108,22 +107,30 @@ const Checkout = () => {
   };
 
   // Handle checkbox change to use signup address for shipping
-  const handleCheckboxChange = () => {
-    setUseSignupAddress(!useSignupAddress);
-
-    if (!useSignupAddress) {
-      // Autofill shipping details with signup address
+  const handleCheckboxChange = (e) => {
+    setUseSignupAddress(e.target.checked);
+    if (e.target.checked) {
+      if (signupAddress.country === 'IN') {
+        Swal.fire({
+          title: 'Address Country Not Supported',
+          text: 'At this time any other addresses are not supported for shipping. Please provide a Canadian Address',
+          icon: 'error',
+          confirmButtonText: 'OK'
+      });
+        setUseSignupAddress(false);
+      } else {
       setShippingInfo({
         firstName: signupAddress.address_first_name || '',
         lastName: signupAddress.address_last_name || '',
         street: signupAddress.street || '',
         city: signupAddress.city || '',
-        state: signupAddress.state || '',
+        state: signupAddress.stateCode || '',
         zip: signupAddress.postal_code || '',
-        country: signupAddress.country || '',
+        country: signupAddress.countryCode || '',
         email: signupAddress.address_email || '',
         phone: signupAddress.phone_num || '',
       });
+    }
     } else {
       // Clear shipping details if the checkbox is unchecked
       setShippingInfo({
@@ -150,8 +157,8 @@ const Checkout = () => {
 
   // Function to validate step 1 (shipping details)
   const validateStep1 = () => {
-    const { firstName, lastName, street, city, state, zip, email, country } = shippingInfo;
-    setIsStepValid(firstName && lastName && street && city && state && zip && email && country);
+    const { firstName, lastName, street, city, stateCode, zip, email, countryCode } = shippingInfo;
+    setIsStepValid(firstName && lastName && street && city && stateCode && zip && email && countryCode);
   };
 
   // Handler to move to previous step
@@ -193,9 +200,9 @@ const Checkout = () => {
                 lastName: shippingInfo.lastName,
                 street: shippingInfo.street,
                 city: shippingInfo.city,
-                state: shippingInfo.state,
+                state: shippingInfo.stateCode,
                 zip: shippingInfo.zip,
-                country: shippingInfo.country,
+                country: shippingInfo.countryCode,
                 email: shippingInfo.email,
                 phone: shippingInfo.phone,
                 cart,
@@ -296,14 +303,17 @@ const handleAddressChange = (address) => {
       lastName: address.address_last_name || '',
       street: address.street || '',
       city: address.city || '',
-      state: address.state || '',
+      stateCode: address.state || '',
       zip: address.postal_code || '',
-      country: address.country || '',
+      countryCode: address.country || '',
       email: address.address_email || '',
       phone: address.phone_num || '',
     });
   setUseSignupAddress(false);
 };
+
+const filteredExistingAddresses = existingAddresses.filter(address => address.country !== 'IN');
+
 const renderStep = () => {
   switch (step) {
     case 1:
@@ -397,7 +407,7 @@ const renderStep = () => {
                     <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
                   </svg>
                 </div>
-              </div>
+              </div>  
               <div className="relative group">
                 <AddressInput
                   setIsAddressLoaded={setIsAddressLoaded}
@@ -473,7 +483,7 @@ const renderStep = () => {
                   <div className="space-y-1 text-sm">
                     <p className="text-gray-700">{shippingInfo.firstName} {shippingInfo.lastName}</p>
                     <p className="text-gray-700">{shippingInfo.street}</p>
-                    <p className="text-gray-700">{shippingInfo.city}, {shippingInfo.state}, {shippingInfo.zip}</p>
+                    <p className="text-gray-700">{shippingInfo.city}, {shippingInfo.stateCode}, {shippingInfo.zip}</p>
                     <p className="text-gray-700">{shippingInfo.email}</p>
                   </div>
                 </div>
@@ -509,14 +519,14 @@ const renderStep = () => {
                     lastName: shippingInfo.lastName,
                     street: shippingInfo.street,
                     city: shippingInfo.city,
-                    state: shippingInfo.state,
+                    state: shippingInfo.stateCode,
                     zip: shippingInfo.zip,
-                    country: shippingInfo.country,
+                    country: shippingInfo.countryCode,
                     email: shippingInfo.email,
                     phone: shippingInfo.phone,
                   }}
                   onTotalShippingCostChange={handleTotalShippingCostChange}
-                  onShippingDetailsChange={handleShippingDetailsChange}
+                  onShippingDetailsChange={handleShippingDetailsChange}           
                 />
               </div>
               <div className="flex justify-between font-bold text-lg border-t pt-4">
@@ -588,7 +598,6 @@ const renderStep = () => {
               </div>
             </div>
           );
-  
         default:
           return null;
       }

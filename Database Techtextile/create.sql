@@ -1,10 +1,3 @@
--- 
--- CREATE TABLE Category (
---   category_id SERIAL PRIMARY KEY,
---   categoryName VARCHAR(100) NOT NULL,
---   parentCategory_id INT REFERENCES Category (category_id)
--- );
-
 
 CREATE TABLE UserAccounts (
     user_id VARCHAR(200) PRIMARY KEY,
