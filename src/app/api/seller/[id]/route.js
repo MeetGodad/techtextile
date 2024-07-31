@@ -1,12 +1,15 @@
 import { neon } from '@neondatabase/serverless';
 
+export const fetchCache = 'force-no-store'
+export const revalidate = 0 // seconds
+export const dynamic = 'force-dynamic'
+
 export async function GET(req) {
     try {
         const databaseUrl = process.env.DATABASE_URL || "";
         const sql = neon(databaseUrl);
         const url = new URL(req.url);
         const userId = url.pathname.split('/').pop();
-        // console.log("Seller ID:", userId);
 
         if (!userId) {
             console.error("User ID is missing in the request");
@@ -22,7 +25,6 @@ export async function GET(req) {
         }
 
         const sellerId = sellerResult[0].seller_id;
-        // console.log("Seller ID found:", sellerId);
 
         const products = await sql`
             SELECT 
@@ -32,22 +34,23 @@ export async function GET(req) {
                 p.price,
                 p.image_url,
                 p.product_type,
-                COALESCE(y.yarn_material, 'N/A') AS yarn_material,
-                COALESCE(f.fabric_print_tech, 'N/A') AS fabric_print_tech,
-                COALESCE(f.fabric_material, 'N/A') AS fabric_material,
-                COALESCE(variant.variant_attributes, 'N/A') AS variant_attributes
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'variant_id', variant.variant_id,
+                        'attributes', variant.variant_attributes,
+                        'quantity', variant.quantity
+                    )
+                ) AS variants
             FROM Products p
-            LEFT JOIN YarnProducts y ON p.product_id = y.product_id AND p.product_type = 'yarn'
-            LEFT JOIN FabricProducts f ON p.product_id = f.product_id AND p.product_type = 'fabric'
             LEFT JOIN ProductVariant variant ON p.product_id = variant.product_id
-            WHERE p.seller_id = ${sellerId};`;
+            WHERE p.seller_id = ${sellerId}
+            GROUP BY p.product_id;`;
 
         if (products.length === 0) {
             console.error(`No products found for seller ID: ${sellerId}`);
             return new Response(JSON.stringify({ message: "No products found" }), { status: 404 });
         }
 
-        // console.log("Products found:", products);
         return new Response(JSON.stringify(products), { status: 200 });
 
     } catch (error) {
@@ -57,28 +60,99 @@ export async function GET(req) {
     }
 }
 
-// PUT REQUEST
-export async function PUT(req) {
-    try {
-        const databaseUrl = process.env.DATABASE_URL || "";
-        const sql = neon(databaseUrl);
-        const url = new URL(req.url);
-        const pathSegments = url.pathname.split('/');
-        const productId = pathSegments[pathSegments.length - 1];
-        const body = await req.json();
+// // PUT REQUEST
+// export async function PUT(req) {
+//     try {
+//         const databaseUrl = process.env.DATABASE_URL || "";
+//         const sql = neon(databaseUrl);
+//         const url = new URL(req.url);
+//         const pathSegments = url.pathname.split('/');
+//         const productId = pathSegments[pathSegments.length - 1];
+//         const body = await req.json();
 
-        const { product_type, product_name, product_description, price, image_url, yarn_material, yarn_variants, fabric_print_tech, fabric_material, fabric_variants } = body;
+//         const { product_type, product_name, product_description, price, image_url, yarn_material, yarn_variants, fabric_print_tech, fabric_material, fabric_variants } = body;
+
+//         const productTypeResult = await sql`
+//             SELECT product_type FROM products WHERE product_id = ${productId};`;
+
+//         if (productTypeResult.length === 0) {
+//             return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
+//         }
+
+//         const currentProductType = productTypeResult[0].product_type;
+
+//         if (currentProductType !== product_type) {
+//             return new Response(JSON.stringify({ message: "Changing product type from yarn to fabric or vice versa is not allowed. Please remove the product and add a new one." }), { status: 400 });
+//         }
+
+//         await sql`
+//             UPDATE products 
+//             SET product_name = ${product_name}, product_description = ${product_description}, price = ${price}, image_url = ${image_url}
+//             WHERE product_id = ${productId}`;
+
+//         if (product_type === 'yarn') {
+//             await sql`
+//                 UPDATE yarnproducts
+//                 SET yarn_material = ${yarn_material}
+//                 WHERE product_id = ${productId}`;
+            
+//             await sql`DELETE FROM productvariant WHERE product_id = ${productId}`;
+            
+//             for (const variant of yarn_variants) {
+//                 for (const denier of variant.deniers) {
+//                     await sql`
+//                         INSERT INTO productvariant (product_id, variant_attributes, quantity)
+//                         VALUES (${productId}, ${JSON.stringify({ color: variant.color, denier: denier.denier })}, ${denier.quantity})`;
+//                 }
+//             }
+//         } else if (product_type === 'fabric') {
+//             await sql`
+//                 UPDATE fabricproducts
+//                 SET fabric_print_tech = ${fabric_print_tech}, fabric_material = ${fabric_material}
+//                 WHERE product_id = ${productId}`;
+            
+//             await sql`DELETE FROM productvariant WHERE product_id = ${productId}`;
+            
+//             for (const variant of fabric_variants) {
+//                 await sql`
+//                     INSERT INTO productvariant (product_id, variant_attributes, quantity)
+//                     VALUES (${productId}, ${JSON.stringify({ color: variant.color })}, ${variant.quantity})`;
+//             }
+//         }
+
+//         return new Response(JSON.stringify({ message: "Product updated successfully" }), { status: 200 });
+//     } catch (error) {
+//         console.error('An error occurred: Internal server error', error);
+//         return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
+//     }
+// }
+
+// route.js
+
+export async function PUT(req) {
+    const sql = neon(process.env.DATABASE_URL || "");
+    const url = new URL(req.url);
+    const pathSegments = url.pathname.split('/');
+    const productId = pathSegments[pathSegments.length - 1];
+
+    try {
+        const body = await req.json();
+        const { product_type, product_name, product_description, price, image_url, yarn_variants, fabric_variants } = body;
+
+        // Start transaction
+        await sql`BEGIN`;
 
         const productTypeResult = await sql`
             SELECT product_type FROM products WHERE product_id = ${productId};`;
 
         if (productTypeResult.length === 0) {
+            await sql`ROLLBACK`;
             return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
         }
 
         const currentProductType = productTypeResult[0].product_type;
-
         if (currentProductType !== product_type) {
+            await sql`ROLLBACK`;
             return new Response(JSON.stringify({ message: "Changing product type from yarn to fabric or vice versa is not allowed. Please remove the product and add a new one." }), { status: 400 });
         }
 
@@ -87,44 +161,62 @@ export async function PUT(req) {
             SET product_name = ${product_name}, product_description = ${product_description}, price = ${price}, image_url = ${image_url}
             WHERE product_id = ${productId}`;
 
+        const existingVariants = await sql`SELECT * FROM productvariant WHERE product_id = ${productId}`;
+
         if (product_type === 'yarn') {
-            await sql`
-                UPDATE yarnproducts
-                SET yarn_material = ${yarn_material}
-                WHERE product_id = ${productId}`;
-            
-            await sql`DELETE FROM productvariant WHERE product_id = ${productId}`;
-            
             for (const variant of yarn_variants) {
                 for (const denier of variant.deniers) {
-                    await sql`
-                        INSERT INTO productvariant (product_id, variant_attributes, quantity)
-                        VALUES (${productId}, ${JSON.stringify({ color: variant.color, denier: denier.denier })}, ${denier.quantity})`;
+                    const variantAttributes = `Color: ${variant.color}, Denier: ${denier.denier}`;
+
+                    const existingVariant = existingVariants.find(v => {
+                        const attributes = Object.fromEntries(
+                            v.variant_attributes.split(', ').map(a => a.split(': '))
+                        );
+                        return attributes.Color === variant.color && attributes.Denier === denier.denier.toString();
+                    });
+
+                    if (existingVariant) {
+                        await sql`
+                            UPDATE productvariant
+                            SET quantity = ${denier.quantity}
+                            WHERE variant_id = ${existingVariant.variant_id}`;
+                    } else {
+                        // You can choose to handle the case where no existing variant is found if needed
+                    }
                 }
             }
         } else if (product_type === 'fabric') {
-            await sql`
-                UPDATE fabricproducts
-                SET fabric_print_tech = ${fabric_print_tech}, fabric_material = ${fabric_material}
-                WHERE product_id = ${productId}`;
-            
-            await sql`DELETE FROM productvariant WHERE product_id = ${productId}`;
-            
             for (const variant of fabric_variants) {
-                await sql`
-                    INSERT INTO productvariant (product_id, variant_attributes, quantity)
-                    VALUES (${productId}, ${JSON.stringify({ color: variant.color })}, ${variant.quantity})`;
+                const variantAttributes = `Color: ${variant.color}`;
+
+                const existingVariant = existingVariants.find(v => {
+                    const attributes = Object.fromEntries(
+                        v.variant_attributes.split(', ').map(a => a.split(': '))
+                    );
+                    return attributes.Color === variant.color;
+                });
+
+                if (existingVariant) {
+                    await sql`
+                        UPDATE productvariant
+                        SET quantity = ${variant.quantity}
+                        WHERE variant_id = ${existingVariant.variant_id}`;
+                } else {
+                    // You can choose to handle the case where no existing variant is found if needed
+                }
             }
         }
 
+        // Commit transaction
+        await sql`COMMIT`;
+
         return new Response(JSON.stringify({ message: "Product updated successfully" }), { status: 200 });
     } catch (error) {
+        await sql`ROLLBACK`;
         console.error('An error occurred: Internal server error', error);
         return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
     }
 }
-
-
 
 // DELETE REQUEST
 export async function DELETE(req) {
