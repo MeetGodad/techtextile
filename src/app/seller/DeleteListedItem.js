@@ -25,7 +25,7 @@ const DeleteListedItem = ({ item, onClose, onDeleteSuccess, position }) => {
         throw new Error(data.message || 'Failed to remove the item');
       }
 
-      onDeleteSuccess(); 
+      onDeleteSuccess();
     } catch (error) {
       setError(error.message);
     } finally {
@@ -46,8 +46,8 @@ const DeleteListedItem = ({ item, onClose, onDeleteSuccess, position }) => {
         <p className="mb-4">Are you sure you want to remove this item?</p>
         <div className="mb-4">
           <img src={item.image_url} alt={item.product_description} className="h-16 w-24 object-cover rounded-md mb-2" />
-          <p><strong>Product Name:</strong> {item.product_description}</p>
-          <p><strong>Description:</strong> {item.product_type}</p>
+          <p><strong>Product Name:</strong> {item.product_name}</p>
+          <p><strong>Description:</strong> {item.product_description}</p>
           <p><strong>Variant:</strong> {item.variant}</p>
           <p><strong>Price:</strong> ${item.price}</p>
         </div>

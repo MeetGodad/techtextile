@@ -127,8 +127,7 @@ export async function GET(req) {
 //     }
 // }
 
-// route.js
-
+//Put request
 export async function PUT(req) {
     const sql = neon(process.env.DATABASE_URL || "");
     const url = new URL(req.url);
@@ -161,49 +160,24 @@ export async function PUT(req) {
             SET product_name = ${product_name}, product_description = ${product_description}, price = ${price}, image_url = ${image_url}
             WHERE product_id = ${productId}`;
 
-        const existingVariants = await sql`SELECT * FROM productvariant WHERE product_id = ${productId}`;
+        // Remove old variants
+        await sql`DELETE FROM productvariant WHERE product_id = ${productId}`;
 
         if (product_type === 'yarn') {
             for (const variant of yarn_variants) {
                 for (const denier of variant.deniers) {
                     const variantAttributes = `Color: ${variant.color}, Denier: ${denier.denier}`;
-
-                    const existingVariant = existingVariants.find(v => {
-                        const attributes = Object.fromEntries(
-                            v.variant_attributes.split(', ').map(a => a.split(': '))
-                        );
-                        return attributes.Color === variant.color && attributes.Denier === denier.denier.toString();
-                    });
-
-                    if (existingVariant) {
-                        await sql`
-                            UPDATE productvariant
-                            SET quantity = ${denier.quantity}
-                            WHERE variant_id = ${existingVariant.variant_id}`;
-                    } else {
-                        // You can choose to handle the case where no existing variant is found if needed
-                    }
+                    await sql`
+                        INSERT INTO productvariant (product_id, variant_attributes, quantity)
+                        VALUES (${productId}, ${variantAttributes}, ${denier.quantity})`;
                 }
             }
         } else if (product_type === 'fabric') {
             for (const variant of fabric_variants) {
                 const variantAttributes = `Color: ${variant.color}`;
-
-                const existingVariant = existingVariants.find(v => {
-                    const attributes = Object.fromEntries(
-                        v.variant_attributes.split(', ').map(a => a.split(': '))
-                    );
-                    return attributes.Color === variant.color;
-                });
-
-                if (existingVariant) {
-                    await sql`
-                        UPDATE productvariant
-                        SET quantity = ${variant.quantity}
-                        WHERE variant_id = ${existingVariant.variant_id}`;
-                } else {
-                    // You can choose to handle the case where no existing variant is found if needed
-                }
+                await sql`
+                    INSERT INTO productvariant (product_id, variant_attributes, quantity)
+                    VALUES (${productId}, ${variantAttributes}, ${variant.quantity})`;
             }
         }
 
@@ -226,7 +200,7 @@ export async function DELETE(req) {
         const url = new URL(req.url);
         const pathSegments = url.pathname.split('/');
         const productId = pathSegments[pathSegments.length - 1];
-        
+
         console.log("Product ID to delete:", productId);
 
         if (!productId) {
@@ -234,45 +208,13 @@ export async function DELETE(req) {
             return new Response(JSON.stringify({ message: "productId is required" }), { status: 400 });
         }
 
-        // Fetch the product type to determine which table to delete from
-        const productTypeResult = await sql`
-            SELECT product_type FROM products WHERE product_id = ${productId};`;
+        // Update the quantity to 0 for all variants of the product
+        await sql`
+            UPDATE productvariant
+            SET quantity = 0
+            WHERE product_id = ${productId};`;
 
-        if (productTypeResult.length === 0) {
-            console.error("Product not found or already deleted");
-            return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
-        }
-
-        const productType = productTypeResult[0].product_type;
-
-        // Handle foreign key constraint in orderitems table
-        await sql`DELETE FROM orderitems WHERE product_id = ${productId};`;
-
-        // Handle foreign key constraint in feedback table
-        await sql`DELETE FROM feedback WHERE product_id = ${productId};`;
-
-        // Delete dependent records from specific tables
-        if (productType === 'yarn') {
-            await sql`DELETE FROM yarnproducts WHERE product_id = ${productId};`;
-        } else if (productType === 'fabric') {
-            await sql`DELETE FROM fabricproducts WHERE product_id = ${productId};`;
-        }
-
-        // Delete product variants
-        await sql`DELETE FROM productvariant WHERE product_id = ${productId};`;
-
-        // Delete the main product record
-        const result = await sql`DELETE FROM products WHERE product_id = ${productId} RETURNING product_id;`;
-
-        console.log("SQL Result:", result);
-
-        if (result.length === 0) {
-            console.error("Product not found or already deleted");
-            return new Response(JSON.stringify({ message: "Product not found" }), { status: 404 });
-        }
-
-        console.log("Product deleted:", productId);
-        return new Response(JSON.stringify({ message: "Product deleted" }), { status: 200 });
+        return new Response(JSON.stringify({ message: "Product soft deleted successfully" }), { status: 200 });
 
     } catch (error) {
         console.error('An error occurred: Internal server error', error);
