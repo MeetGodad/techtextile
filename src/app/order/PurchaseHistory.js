@@ -289,6 +289,27 @@ const PurchaseHistory = ({ userId }) => {
                   <h5 className="font-semibold text-sm mb-1">{item.product_name}</h5>
                   <p className="text-sm mb-1">Price: ${item.price}</p>
                   <p className="text-sm mb-2">Quantity: {item.quantity}</p>
+                  {item.selected_variant && (
+                    <div className="mb-4">
+                      <div className="text-gray-600 mb-2">
+                        {item.selected_variant.color && (
+                          <div className="flex items-center">
+                            <span className="font-semibold">Color: </span>
+                            <span 
+                              className="inline-block w-6 h-6 rounded-full ml-2 border-2 border-black transform transition duration-300 ease-in-out hover:scale-110 hover:border-white"
+                              style={{ backgroundColor: item.selected_variant.color.split(':')[1]?.trim() || item.selected_variant.color }}
+                            ></span>
+                          </div>
+                        )}
+                        {item.selected_variant.denier && (
+                          <div>
+                            <span className="font-semibold">Denier: </span>
+                            <span>{item.selected_variant.denier.split(':')[1]?.trim() || item.selected_variant.denier}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <button 
                     onClick={() => handleBuyAgain(item.product_id)}
                     className="mt-auto bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 text-sm"
