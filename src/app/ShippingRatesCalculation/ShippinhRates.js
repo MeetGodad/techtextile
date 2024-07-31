@@ -302,7 +302,7 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
   }
 
   return (
-    <div className='text-black bg-gray-50 p-6 rounded-lg shadow-md'>
+    <div className='flex flex-col'>
       {Object.entries(errors).length > 0 && (
         <div className="mb-4 p-4 bg-red-100 rounded-md">
           {Object.entries(errors).map(([sellerId, errorMessage]) => (
@@ -315,9 +315,9 @@ const ShippingRateCalculator = ({ cartItems, buyerAddress ,onTotalShippingCostCh
           ))}
         </div>
       )}
-      <div className="flex justify-between items-center font-bold text-lg border-gray-200 pt-4">
-        <p className="text-gray-800">Estimated Shipping Rate: </p>
-        <p className="text-blue-700 text-xl"> ${totalShippingCost.toFixed(2)}</p> 
+      <div className="flex justify-between items-center border-b pb-4 transition-all duration-300 hover:bg-gray-50 rounded-md p-2">
+        <p className="font-semibold text-gray-800">Estimated Shipping Rate:</p> 
+        <p className="flex font-semibold text-blue-600 ml-64">${totalShippingCost.toFixed(2)}</p>
       </div>
       {hasInternationalShippingRef.current && (
         <div className="mt-4 p-4 bg-yellow-100 rounded-md">

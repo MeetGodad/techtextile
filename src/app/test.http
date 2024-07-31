@@ -28,7 +28,7 @@ Content-Type: application/json
 
 
 
-GET http://localhost:3000/api/search?term=Cotton  HTTP/1.1
+GET http://localhost:3000/api/history/P2YXYSULfYPEcrS44zjgsWwxDWM2  HTTP/1.1
 
 #######
 
