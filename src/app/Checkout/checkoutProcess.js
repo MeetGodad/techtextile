@@ -519,7 +519,7 @@ const renderStep = () => {
               <div className="bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300">
                 <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
                   <h2 className="text-3xl font-bold text-white mb-2">Complete Your Order</h2>
-                  <p className="text-blue-100">You're just one step away from your purchase!</p>
+                  <p className="text-blue-100">You&apos;re just one step away from your purchase!</p>
                 </div>
                 <div className="p-6">
                   <div className="mb-6">
