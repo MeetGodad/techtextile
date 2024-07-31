@@ -5,8 +5,6 @@ import { useUserAuth } from "../auth/auth-context";
 import Link from "next/link";
 import Swal from "sweetalert2";
 
-
-
 export default function Login( {onSwitch} ) {
  
   const { user, emailSignIn } = useUserAuth();
@@ -57,6 +55,7 @@ export default function Login( {onSwitch} ) {
   }
 
   return (
+
     <div className="relative flex flex-col items-center justify-center min-h-screen w-full bg-white p-4">
       <div className="absolute top-4 right-6 text-4xl md:text-5xl text-black font-semibold z-10 animate-fadeInUp">LOG</div>
   

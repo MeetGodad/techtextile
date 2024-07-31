@@ -51,50 +51,49 @@ export function Step1Form({
         </label>
       </div>
 
-      <div className="relative group">
-        <input
-          type={showPassword ? "text" : "password"}
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          disabled={formData.role === ""}
-          className="w-full p-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 peer placeholder-transparent"
-          placeholder="Password"
-        />
-        <label className="absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 bg-white px-1 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-blue-600">
-          Password
-        </label>
-        <button
-          type="button"
-          className="absolute right-3 top-3 text-gray-500 transition duration-300 hover:text-gray-700"
-          onClick={() => setShowPassword(!showPassword)}
-        >
-          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-        </button>
-      </div>
+        <div className="relative group flex-1">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            disabled={formData.role === ""}
+            className="w-full p-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 peer placeholder-transparent"
+            placeholder="Password"
+          />
+          <label className="absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 bg-white px-1 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-blue-600">
+            Password
+          </label>
+          <button
+            type="button"
+            className="absolute right-3 top-3 text-gray-500 transition duration-300 hover:text-gray-700"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+          </button>
+        </div>
 
-      <div className="relative group">
-        <input
-          type={showConfirmPassword ? "text" : "password"}
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          disabled={formData.role === ""}
-          className="w-full p-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 peer placeholder-transparent"
-          placeholder="Confirm Password"
-        />
-        <label className="absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 bg-white px-1 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-blue-600">
-          Confirm Password
-        </label>
-        <button
-          type="button"
-          className="absolute right-3 top-3 text-gray-500 transition duration-300 hover:text-gray-700"
-          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-        >
-          <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
-        </button>
-      </div>
-
+        <div className="relative group flex-1">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            disabled={formData.role === ""}
+            className="w-full p-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 peer placeholder-transparent"
+            placeholder="Confirm Password"
+          />
+          <label className="absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 bg-white px-1 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-blue-600">
+            Confirm Password
+          </label>
+          <button
+            type="button"
+            className="absolute right-3 top-3 text-gray-500 transition duration-300 hover:text-gray-700"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+          </button>
+        </div>
       <div className="mt-6">
         <ul className="space-y-1">
           {Object.entries(requirements).map(([key, value]) => (
