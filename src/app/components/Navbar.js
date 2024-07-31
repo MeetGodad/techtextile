@@ -97,49 +97,16 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
   }, []);
 
   return (
-    <header className={`w-full flex items-center gap-80 px-3 box-border z-40 fixed top-0 leading-normal tracking-normal text-xl text-black font-sans ${isSticky ? 'bg-white shadow-md' : 'bg-transparent'}`}>
-      <div className="flex flex-auto items-center">
-        <div className="flex items-center justify-center w-20 h-20"></div>
+    <header className={`w-screen flex items-center px-3 box-border z-40 fixed top-0 leading-normal tracking-normal text-xl text-black font-sans ${isSticky ? 'bg-white shadow-md' : 'bg-transparent'}`}>
+      <div className="flex basis-2/5 flex-row items-center">
+        <div className="flex items-center justify-start w-20 h-20"></div>
         <h3 className="text-4xl text-center font-bold" style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}>
           <Link href="/Home" onClick={resetSearchResults} >TECH TEXTILE</Link>
         </h3>
       </div>
-      <div className="flex justify-between items-start gap-5">
-        <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[250px] h-10">
-          <input
-            type="text"
-            placeholder="What are you looking for?"
-            className="text-left bg-transparent outline-none text-sm"
-            value={searchText}
-            onChange={(e) => {
-              setSearchText(e.target.value);
-            }}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            style={{ width: 'calc(100% - 24px)' }}
-          />
-          <button
-            onClick={() => { handleSearch(); setSearchText(''); }}
-            style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
-          >
-            {searchText === '' ? (
-              <img
-                className="ml-2 w-8 h-6"
-                alt="Search"
-                src="/Images/Search.png"
-              />
-            ) : (
-              <img
-                className="ml-2 w-8 h-6"
-                alt="Clear"
-                src="/Images/Search.png" // Assuming you have an icon to clear the search
-                onClick={() => setSearchText('')}
-              />
-            )}
-          </button>
-        </div>
-
+      <div className="flex basis-4/5 justify-end items-start gap-4 mr-16">
         {isHomePage && (
-          <div className="flex w-52 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[250px] h-10">
+          <div className="flex w-80 place-items-start bg-gray-200 rounded-md px-6 py-2 min-w-[250px] h-10">
   
             <input
               type="text"
@@ -161,7 +128,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
             >
               {searchText === '' ? (
                 <img
-                  className="ml-2 w-8 h-6"
+                  className="ml-16 w-8 h-6"
                   alt="Search"
                   src="/Images/Search.png"
                 />
@@ -175,9 +142,12 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
               )}
             </button>
           </div>)}
+        </div>
+      <div className="flex basis-3/5 justify-end items-start gap-8 mr-2">
+        
 
             {isHomePage && (
-              <div className="flex items-center ml-4">
+              <div className="flex items-center">
                 <CategoryDropdown
                   category={category}
                   subCategory={subCategory}
@@ -200,13 +170,13 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
               </div>
             </Link>
             {user ? (
-              <Link href="/Profile" className="nav-link font-semibold ml-4">
+              <Link href="/Profile" className="nav-link font-semibold ml-4 mr-4">
                 <div className="flex items-center">
                   <CgProfile size={35} />
                 </div>
               </Link>
             ) : (
-              <Link href="/Login" className="nav-link font-semibold ml-4">
+              <Link href="/Login" className="nav-link font-semibold ml-4 mr-4">
                 <div className="flex items-center">
                   <span className="ml-2">SignUp/Login</span>
                 </div>
