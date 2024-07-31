@@ -10,7 +10,7 @@ export async function POST(request) {
     const result = await sql.transaction((tx) => [
       tx`
         UPDATE OrderItems
-        SET item_status = 'cancelled'
+        SET item_status = 'canceled'
         WHERE order_item_id = ${orderItemId}
         RETURNING *
       `,

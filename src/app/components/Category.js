@@ -29,23 +29,30 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
     { value: 'Polyster', label: 'Polyster' },
     { value: 'Nylon', label: 'Nylon' },
     { value: 'Silk', label: 'Silk' },
+    { value: 'Acrylic', label: 'Acrylic' },
+    { value: 'All Yarns', label: 'All Yarns' },
   ];
 
   const subSubCategories = {
     fabric: {
       fabric_print_tech: [
-        { value: 'machin', label: 'Marble Print' },
-        { value: 'Handblock & Dyed', label: 'Handblock & Dyed' },
-        { value: 'Screen Print', label: 'Screen Print' },
-        { value: 'Digital Print', label: 'Digital Print' },
-
+     { value: 'Handblock & Dyed', label: 'Handblock & Dyed' },
+      { value: 'Screen Print', label: 'Screen Print' },
+      { value: 'Digital Print', label: 'Digital Print' },
+      { value: 'Marble Print', label: 'Marble Print' },
+      { value : 'Plain', label: 'Plain'},
+      { value: 'Other', label: 'Other' },
       ],
       fabric_material: [
-        { value: 'Cotton', label: 'Cotton' },
         { value: 'Viscose', label: 'Viscose' },
+        { value: 'Cotton', label: 'Cotton' },
         { value: 'Silk & Blends', label: 'Silk & Blends' },
-        { value: 'Polyster', label: 'Polyster' },
         { value: 'Linen', label: 'Linen' },
+        { value: 'Polyester', label: 'Polyester' },
+        { value: 'Sustainable', label: 'Sustainable' },
+        { value: 'Wool', label: 'Wool' },
+        { value: 'Nylon', label: 'Nylon' },
+        { value: 'All Fabrics', label: 'All Fabrics' },
       ],
     },
   };
@@ -92,7 +99,7 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
           ))}
         </div>
       )}
-      {isSubOpen && category === 'fabric' && (
+      {category === 'fabric' && (
         <div className="absolute  ml-2 mt-2 w-48 bg-gray-200 border text-center border-gray-200 rounded shadow-lg z-50" style={{ position: 'absolute', top: '75px', width: '144px', marginLeft: '85px' }}>
           {fabricSubCategories.map((subCat) => (
             <button
@@ -104,9 +111,9 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
               {subCat.label}
             </button>
           ))}
-        </div>
-      )}
-      {isSubOpen && category === 'yarn' && (
+        
+      
+      {category === 'yarn' && (
         <div className="absolute ml-2 mt-2 w-48 bg-gray-200 border border-gray-200 rounded shadow-lg z-50" style={{ position: 'absolute', top: '75px', width: '144px', marginLeft: '85px' }}>
           {yarnSubCategories.map((subCat) => (
             <button
@@ -120,7 +127,7 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
           ))}
         </div>
       )}
-      {isSubSubOpen && subCategory && subSubCategories[category] && subSubCategories[category][subCategory] && (
+      {subCategory && subSubCategories[category] && subSubCategories[category][subCategory] && (
         <div className="absolute  ml-2 mt-2 w-48 bg-gray-200 border border-gray-200 rounded shadow-lg z-50" style={{ position: 'absolute', top: '105px', width: '144px', marginLeft: '230px' }}>
           {subSubCategories[category][subCategory].map((subSubCat) => (
             <button
@@ -133,8 +140,11 @@ const CategoryDropdown = ({ category, subCategory, subSubCategory, onCategoryCha
             </button>
           ))}
         </div>
+          )}
+      </div>
       )}
     </div>
+
   );
 };
 

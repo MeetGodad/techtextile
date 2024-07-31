@@ -8,7 +8,7 @@ BEGIN
     INTO total
     FROM OrderItems
     WHERE order_id = p_order_id
-    AND (p_include_cancelled OR item_status != 'cancelled');
+    AND (p_include_cancelled OR item_status != 'canceled');
     
     RETURN total;
 END;
@@ -46,7 +46,7 @@ BEGIN
         SELECT COALESCE(SUM(quantity * item_price), 0)
         FROM OrderItems
         WHERE order_id = NEW.order_id
-        AND item_status != 'cancelled'
+        AND item_status != 'canceled'
     ) + NEW.current_shipping_cost;
     
     RETURN NEW;
@@ -55,12 +55,14 @@ $$
  LANGUAGE plpgsql;
 
 -- Trigger: order_totals_insert_trigger
+Drop TRIGGER IF EXISTS order_totals_insert_trigger ON Orders;
 CREATE TRIGGER order_totals_insert_trigger
 BEFORE INSERT ON Orders
 FOR EACH ROW
 EXECUTE FUNCTION update_order_totals();
 
 -- Trigger: order_totals_update_trigger
+Drop TRIGGER IF EXISTS order_totals_update_trigger ON Orders;
 CREATE TRIGGER order_totals_update_trigger
 BEFORE UPDATE ON Orders
 FOR EACH ROW
@@ -77,7 +79,7 @@ BEGIN
     INTO items_total
     FROM OrderItems
     WHERE order_id = NEW.order_id
-    AND item_status != 'cancelled';
+    AND item_status != 'canceled';
 
     -- Update the order with the new total
     UPDATE Orders
@@ -90,6 +92,7 @@ $$
  LANGUAGE plpgsql;
 
 -- Trigger: order_item_update_trigger
+Drop TRIGGER IF EXISTS order_item_update_trigger ON OrderItems;
 CREATE TRIGGER order_item_update_trigger
 AFTER UPDATE OF item_status, quantity, item_price ON OrderItems
 FOR EACH ROW

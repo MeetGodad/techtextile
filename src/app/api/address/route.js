@@ -26,8 +26,6 @@ export async function POST(request) {
       VALUES (${userId}, ${firstName}, ${lastName}, ${email}, ${street}, ${city}, ${state}, ${postalCode}, ${country}, ${phone}, 'shipping')
       RETURNING address_id;
     `;
-
-    console.log('SQL Result:', result); // Add this line
     
     return new Response(JSON.stringify(result[0]), { 
       status: 200, 
