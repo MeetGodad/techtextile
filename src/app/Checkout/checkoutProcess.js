@@ -49,7 +49,6 @@ const Checkout = () => {
     setShippingDetails(details);
   };
   
-
   const handleTotalShippingCostChange = (cost) => {
     setTotalShippingCost(cost);
   };
@@ -98,11 +97,13 @@ const Checkout = () => {
   };
 
   // Handle checkbox change to use signup address for shipping
-  const handleCheckboxChange = () => {
-    setUseSignupAddress(!useSignupAddress);
-
-    if (!useSignupAddress) {
-      // Autofill shipping details with signup address
+  const handleCheckboxChange = (e) => {
+    setUseSignupAddress(e.target.checked);
+    if (e.target.checked) {
+      if (signupAddress.country === 'IN') {
+        alert("Indian addresses are not supported for shipping. Please provide a different address.");
+        setUseSignupAddress(false);
+      } else {
       setShippingInfo({
         firstName: signupAddress.address_first_name || '',
         lastName: signupAddress.address_last_name || '',
@@ -114,6 +115,7 @@ const Checkout = () => {
         email: signupAddress.address_email || '',
         phone: signupAddress.phone_num || '',
       });
+    }
     } else {
       // Clear shipping details if the checkbox is unchecked
       setShippingInfo({
@@ -294,118 +296,122 @@ const handleAddressChange = (address) => {
     });
   setUseSignupAddress(false);
 };
+
+const filteredExistingAddresses = existingAddresses.filter(address => address.country !== 'IN');
+
 const renderStep = () => {
   switch (step) {
     case 1:
-      return (
-        <div className="animate-fade-in-down">
-          <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">Shipping Details</h2>
-          <form className="space-y-6 bg-white p-8 rounded-xl shadow-lg max-w-2xl mx-auto transform transition duration-500 hover:shadow-2xl hover:scale-105">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="useSignupAddress"
-                name="useSignupAddress"
-                checked={useSignupAddress}
-                onChange={handleCheckboxChange}
-                className="form-checkbox h-5 w-5 text-blue-500 transition duration-300 ease-in-out transform hover:scale-110"
-              />
-              <label htmlFor="useSignupAddress" className="ml-2 text-black">
-                Use the same address as signup address
-              </label>
-            </div>
-            <div className="w-full max-w-md mx-auto">
-              <h2 className="text-lg font-semibold mb-4">Existing Shipping Addresses</h2>
-              {existingAddresses.length > 0 ? (
-                <div className="relative mb-10">
-                  <select
-                    onChange={(e) => {
-                      const selectedAddress = existingAddresses.find(
-                        (address) => address.address_id === parseInt(e.target.value)
-                      );
-                      handleAddressChange(selectedAddress);
-                    }}
-                    className="block w-full p-4 pr-8 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none bg-white text-gray-700 hover:bg-gray-50"
-                  >
-                    <option value="" disabled selected className="text-gray-500">
-                      Select an existing shipping address
+
+    return (
+      <div className="animate-fade-in-down">
+        <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">Shipping Details</h2>
+        <form autocomplete="off" className="space-y-6 bg-white p-8 rounded-xl shadow-lg max-w-2xl mx-auto transform transition duration-500 hover:shadow-2xl hover:scale-105">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="useSignupAddress"
+              name="useSignupAddress"
+              checked={useSignupAddress}
+              onChange={handleCheckboxChange}
+              className="form-checkbox h-5 w-5 text-blue-500 transition duration-300 ease-in-out transform hover:scale-110"
+            />
+            <label htmlFor="useSignupAddress" className="ml-2 text-black">
+              Use the same address as signup address
+            </label>
+          </div>
+          <div className="w-full max-w-md mx-auto">
+            <h2 className="text-lg font-semibold mb-4">Existing Shipping Addresses</h2>
+            {filteredExistingAddresses.length > 0 ? (
+              <div className="relative mb-10">
+                <select
+                  onChange={(e) => {
+                    const selectedAddress = filteredExistingAddresses.find(
+                      (address) => address.address_id === parseInt(e.target.value)
+                    );
+                    handleAddressChange(selectedAddress);
+                  }}
+                  className="block w-full p-4 pr-8 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none bg-white text-gray-700 hover:bg-gray-50"
+                >
+                  <option value="" disabled selected className="text-gray-500">
+                    Select an existing shipping address
+                  </option>
+                  {filteredExistingAddresses.map((address) => (
+                    <option
+                      key={address.address_id}
+                      value={address.address_id}
+                      className="truncate"
+                    >
+                      {`${address.address_first_name} ${address.address_last_name}, ${address.street}, ${address.city}, ${address.state}, ${address.postal_code}, ${address.country}`}
                     </option>
-                    {existingAddresses.map((address) => (
-                      <option 
-                        key={address.address_id} 
-                        value={address.address_id}
-                        className="truncate"
-                      >
-                        {`${address.address_first_name} ${address.address_last_name}, ${address.street}, ${address.city} ${address.postal_code}, ${address.country}`}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                    </svg>
-                  </div>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
                 </div>
-              ) : (
-                <p className="text-gray-600">No existing addresses found.</p>
-              )}
-            </div>        
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="relative group">
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder=" "
-                  value={shippingInfo.firstName}
-                  onChange={handleShippingChange}
-                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
-                />
-                <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
-                  First Name
-                </label>
-                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
-                  <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
-                </svg>
               </div>
-              <div className="relative group">
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder=" "
-                  value={shippingInfo.lastName}
-                  onChange={handleShippingChange}
-                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
-                />
-                <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
-                  Last Name
-                </label>
-                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
-                  <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
-                </svg>
-              </div>
+            ) : (
+              <p className="text-gray-600">No existing addresses found.</p>
+            )}
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 delayed-load">
+            <div className="relative group">
+              <input
+                type="text"
+                name="firstName"
+                placeholder=" "
+                value={shippingInfo.firstName}
+                onChange={handleShippingChange}
+                className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
+              />
+              <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
+                First Name
+              </label>
+              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
+              </svg>
             </div>
             <div className="relative group">
-              <AddressInput
-                supportedCountries={['CA']}
-                role="shipping"
-                street={shippingInfo.street}
-                city={shippingInfo.city}
-                state={shippingInfo.state}
-                postalCode={shippingInfo.zip}
-                country={shippingInfo.country}
-                setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
-                setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
-                setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
-                setState={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
-                setCountry={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
-                setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
-                setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
-                inputClassName="w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white"
-                containerClassName="relative mb-4 group"
-                iconClassName="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
+              <input
+                type="text"
+                name="lastName"
+                placeholder=" "
+                value={shippingInfo.lastName}
+                onChange={handleShippingChange}
+                className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
               />
+              <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
+                Last Name
+              </label>
+              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
+              </svg>
             </div>
-            <div className="grid md:grid-cols-2 gap-6">
+          </div>
+          <div className="relative group delayed-load">
+            <AddressInput
+              supportedCountries={['CA']}
+              role="shipping"
+              street={shippingInfo.street}
+              city={shippingInfo.city}
+              state={shippingInfo.stateCode}
+              postalCode={shippingInfo.zip}
+              country={shippingInfo.countryCode}
+              setStreet={(value) => setShippingInfo((prev) => ({ ...prev, street: value }))}
+              setCity={(value) => setShippingInfo((prev) => ({ ...prev, city: value }))}
+              setPostalCode={(value) => setShippingInfo((prev) => ({ ...prev, zip: value }))}
+              setState={(value) => setShippingInfo((prev) => ({ ...prev, stateCode: value }))}
+              setCountry={(value) => setShippingInfo((prev) => ({ ...prev, countryCode: value }))}
+              setStateCode={(value) => setShippingInfo((prev) => ({ ...prev, stateCode: value }))}
+              setCountryCode={(value) => setShippingInfo((prev) => ({ ...prev, countryCode: value }))}
+              inputClassName="w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white"
+              containerClassName="relative mb-4 group"
+              iconClassName="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
+            />
+          </div>
+            <div className="grid md:grid-cols-2 gap-6 delayed-load">
               <div className="relative group">
                 <input
                   type="email"
@@ -454,7 +460,7 @@ const renderStep = () => {
                   <div className="space-y-1 text-sm">
                     <p className="text-gray-700">{shippingInfo.firstName} {shippingInfo.lastName}</p>
                     <p className="text-gray-700">{shippingInfo.street}</p>
-                    <p className="text-gray-700">{shippingInfo.city}, {shippingInfo.state}, {shippingInfo.zip}</p>
+                    <p className="text-gray-700">{shippingInfo.city}, {shippingInfo.stateCode}, {shippingInfo.zip}</p>
                     <p className="text-gray-700">{shippingInfo.email}</p>
                   </div>
                 </div>
@@ -490,9 +496,9 @@ const renderStep = () => {
                     lastName: shippingInfo.lastName,
                     street: shippingInfo.street,
                     city: shippingInfo.city,
-                    state: shippingInfo.state,
+                    state: shippingInfo.stateCode,
                     zip: shippingInfo.zip,
-                    country: shippingInfo.country,
+                    country: shippingInfo.countryCode,
                     email: shippingInfo.email,
                     phone: shippingInfo.phone,
                   }}

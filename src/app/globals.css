@@ -345,3 +345,28 @@ body {
   display: block;
   margin-bottom: 5px;
 }
+/* Add to your global CSS file or the relevant component's CSS file */
+header {
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+header.bg-transparent {
+  background-color: transparent;
+}
+
+header.bg-white {
+  background-color: white;
+}
+.delayed-load {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+

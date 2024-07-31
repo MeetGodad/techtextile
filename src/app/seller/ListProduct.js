@@ -179,28 +179,28 @@ export default function ListProduct() {
     return (
         user ? (
           <div className="w-full min-h-screen bg-white p-8 text-black">
-            <h2 className="text-4xl font-extrabold mb-10 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">List Your Product</h2>
-            <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl mx-auto">
+            <h2 className="text-4xl font-extrabold mb-10 text-center text-black">List Your Product</h2>
+            <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl mx-auto bg-gray-100 p-8 rounded-xl shadow-lg">
               <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                <div className="space-y-2 transform transition duration-300">
-                  <label className="block font-semibold text-lg text-gray-700">Product Name</label>
+                <div className="space-y-2">
+                  <label className="block font-semibold text-lg text-gray-800">Product Name</label>
                   <input 
                     type="text" 
                     required 
                     name="product_name" 
                     value={productData.product_name} 
                     onChange={handleChange} 
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300"
+                    className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                   />
                 </div>
-                <div className="space-y-2 transform transition duration-300">
-                  <label className="block font-semibold text-lg text-gray-700">Product Type</label>
+                <div className="space-y-2">
+                  <label className="block font-semibold text-lg text-gray-800">Product Type</label>
                   <select 
                     name="product_type" 
                     value={productData.product_type} 
                     onChange={handleChange} 
                     required 
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300 appearance-none"
+                    className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent appearance-none bg-white"
                   >
                     <option value="">Select Type</option>
                     <option value="yarn">Yarn</option>
@@ -208,50 +208,50 @@ export default function ListProduct() {
                   </select>
                 </div>
               </div>
-              <div className="space-y-2 transform transition duration-300">
-                <label className="block font-semibold text-lg text-gray-700">Description</label>
+              <div className="space-y-2">
+                <label className="block font-semibold text-lg text-gray-800">Description</label>
                 <textarea 
                   required 
                   name="description" 
                   value={productData.description} 
                   onChange={handleChange} 
-                  className="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300"
+                  className="w-full p-3 border border-gray-400 rounded-lg h-32 resize-none focus:ring-2 focus:ring-black focus:border-transparent"
                 ></textarea>
               </div>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                <div className="space-y-2 transform transition duration-300">
-                  <label className="block font-semibold text-lg text-gray-700">Price</label>
+                <div className="space-y-2">
+                  <label className="block font-semibold text-lg text-gray-800">Price</label>
                   <input 
                     type="text" 
                     required 
                     name="price" 
                     value={productData.price} 
                     onChange={handleChange} 
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300"
+                    className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                   />
                 </div>
-                <div className="space-y-2 transform transition duration-300">
-                  <label className="block font-semibold text-lg text-gray-700">Upload Images</label>
+                <div className="space-y-2">
+                  <label className="block font-semibold text-lg text-gray-800">Upload Images</label>
                   <input 
                     type="file" 
                     required 
                     multiple
                     name="image_url" 
                     onChange={handleImageChange} 
-                    className="w-full p-2 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-300"
+                    className="w-full p-2 border border-gray-400 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-200 file:text-black"
                   />
                 </div>
               </div>
               {productData.product_type === 'yarn' && (
-                <div className="space-y-2 transform transition duration-300">
-                  <label className="block font-semibold text-lg text-gray-700">Yarn Material</label>
+                <div className="space-y-2">
+                  <label className="block font-semibold text-lg text-gray-800">Yarn Material</label>
                   <select 
                     type="text" 
                     required 
                     name="yarn_material" 
                     value={productData.yarn_material}  
                     onChange={handleChange} 
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300 appearance-none"
+                    className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent appearance-none bg-white"
                   >
                     <option value="" disabled>Select Yarn Material</option>
                     <option value="Cotton">Cotton</option>
@@ -263,169 +263,18 @@ export default function ListProduct() {
                     <option value="Acrylic">Acrylic</option>
                     <option value="All Yarns">Other</option>
                   </select>
-                <div>
-                                <label className="block font-semibold">Yarn Variants</label>
-                                {productData.yarn_variants.map((variant, index) => (
-                                    <div key={index} className="relative w-80 mr-2">
-                                        <label className="block font-semibold">Color</label>
-                                        <input
-                                            type="color"
-                                            placeholder="Color"
-                                            value={variant.color}
-                                            onChange={(e) => handleYarnVariantChange(index, 'color', e.target.value)}
-                                            className="w-1/3 h-12 my-2 p-1 border border-black rounded-lg" 
-                                        />
-                                        {variant.deniers.map((denier, denierIndex) => (
-                                            <div key={denierIndex} className="flex items-center mb-4">
-                                                <div className="flex-1 mr-2">
-                                                    <label className="block font-semibold">Denier</label>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Denier"
-                                                        value={denier.denier}
-                                                        onChange={(e) => handleDeniersChange(index, denierIndex, 'denier', e.target.value)}
-                                                        className="w-full p-3 border border-gray-300 rounded-lg"
-                                                    />
-                                                </div>
-                                                <div className="flex-1 mr-2">
-                                                    <label className="block font-semibold">Quantity</label>
-                                                    <input
-                                                        type="number"
-                                                        placeholder="Quantity"
-                                                        value={denier.quantity}
-                                                        onChange={(e) => handleDeniersChange(index, denierIndex, 'quantity', e.target.value)}
-                                                        className="w-full p-3 border border-gray-300 rounded-lg"
-                                                    />
-                                                </div>
-                                                {variant.deniers.length > 1 && (
-                                                    <button type="button" onClick={() => removeDenier(index, denierIndex)} className="text-red-500">
-                                                        <MdDeleteForever size={24} />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
-                                            <button
-                                                    type="button"
-                                                    onClick={() => addDenier(index)}
-                                                    className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">
-                                                    Add Denier
-                                                </button>
-                                            {productData.yarn_variants.length > 1 && (
-                                            <button type="button" onClick={() => removeYarnVariant(index)} className="text-red-500">
-                                                <MdDeleteForever size={24} />
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                <button type="button" onClick={addYarnVariant} className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">Add Yarn Variant</button>
-                            </div>
-                        </div>
-                    )}
-                    {productData.product_type === 'fabric' && (
-                        <div className="space-y-2">
-                            <div>
-                                <label className="block font-semibold">Fabric Print Technology</label>
-                                <select 
-                                    type="text" 
-                                    required 
-                                    name="fabric_print_tech" 
-                                    value={productData.fabric_print_tech} 
-                                    onChange={handleChange} 
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                >
-                                    <option value="" disabled>Select Fabric Print Technology</option>
-                                    <option value="Handblock & Dyed">Handblock & Dyed</option>
-                                    <option value="Screen Print">Screen Print</option>
-                                    <option value="Digital Print">Digital Print</option>
-                                    <option value="Marble Print">Marble Print</option>
-                                    <option value="Plain">Plain</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block font-semibold">Fabric Material</label>
-                                <select 
-                                    type="text" 
-                                    required 
-                                    name="fabric_material" 
-                                    value={productData.fabric_material}  
-                                    onChange={handleChange} 
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                >
-                                    <option value="" disabled>Select Fabric Material</option>
-                                    <option value="Cotton">Cotton</option>
-                                    <option value="Linen">Linen</option>
-                                    <option value="Silk & Blends">Silk & Blends</option>
-                                    <option value="Polyester">Polyester</option>
-                                    <option value="Sustainable">Sustainable</option>
-                                    <option value="Wool">Wool</option>
-                                    <option value="Nylon">Nylon</option> 
-                                    <option value="Viscose">Viscose</option>
-                                    <option value="All Fabrics">Other</option>
-                                    
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block font-semibold">Fabric Variants</label>
-                                {productData.fabric_variants.map((variant, index) => (
-            <div key={index} className="mb-4">
-                 <div className="flex items-center mb-4">
-                    <div className="mr-4">
-                        <label className="block mb-2 font-semibold">Color</label>
-                        <input
-                            type="color"
-                            placeholder="Color"
-                            value={variant.color}
-                            onChange={(e) => handleFabricVariantChange(index, 'color', e.target.value)}
-                            className="w-full h-12 p-1 border border-gray-300 rounded-lg"
-            style={{ minWidth: '120px' }}
-                        />
-                    </div>
-            <div className="mr-2">
-                <label className="block mb-2 font-semibold">Quantity</label>
-                <input
-                    type="number"
-                    placeholder="Quantity"
-                    value={variant.quantity}
-                    onChange={(e) => handleFabricVariantChange(index, 'quantity', e.target.value)}
-                    className="w-1/3 p-3 border border-gray-300 rounded-lg"
-                />
-            </div>
-            {productData.fabric_variants.length > 1 && (
-                <button type="button" onClick={() => removeFabricVariant(index)} className="text-red-500">
-                    <MdDeleteForever size={24} />
-                </button>
-            )}
-        </div>
-        </div>
-        ))}
-            <button
-                type="button"
-                onClick={addFabricVariant}
-                className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500"
-            >
-                Add Fabric Variant
-            </button>
-                    </div>
-                        </div>
-                    )}
-                    <div className="text-center">
-                    <button 
-                        type="submit" 
-                        disabled={isSubmitting}
-                        className={`px-6 py-3 text-white rounded-lg transition-colors duration-300 ${
-                            isSubmitting 
-                            ? 'bg-gray-400 cursor-not-allowed' 
-                            : 'bg-blue-500 hover:bg-blue-600'   
-                        }`}
-                    >
-                        {isSubmitting ? 'Saving...' : 'Submit'}
-                    </button>
                 </div>
-                </form>
-            </div>
-        ) : (
-            <p className="text-center">Please log in to list a product.</p>
-        )
-    );
-}
+              )}
+              <div className="text-center">
+                <button 
+                  type="submit" 
+                  className="px-8 py-3 bg-black text-white font-bold rounded-full shadow-md"
+                >
+                  List Product
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : null
+      );
+    }

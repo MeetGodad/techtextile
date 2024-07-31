@@ -129,6 +129,7 @@ const AddressInput = ({
           type="text" 
           required
           placeholder=" "
+          autocomplete="off"
           value={street}
           disabled={role === ""}
           onChange={handleManualInput}
@@ -147,6 +148,7 @@ const AddressInput = ({
             type="text" 
             required
             placeholder=" "
+            autocomplete="off"
             value={city}
             disabled={role === "" || !isManualEntry}
             readOnly
@@ -164,6 +166,7 @@ const AddressInput = ({
             type="text" 
             required
             placeholder=" "
+            autocomplete="off"
             value={state}
             disabled={role === "" || !isManualEntry}
             readOnly
@@ -183,6 +186,7 @@ const AddressInput = ({
             type="text" 
             required
             placeholder=" "
+            autocomplete="off"
             value={postalCode}
             disabled={role === "" || !isManualEntry}
             readOnly
@@ -200,6 +204,7 @@ const AddressInput = ({
             type="text" 
             required
             placeholder=" "
+            autocomplete="off"
             value={country}
             disabled={role === "" || !isManualEntry}
             readOnly
