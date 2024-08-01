@@ -23,41 +23,44 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
       try {
         if (user) {
           const userId = user.uid;
-          fetch(`/api/cart/${userId}`, {
+          const response = await fetch(`/api/cart/${userId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
             },
-          })
-            .then(response => {
-              return response.json();
-            })
-            .then(data => {
-              if (data && typeof data === 'object') {
-                setCart(data);
-              } else {
-                console.error('Server response is not an object:', data);
-              }
-            })
-            .catch(error => {
-              console.error('Unexpected server response:', error);
-            });
+          });
+  
+          if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data)) {
+              setCart(data);
+            } else {
+              console.error('Server response is not an array:', data);
+            }
+          } else {
+            console.error('Network response was not ok:', response.statusText);
+          }
         }
+        window.dispatchEvent(new Event('cartUpdated'));
+
       } catch (error) {
         console.error('Error fetching the cart:', error);
       }
     };
-
+  
+    fetchCart();
+  
     const handleCartUpdate = () => {
       fetchCart();
     };
-
+  
     window.addEventListener('cartUpdated', handleCartUpdate);
-
+  
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate);
     };
   }, [user]);
+  
 
   const handleSearch = async () => {
     try {
@@ -163,12 +166,13 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
               <div id="cart-icon" className="relative flex items-center w-10 h-8">
                 <RiShoppingBag4Fill size={45} />
                 {user && cart.length > 0 && (
-                  <div className="bg-red-600 text-white rounded-full text-xs w-7 h-5 flex items-center mb-4 justify-center">
+                  <div className="bg-red-600 text-white rounded-full text-xs w-7 h-5 flex items-center mb-4 justify-center absolute -top-1 -right-1">
                     {cart.length}
                   </div>
                 )}
               </div>
             </Link>
+
             {user ? (
               <Link href="/Profile" className="nav-link font-semibold ml-4 mr-4">
                 <div className="flex items-center">
