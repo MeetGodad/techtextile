@@ -137,6 +137,9 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+.fixed-width {
+  width: 200px; /* Set a fixed width */
+}
 
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
@@ -358,3 +361,6 @@ header.bg-white {
   background-color: white;
 }
 
+.circle-image img {
+  border-radius: 50%;
+}
