@@ -4,8 +4,6 @@ import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
 import Loder from '../components/Loder';
 import { useRouter } from 'next/navigation';
-import styled, { keyframes } from 'styled-components';
-import Image from 'next/image';
 import Header from '../components/Navbar'
 
 export default function Home({ category, subCategory, subSubCategory, searchResults, props}) {

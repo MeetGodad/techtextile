@@ -41,7 +41,6 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
             console.error('Network response was not ok:', response.statusText);
           } 
         }
-        window.dispatchEvent(new Event('cartUpdated'));
 
       } catch (error) {
         console.error('Error fetching the cart:', error);
@@ -104,10 +103,6 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
   const textColor = isHomePage && !isSticky ? 'text-white' : 'text-black';
   const backgroundColor = isHomePage && !isSticky ? 'bg-transparent' : 'bg-white';
 
-  /*useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);*/
 
   return (
     <header className={`w-full flex items-center gap-80 px-3 box-border z-40 fixed top-0 leading-normal tracking-normal text-xl font-sans  ${backgroundColor} ${isSticky ? 'bg-white shadow-md' : 'bg-transparent'}`}>
