@@ -673,5 +673,5 @@ const renderStep = () => {
       </div>
   );
 };
-    
+  
 export default Checkout;

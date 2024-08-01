@@ -228,7 +228,7 @@ const PurchaseHistory = ({ userId }) => {
     <div className="w-full min-h-screen bg-gray-100 p-8">
       <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Purchase History</h2>
       {isLoading ? (
-      <div className="self-center">
+      <div className="flex justfy-center align-self ">
         <Loder />
       </div>
     ) : orders.length === 0 ? (
