@@ -60,7 +60,7 @@ export async function GET(req) {
     }
 }
 
-//Put request
+//PUT Request
 export async function PUT(req) {
     const sql = neon(process.env.DATABASE_URL || "");
     const url = new URL(req.url);
@@ -93,27 +93,48 @@ export async function PUT(req) {
             SET product_name = ${product_name}, product_description = ${product_description}, price = ${price}, image_url = ${image_url}
             WHERE product_id = ${productId}`;
 
-        // Set the quantity of the existing variants to 0
-        await sql`
-            UPDATE productvariant
-            SET quantity = 0
-            WHERE product_id = ${productId}`;
-
+        // Update existing variants and add new ones
         if (product_type === 'yarn') {
             for (const variant of yarn_variants) {
                 for (const denier of variant.deniers) {
                     const variantAttributes = `Color: ${variant.color}, Denier: ${denier.denier}`;
-                    await sql`
-                        INSERT INTO productvariant (product_id, variant_attributes, quantity)
-                        VALUES (${productId}, ${variantAttributes}, ${denier.quantity})`;
+                    const existingVariant = await sql`
+                        SELECT variant_id FROM productvariant 
+                        WHERE product_id = ${productId} AND variant_attributes = ${variantAttributes};`;
+
+                    if (existingVariant.length > 0) {
+                        // Update the existing variant quantity
+                        await sql`
+                            UPDATE productvariant
+                            SET quantity = ${denier.quantity}
+                            WHERE variant_id = ${existingVariant[0].variant_id};`;
+                    } else {
+                        // Insert new variant
+                        await sql`
+                            INSERT INTO productvariant (product_id, variant_attributes, quantity)
+                            VALUES (${productId}, ${variantAttributes}, ${denier.quantity});`;
+                    }
                 }
             }
         } else if (product_type === 'fabric') {
             for (const variant of fabric_variants) {
                 const variantAttributes = `Color: ${variant.color}`;
-                await sql`
-                    INSERT INTO productvariant (product_id, variant_attributes, quantity)
-                    VALUES (${productId}, ${variantAttributes}, ${variant.quantity})`;
+                const existingVariant = await sql`
+                    SELECT variant_id FROM productvariant 
+                    WHERE product_id = ${productId} AND variant_attributes = ${variantAttributes};`;
+
+                if (existingVariant.length > 0) {
+                    // Update the existing variant quantity
+                    await sql`
+                        UPDATE productvariant
+                        SET quantity = ${variant.quantity}
+                        WHERE variant_id = ${existingVariant[0].variant_id};`;
+                } else {
+                    // Insert new variant
+                    await sql`
+                        INSERT INTO productvariant (product_id, variant_attributes, quantity)
+                        VALUES (${productId}, ${variantAttributes}, ${variant.quantity});`;
+                }
             }
         }
 
@@ -130,36 +151,44 @@ export async function PUT(req) {
 
 
 
-
 // DELETE REQUEST
 
 export async function DELETE(req) {
     try {
-        const databaseUrl = process.env.DATABASE_URL || "";
-        const sql = neon(databaseUrl);
-        const url = new URL(req.url);
-        const pathSegments = url.pathname.split('/');
-        const productId = pathSegments[pathSegments.length - 1];
-
-        console.log("Product ID to delete:", productId);
-
-        if (!productId) {
-            console.error("Product ID is missing");
-            return new Response(JSON.stringify({ message: "productId is required" }), { status: 400 });
-        }
-
-        // Update the quantity to 0 for all variants of the product
+      const databaseUrl = process.env.DATABASE_URL || "";
+      const sql = neon(databaseUrl);
+      const url = new URL(req.url);
+      const pathSegments = url.pathname.split('/');
+      const productId = pathSegments[pathSegments.length - 1];
+      const variantId = url.searchParams.get('variantId'); // Get the variantId from the query params
+  
+      console.log("Product ID to delete:", productId);
+      console.log("Variant ID to delete:", variantId);
+  
+      if (!productId) {
+        console.error("Product ID is missing");
+        return new Response(JSON.stringify({ message: "productId is required" }), { status: 400 });
+      }
+  
+      if (variantId) {
+        // Delete only the specified variant by setting its quantity to 0
         await sql`
-            UPDATE productvariant
-            SET quantity = 0
-            WHERE product_id = ${productId};`;
-
+          UPDATE productvariant
+          SET quantity = 0
+          WHERE product_id = ${productId} AND variant_id = ${variantId};`;
+        return new Response(JSON.stringify({ message: "Variant deleted successfully" }), { status: 200 });
+      } else {
+        // Delete the entire product by setting the quantity to 0 for all variants
+        await sql`
+          UPDATE productvariant
+          SET quantity = 0
+          WHERE product_id = ${productId};`;
         return new Response(JSON.stringify({ message: "Product soft deleted successfully" }), { status: 200 });
-
+      }
+  
     } catch (error) {
-        console.error('An error occurred: Internal server error', error);
-        console.error('Error details:', error);
-        return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
+      console.error('An error occurred: Internal server error', error);
+      console.error('Error details:', error);
+      return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
     }
-}
-
+  }
