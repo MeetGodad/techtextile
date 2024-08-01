@@ -134,7 +134,7 @@ export default function Login({ onSwitch }) {
           onClick={() => onSwitch('signup')} 
           className="text-black text-sm font-bold md:text-lg hover:underline mb-19 transition duration-300"
         >
-          Don't have an account? Sign Up<br />
+          Don&apos;t have an account? Sign Up<br />
         </button>
       </div>
     </div>
