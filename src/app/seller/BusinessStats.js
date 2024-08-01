@@ -33,8 +33,12 @@ const BusinessStats = ({ userId }) => {
       .catch(error => console.error('Error fetching business stats:', error));
   }, [userId]);
 
+  const truncateProductName = (name) => {
+    return name.length > 12 ? name.slice(0, 12) + '...' : name;
+  };
+
   const productData = {
-    labels: salesByProduct.map(item => item.product_name),
+    labels: salesByProduct.map(item => truncateProductName(item.product_name)),
     datasets: [
       {
         label: 'Total Sales',
@@ -73,6 +77,14 @@ const BusinessStats = ({ userId }) => {
         type: 'category',
         ticks: {
           autoSkip: false,
+          callback: function (val, index) {
+            return this.getLabelForValue(val).split(' ').map((word, i, arr) => {
+              if (arr.length > 1 && i < arr.length - 1) return word + ' ';
+              return word;
+            });
+          },
+          maxRotation: 0,
+          minRotation: 0,
         },
       },
       y: {
@@ -109,4 +121,3 @@ const BusinessStats = ({ userId }) => {
 };
 
 export default BusinessStats;
-

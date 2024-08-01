@@ -13,7 +13,6 @@ export async function GET(req, { params }) {
 
         const cart = await sql`
             WITH UserCart AS (
-            
             SELECT cart_id 
             FROM ShoppingCart 
             WHERE user_id = ${id}

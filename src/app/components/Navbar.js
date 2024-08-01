@@ -23,37 +23,44 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
       try {
         if (user) {
           const userId = user.uid;
-          fetch(`/api/cart/${userId}`, {
+          const response = await fetch(`/api/cart/${userId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
             },
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data && typeof data === 'object') {
-                setCart(data);
-              } else {
-                console.error('Server response is not an object:', data);
-              }
-            })
-            .catch(error => console.error('Unexpected server response:', error));
+          });
+  
+          if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data)) {
+              setCart(data);
+            } else {
+              console.error('Server response is not an array:', data);
+            }
+          } else {
+            console.error('Network response was not ok:', response.statusText);
+          } 
         }
+        window.dispatchEvent(new Event('cartUpdated'));
+
       } catch (error) {
         console.error('Error fetching the cart:', error);
       }
     };
-
+  
+    fetchCart();
+  
     const handleCartUpdate = () => {
       fetchCart();
     };
-
+  
     window.addEventListener('cartUpdated', handleCartUpdate);
-
+  
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate);
     };
   }, [user]);
+  
 
   const handleSearch = async () => {
     try {
