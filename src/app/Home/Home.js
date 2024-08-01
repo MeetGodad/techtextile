@@ -1,6 +1,4 @@
-// Home.js
 "use client";
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import ProductSection from '../components/ProductSection';
 import { useUserAuth } from '../auth/auth-context';
@@ -8,8 +6,9 @@ import Loder from '../components/Loder';
 import { useRouter } from 'next/navigation';
 import styled, { keyframes } from 'styled-components';
 import Image from 'next/image';
+import Header from '../components/Navbar'
 
-export default function Home({ category, subCategory, subSubCategory, searchResults }) {
+export default function Home({ category, subCategory, subSubCategory, searchResults, props}) {
   const { user } = useUserAuth();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
@@ -102,14 +101,18 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
 
   return (
     <div className="relative flex flex-col w-full min-h-0 bg-white overflow-x-auto z-20 overflow-hidden">
+      <Header isHomePage={true} />
       {/* Background Image Section */}
-      <div className="relative h-screen w-full bg-cover bg-center" style={{ backgroundImage: `url('../Images/Choosing clothes.gif')` }}>
-        <div className="flex flex-col items-center justify-center h-full bg-black bg-opacity-50 text-white">
-          <h1 className="text-5xl font-bold mb-4">Fabric Sourcing. Simplified.</h1>
-          <p className="text-2xl">Tech-enabled Sourcing-to-Production</p>
-          <p className="text-2xl">AI-enabled Fabric-to-Garment Visualization</p>
-          <p className="text-2xl">Trusted by 400+ Private Labels Globally</p>
+      <div className="relative h-screen w-full bg-cover bg-center" style={{ backgroundImage: `url('../Images/cotton fabric.gif')` /*, backgroundSize: 'contain', backgroundRepeat: 'no-repeat'*/ }}>
+        <div className="flex flex-col items-baseline justify-center h-full bg-black bg-opacity-60 text-white">
+          <h1 className="text-5xl font-bold ml-10 mb-6">Your Gateway to Premium Fabrics and Yarn.</h1>
+          <p className="text-3xl mb-3">✦ Seamless Buying and Selling Experience</p>
+          <p className="text-3xl mb-3">✦ Exclusive Designs and Quality Materials</p>
+          <p className="text-3xl">✦ Trusted by Artisans and Brands Worldwide</p>
         </div>
+        {/*<div className="absolute right-0 bottom-0 mr-10 mb-10 w-1/3 h-auto rounded-full">
+          <Image src="/Images/Choosing clothes.gif" alt="Choosing clothes" layout="responsive" width={500} height={500} className="rounded-full"/>
+        </div>*/}
       </div>
       {/* Product Listing Section */}
       <main className="max-w-screen-xl mx-auto mt-20">
