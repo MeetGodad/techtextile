@@ -112,7 +112,6 @@ export default function Profile() {
   return (
 
 
-
     (user && userDetails) ? (
 
       <div className="min-h-screen bg-gray-100 flex">
@@ -235,8 +234,9 @@ export default function Profile() {
         </div>
       
       </div>
-    </div>
-    )
+
+     </div>
+    ) 
     :
     (
       <div className="min-h-screen flex items-center justify-center">
