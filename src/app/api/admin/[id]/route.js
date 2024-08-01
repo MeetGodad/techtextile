@@ -49,7 +49,8 @@
 //         a.street,
 //         a.city,
 //         a.state,
-//         a.postal_code
+//         a.postal_code,
+//         pv.variant_attributes
 //       FROM Orders o
 //       JOIN OrderItems oi ON o.order_id = oi.order_id
 //       JOIN Products p ON oi.product_id = p.product_id
@@ -58,6 +59,7 @@
 //       JOIN Buyers b ON o.user_id = b.user_id
 //       JOIN UserAccounts ua ON b.user_id = ua.user_id
 //       JOIN Addresses a ON b.user_address = a.address_id
+//       JOIN ProductVariant pv ON p.product_id = pv.product_id
 //       WHERE p.seller_id = ${sellerId}
 //     `;
 
@@ -76,12 +78,11 @@
 //   }
 // }
 
-
 import { neon } from '@neondatabase/serverless';
 
-export const fetchCache = 'force-no-store'
-export const revalidate = 0 // seconds
-export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store';
+export const revalidate = 0; // seconds
+export const dynamic = 'force-dynamic';
 
 export async function GET(req, { params }) {
   const userId = params.id;
@@ -129,7 +130,8 @@ export async function GET(req, { params }) {
         a.city,
         a.state,
         a.postal_code,
-        pv.variant_attributes
+        pv.variant_attributes,
+        pv.variant_id
       FROM Orders o
       JOIN OrderItems oi ON o.order_id = oi.order_id
       JOIN Products p ON oi.product_id = p.product_id
@@ -138,7 +140,7 @@ export async function GET(req, { params }) {
       JOIN Buyers b ON o.user_id = b.user_id
       JOIN UserAccounts ua ON b.user_id = ua.user_id
       JOIN Addresses a ON b.user_address = a.address_id
-      JOIN ProductVariant pv ON p.product_id = pv.product_id
+      JOIN ProductVariant pv ON oi.variant_id = pv.variant_id
       WHERE p.seller_id = ${sellerId}
     `;
 
