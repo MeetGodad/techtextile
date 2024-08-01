@@ -55,41 +55,54 @@ export default function Login( {onSwitch} ) {
   }
 
   return (
-      <div className="relative flex-col flex items-center justify-center w-full bg-white">
-        <div className="absolute  text-black top-4 right-3 text-5xl font-semibold mb-8">LOG</div>
 
-
-        <form  onSubmit={handleSubmit}  className="max-w-2xl mx-auto p-8 pt-12 bg-white rounded-md shadow-2xl w-96">
-         <div className="w-full max-w-md">
-
-            <div className="mb-4">
-              <label className="block text-black text-sm font-semibold mb-2">EMAIL</label>
-              <input 
-              type="email" 
+    <div className="relative flex flex-col items-center justify-center min-h-screen w-full bg-white p-4">
+      <div className="absolute top-4 right-6 text-4xl md:text-5xl text-black font-semibold z-10 animate-fadeInUp">LOG</div>
+  
+      <form 
+        onSubmit={handleSubmit} 
+        className="max-w-md mx-auto p-8 pt-12 bg-white rounded-lg shadow-2xl w-full md:w-96 animate-fadeInDown transition-all duration-700 ease-in-out"
+      >
+        <div className="w-full">
+          <div className="mb-6">
+            <label className="block text-black text-sm font-semibold mb-2" htmlFor="email">EMAIL</label>
+            <input
+              type="email"
+              id="email"
               required
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"/>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-black text-sm font-semibold mb-2">PASSWORD</label>
-              <input
-              required  
-              type="password" 
-                onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 pl-2 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent" />
-            </div>
-
-          <button className="w-full p-3 bg-black text-white rounded-md font-semibold text-xl">
+              className="w-full p-3 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition duration-300"
+            />
+          </div>
+  
+          <div className="mb-6">
+            <label className="block text-black text-sm font-semibold mb-2" htmlFor="password">PASSWORD</label>
+            <input
+              type="password"
+              id="password"
+              required
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition duration-300"
+            />
+          </div>
+  
+          <button 
+            type="submit"
+            className="w-full p-3 bg-black text-white rounded-md font-semibold text-lg hover:bg-gray-800 transition duration-300"
+          >
             CONTINUE
           </button>
         </div>
       </form>
-      <div className="absolute bottom-28 left-0 w-full text-center mb-5">
-        <button onClick={() => onSwitch('signup')} className="text-black font-bold text-xl hover:underline transition duration-300">
-          Don’t have an account?
+  
+      <div className="absolute bottom-8 w-full text-center">
+        <button 
+          onClick={() => onSwitch('signup')} 
+          className="text-black text-sm font-bold md:text-lg hover:underline mb-24 transition duration-300"
+        >
+          Don’t have an account? Sign Up<br />
         </button>
       </div>
     </div>
   );
-}
+}  

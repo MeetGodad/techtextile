@@ -18,7 +18,7 @@ const FabricVariants = ({ productData,
                                     name="fabric_print_tech" 
                                     value={productData.fabric_print_tech} 
                                     onChange={handleChange} 
-                                    className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                                 >
                                     <option value="" disabled>Select Fabric Print Technology</option>
                                     <option value="Handblock & Dyed">Handblock & Dyed</option>
@@ -37,7 +37,7 @@ const FabricVariants = ({ productData,
                                     name="fabric_material" 
                                     value={productData.fabric_material}  
                                     onChange={handleChange} 
-                                    className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                                 >
                                     <option value="" disabled>Select Fabric Material</option>
                                     <option value="Cotton">Cotton</option>
@@ -66,7 +66,7 @@ const FabricVariants = ({ productData,
                                                     placeholder="Color"
                                                     value={variant.color}
                                                     onChange={(e) => handleFabricVariantChange(index, 'color', e.target.value)}
-                                                    className="w-40 h-16 p-2 border border-gray-300 rounded-lg"
+                                                    className="w-40 h-16 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                                                 />
                                             </div>
                                             <div className="mr-4">
@@ -78,11 +78,11 @@ const FabricVariants = ({ productData,
                                                     min='1'
                                                     value={variant.quantity}
                                                     onChange={(e) => handleFabricVariantChange(index, 'quantity', e.target.value)}
-                                                    className="w-32 p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    className="w-32 p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                                                 />
                                             </div>
                                             {productData.fabric_variants.length > 1 && (
-                                                <button type="button" onClick={() => removeFabricVariant(index)} className="text-red-500 mt-6">
+                                                <button type="button" onClick={() => removeFabricVariant(index)} className="text-black-500 mt-6">
                                                     <MdDeleteForever size={24} />
                                                 </button>
                                             )}
@@ -92,7 +92,7 @@ const FabricVariants = ({ productData,
                                 <button
                                     type="button"
                                     onClick={addFabricVariant}
-                                    className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-blue-600"
+                                    className="px-4 py-2 mt-2 bg-gray-600 text-white rounded-lg border border-gray-500 hover:bg-gray-800"
                                 >
                                     Add Fabric Variant
                                 </button>

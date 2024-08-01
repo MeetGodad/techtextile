@@ -4,6 +4,7 @@ import { useLoadScript } from '@react-google-maps/api';
 const libraries = ['places'];
 
 const AddressInput = ({ 
+  setIsAddressLoaded,
   supportedCountries,
   role, 
   street, 
@@ -38,8 +39,10 @@ const AddressInput = ({
       });
       autocompleteRef.current = autocompleteInstance;
       autocompleteInstance.addListener('place_changed', handlePlaceSelect);
+      setIsAddressLoaded(true); // Notify parent that Address Input is loaded
     }
-  }, [isLoaded]);
+  }, [isLoaded, setIsAddressLoaded]);
+
 
   const handlePlaceSelect = () => {
     const place = autocompleteRef.current.getPlace();
@@ -129,6 +132,7 @@ const AddressInput = ({
           type="text" 
           required
           placeholder=" "
+          autocomplete="off"
           value={street}
           disabled={role === ""}
           onChange={handleManualInput}
@@ -147,6 +151,7 @@ const AddressInput = ({
             type="text" 
             required
             placeholder=" "
+            autocomplete="off"
             value={city}
             disabled={role === "" || !isManualEntry}
             readOnly
@@ -164,6 +169,7 @@ const AddressInput = ({
             type="text" 
             required
             placeholder=" "
+            autocomplete="off"
             value={state}
             disabled={role === "" || !isManualEntry}
             readOnly
@@ -183,6 +189,7 @@ const AddressInput = ({
             type="text" 
             required
             placeholder=" "
+            autocomplete="off"
             value={postalCode}
             disabled={role === "" || !isManualEntry}
             readOnly
@@ -200,6 +207,7 @@ const AddressInput = ({
             type="text" 
             required
             placeholder=" "
+            autocomplete="off"
             value={country}
             disabled={role === "" || !isManualEntry}
             readOnly

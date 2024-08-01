@@ -36,7 +36,7 @@ export async function POST(request) {
       } else {
         const newAddress = await sql`
           INSERT INTO addresses (user_id, address_type, address_first_name, address_last_name, address_email, phone_num, street, city, state, postal_code, country)
-          VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${phone} ${street}, ${city}, ${state}, ${zip}, ${country})
+          VALUES (${userId}, 'shipping', ${firstName}, ${lastName}, ${email}, ${phone}, ${street}, ${city}, ${state}, ${zip}, ${country})
           RETURNING address_id;
         `;
         shippingAddressId = newAddress[0].address_id;
@@ -53,8 +53,8 @@ export async function POST(request) {
       // Insert order items and update inventory
       for (const item of cart) {
         await sql`
-          INSERT INTO orderitems (order_id, product_id, quantity, item_price, variant_id , item_status)
-          VALUES (${orderId}, ${item.product_id}, ${item.quantity}, ${item.price}, ${item.selected_variant.variant_id} , 'active');
+          INSERT INTO orderitems (order_id, product_id, quantity, item_price, variant_id, item_status)
+          VALUES (${orderId}, ${item.product_id}, ${item.quantity}, ${item.price}, ${item.selected_variant.variant_id}, 'active');
         `;
 
         await sql`

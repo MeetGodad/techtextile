@@ -194,7 +194,7 @@ return (
                                 name="product_name" 
                                 value={productData.product_name} 
                                 onChange={handleChange} 
-                                className="w-full p-4 border  border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-4 border  border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                             />
                             
                         </div>
@@ -205,7 +205,7 @@ return (
                                 value={productData.product_type} 
                                 onChange={handleChange} 
                                 required 
-                                className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                             >
                                 <option value="">Select Type</option>
                                 <option value="yarn">Yarn</option>
@@ -220,19 +220,19 @@ return (
                             name="description" 
                             value={productData.description} 
                             onChange={handleChange} 
-                            className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 resize-none"
+                            className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 h-32 resize-none"
                         ></textarea>
                     </div>
                     <div className='grid grid-cols-1 mt-4 md:grid-cols-2 gap-8'>
                         <div className="space-y-2">
-                            <label className="block text-lg font-semibold">Price</label>
+                            <label className="block text-lg font-semibold">{productData.product_type === 'yarn' ? 'Price/Kg' : productData.product_type === 'fabric' ? 'Price/Meter' : 'Price'}</label>
                             <input 
                                 type="text" 
                                 required 
                                 name="price" 
                                 value={productData.price} 
                                 onChange={handleChange} 
-                                className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                             />
                         </div>
                         <div className="space-y-2">
@@ -276,7 +276,7 @@ return (
                             className={`px-6 py-3 text-white rounded-lg transition-colors duration-300 ${
                                 isSubmitting 
                                 ? 'bg-gray-400 cursor-not-allowed' 
-                                : 'bg-blue-500 hover:bg-blue-600'   
+                                : 'bg-gray-600 hover:bg-gray-800'   
                             }`}
                         >
                             {isSubmitting ? 'Saving...' : 'Submit'}
@@ -290,3 +290,4 @@ return (
         )
     );
 }
+
