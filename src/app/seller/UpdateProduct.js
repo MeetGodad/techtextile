@@ -345,6 +345,7 @@
 //     );
 // }
 
+
 "use client";
 import React, { useEffect, useState } from 'react';
 import { storage } from '../auth/firebase';
@@ -363,8 +364,19 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
     const [productData, setProductData] = useState({
         ...product,
         userId: user ? user.uid : '',
-        yarn_variants: product.yarn_variants || [{ variant_id: '', color: '', deniers: [{ denier: '', quantity: 0 }] }],
-        fabric_variants: product.fabric_variants || [{ variant_id: '', color: '', quantity: 0 }],
+        yarn_variants: product.variants ? product.variants.filter(variant => variant.variant_attributes.includes('Denier')).map(variant => ({
+            variant_id: variant.variant_id,
+            color: variant.variant_attributes.match(/Color: (.*?)(,|$)/)[1],
+            deniers: [{
+                denier: variant.variant_attributes.match(/Denier: (.*?)(,|$)/)[1],
+                quantity: variant.quantity
+            }]
+        })) : [],
+        fabric_variants: product.variants ? product.variants.filter(variant => !variant.variant_attributes.includes('Denier')).map(variant => ({
+            variant_id: variant.variant_id,
+            color: variant.variant_attributes.match(/Color: (.*?)(,|$)/)[1],
+            quantity: variant.quantity
+        })) : [],
     });
     const [error, setError] = useState(null);
 
@@ -377,6 +389,25 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
     useEffect(() => {
         window.scrollTo({ top: position.top - window.innerHeight / 2 + 150, behavior: 'smooth' });
     }, [position]);
+
+    useEffect(() => {
+        setProductData({
+            ...product,
+            yarn_variants: product.variants ? product.variants.filter(variant => variant.variant_attributes.includes('Denier')).map(variant => ({
+                variant_id: variant.variant_id,
+                color: variant.variant_attributes.match(/Color: (.*?)(,|$)/)[1],
+                deniers: [{
+                    denier: variant.variant_attributes.match(/Denier: (.*?)(,|$)/)[1],
+                    quantity: variant.quantity
+                }]
+            })) : [],
+            fabric_variants: product.variants ? product.variants.filter(variant => !variant.variant_attributes.includes('Denier')).map(variant => ({
+                variant_id: variant.variant_id,
+                color: variant.variant_attributes.match(/Color: (.*?)(,|$)/)[1],
+                quantity: variant.quantity
+            })) : [],
+        });
+    }, [product]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -566,7 +597,7 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                                 <input 
                                     type="text" 
                                     name="yarn_material" 
-                                    value={productData.yarn_material}
+                                    value={productData.yarn_material || ''}
                                     readOnly
                                     className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100"
                                 />
@@ -578,7 +609,7 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                                         <label className="block font-semibold">Color</label>
                                         <input
                                             type="color"
-                                            value={variant.color}
+                                            value={variant.color || ''}
                                             onChange={(e) => handleYarnVariantChange(index, 'color', e.target.value)}
                                             className="w-12 h-12 p-1 border border-black rounded-lg" 
                                         />
@@ -588,7 +619,7 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                                                     <label className="block font-semibold">Denier</label>
                                                     <input
                                                         type="text"
-                                                        value={denier.denier}
+                                                        value={denier.denier || ''}
                                                         onChange={(e) => handleDeniersChange(index, denierIndex, 'denier', e.target.value)}
                                                         className="w-full p-3 border border-gray-300 rounded-lg"
                                                     />
@@ -597,7 +628,7 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                                                     <label className="block font-semibold">Quantity</label>
                                                     <input
                                                         type="number"
-                                                        value={denier.quantity}
+                                                        value={denier.quantity || 0}
                                                         onChange={(e) => handleDeniersChange(index, denierIndex, 'quantity', e.target.value)}
                                                         className="w-full p-3 border border-gray-300 rounded-lg"
                                                     />
@@ -634,7 +665,7 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                                 <input
                                     type="text"
                                     name="fabric_print_tech"
-                                    value={productData.fabric_print_tech}
+                                    value={productData.fabric_print_tech || ''}
                                     readOnly
                                     className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100"
                                 />
@@ -644,7 +675,7 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                                 <input
                                     type="text"
                                     name="fabric_material"
-                                    value={productData.fabric_material}
+                                    value={productData.fabric_material || ''}
                                     readOnly
                                     className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100"
                                 />
@@ -656,7 +687,7 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                                         <label className="block font-semibold">Color</label>
                                         <input
                                             type="color"
-                                            value={variant.color}
+                                            value={variant.color || ''}
                                             onChange={(e) => handleFabricVariantChange(index, 'color', e.target.value)}
                                             className="w-12 h-12 p-1 border border-black rounded-lg"
                                         />
@@ -665,7 +696,7 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
                                                 <label className="block font-semibold">Quantity</label>
                                                 <input
                                                     type="number"
-                                                    value={variant.quantity}
+                                                    value={variant.quantity || 0}
                                                     onChange={(e) => handleFabricVariantChange(index, 'quantity', e.target.value)}
                                                     className="w-full p-3 border border-gray-300 rounded-lg"
                                                 />
