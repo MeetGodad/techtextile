@@ -44,12 +44,21 @@ const Checkout = () => {
   const [shippingDetails, setShippingDetails] = useState([]);
   const [existingAddresses, setExistingAddresses] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddressLoaded, setIsAddressLoaded] = useState(true);
+  const [isFormLoaded, setIsFormLoaded] = useState(false);
+  
+  useEffect(() => {
+    if (isAddressLoaded) {
+      setIsFormLoaded(true);
+    }
+  }, [isAddressLoaded]);
+  
+
 
   const handleShippingDetailsChange = (details) => {
     setShippingDetails(details);
   };
   
-
   const handleTotalShippingCostChange = (cost) => {
     setTotalShippingCost(cost);
   };
@@ -98,22 +107,30 @@ const Checkout = () => {
   };
 
   // Handle checkbox change to use signup address for shipping
-  const handleCheckboxChange = () => {
-    setUseSignupAddress(!useSignupAddress);
-
-    if (!useSignupAddress) {
-      // Autofill shipping details with signup address
+  const handleCheckboxChange = (e) => {
+    setUseSignupAddress(e.target.checked);
+    if (e.target.checked) {
+      if (signupAddress.country === 'IN') {
+        Swal.fire({
+          title: 'Address Country Not Supported',
+          text: 'At this time any other addresses are not supported for shipping. Please provide a Canadian Address',
+          icon: 'error',
+          confirmButtonText: 'OK'
+      });
+        setUseSignupAddress(false);
+      } else {
       setShippingInfo({
         firstName: signupAddress.address_first_name || '',
         lastName: signupAddress.address_last_name || '',
         street: signupAddress.street || '',
         city: signupAddress.city || '',
-        state: signupAddress.state || '',
+        state: signupAddress.stateCode || '',
         zip: signupAddress.postal_code || '',
-        country: signupAddress.country || '',
+        country: signupAddress.countryCode || '',
         email: signupAddress.address_email || '',
         phone: signupAddress.phone_num || '',
       });
+    }
     } else {
       // Clear shipping details if the checkbox is unchecked
       setShippingInfo({
@@ -140,8 +157,8 @@ const Checkout = () => {
 
   // Function to validate step 1 (shipping details)
   const validateStep1 = () => {
-    const { firstName, lastName, street, city, state, zip, email, country } = shippingInfo;
-    setIsStepValid(firstName && lastName && street && city && state && zip && email && country);
+    const { firstName, lastName, street, city, stateCode, zip, email, countryCode } = shippingInfo;
+    setIsStepValid(firstName && lastName && street && city && stateCode && zip && email && countryCode);
   };
 
   // Handler to move to previous step
@@ -183,9 +200,9 @@ const Checkout = () => {
                 lastName: shippingInfo.lastName,
                 street: shippingInfo.street,
                 city: shippingInfo.city,
-                state: shippingInfo.state,
+                state: shippingInfo.stateCode,
                 zip: shippingInfo.zip,
-                country: shippingInfo.country,
+                country: shippingInfo.countryCode,
                 email: shippingInfo.email,
                 phone: shippingInfo.phone,
                 cart,
@@ -286,164 +303,176 @@ const handleAddressChange = (address) => {
       lastName: address.address_last_name || '',
       street: address.street || '',
       city: address.city || '',
-      state: address.state || '',
+      stateCode: address.state || '',
       zip: address.postal_code || '',
-      country: address.country || '',
+      countryCode: address.country || '',
       email: address.address_email || '',
       phone: address.phone_num || '',
     });
   setUseSignupAddress(false);
 };
+
+const filteredExistingAddresses = existingAddresses.filter(address => address.country !== 'IN');
+
 const renderStep = () => {
   switch (step) {
     case 1:
       return (
-        <div className="animate-fade-in-down">
-          <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">Shipping Details</h2>
-          <form className="space-y-6 bg-white p-8 rounded-xl shadow-lg max-w-2xl mx-auto transform transition duration-500 hover:shadow-2xl hover:scale-105">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="useSignupAddress"
-                name="useSignupAddress"
-                checked={useSignupAddress}
-                onChange={handleCheckboxChange}
-                className="form-checkbox h-5 w-5 text-blue-500 transition duration-300 ease-in-out transform hover:scale-110"
-              />
-              <label htmlFor="useSignupAddress" className="ml-2 text-black">
-                Use the same address as signup address
-              </label>
-            </div>
-            <div className="w-full max-w-md mx-auto">
-              <h2 className="text-lg font-semibold mb-4">Existing Shipping Addresses</h2>
-              {existingAddresses.length > 0 ? (
-                <div className="relative mb-10">
-                  <select
-                    onChange={(e) => {
-                      const selectedAddress = existingAddresses.find(
-                        (address) => address.address_id === parseInt(e.target.value)
-                      );
-                      handleAddressChange(selectedAddress);
-                    }}
-                    className="block w-full p-4 pr-8 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none bg-white text-gray-700 hover:bg-gray-50"
-                  >
-                    <option value="" disabled selected className="text-gray-500">
-                      Select an existing shipping address
-                    </option>
-                    {existingAddresses.map((address) => (
-                      <option 
-                        key={address.address_id} 
-                        value={address.address_id}
-                        className="truncate"
-                      >
-                        {`${address.address_first_name} ${address.address_last_name}, ${address.street}, ${address.city} ${address.postal_code}, ${address.country}`}
+        <div>
+          {!isFormLoaded ? (
+            <div className='text-black'>Loading...</div>
+          ) : (
+          <div className="animate-fade-in-down">
+            <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">Shipping Details</h2>
+            <form className="space-y-6 bg-white p-8 rounded-xl shadow-lg max-w-2xl mx-auto transform transition duration-500 hover:shadow-2xl hover:scale-105">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="useSignupAddress"
+                  name="useSignupAddress"
+                  checked={useSignupAddress}
+                  onChange={handleCheckboxChange}
+                  className="form-checkbox h-5 w-5 text-blue-500 transition duration-300 ease-in-out transform hover:scale-110"
+                />
+                <label htmlFor="useSignupAddress" className="ml-2 text-black">
+                  Use the same address as signup address
+                </label>
+              </div>
+              <div className="w-full max-w-md mx-auto">
+                <h2 className="text-lg font-semibold mb-4">Existing Shipping Addresses</h2>
+                {existingAddresses.length > 0 ? (
+                  <div className="relative mb-10">
+                    <select
+                      onChange={(e) => {
+                        const selectedAddress = existingAddresses.find(
+                          (address) => address.address_id === parseInt(e.target.value)
+                        );
+                        handleAddressChange(selectedAddress);
+                      }}
+                      className="block w-full p-4 pr-8 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none bg-white text-gray-700 hover:bg-gray-50"
+                    >
+                      <option value="" disabled selected className="text-gray-500">
+                        Select an existing shipping address
                       </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                    </svg>
+                      {existingAddresses.map((address) => (
+                        <option 
+                          key={address.address_id} 
+                          value={address.address_id}
+                          className="truncate"
+                        >
+                          {`${address.address_first_name} ${address.address_last_name}, ${address.street}, ${address.city} ${address.postal_code}, ${address.country}`}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                      </svg>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <p className="text-gray-600">No existing addresses found.</p>
-              )}
-            </div>        
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="relative group">
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder=" "
-                  value={shippingInfo.firstName}
-                  onChange={handleShippingChange}
-                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
-                />
-                <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
-                  First Name
-                </label>
-                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
-                  <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
-                </svg>
-              </div>
-              <div className="relative group">
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder=" "
-                  value={shippingInfo.lastName}
-                  onChange={handleShippingChange}
-                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
-                />
-                <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
-                  Last Name
-                </label>
-                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
-                  <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
-                </svg>
-              </div>
-            </div>
-            <div className="relative group">
-              <AddressInput
-                supportedCountries={['CA']}
-                role="shipping"
-                street={shippingInfo.street}
-                city={shippingInfo.city}
-                state={shippingInfo.state}
-                postalCode={shippingInfo.zip}
-                country={shippingInfo.country}
-                setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
-                setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
-                setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
-                setState={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
-                setCountry={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
-                setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
-                setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
-                inputClassName="w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white"
-                containerClassName="relative mb-4 group"
-                iconClassName="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
-              />
-            </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="relative group">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder=" "
-                  value={shippingInfo.email}
-                  onChange={handleShippingChange}
-                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
-                />
-                <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
-                  Email
-                </label>
-                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
-                  <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm2.5 0v.8l5.5 3.3 5.5-3.3V5H4.5zM4 15h12V7.5l-5.5 3.3-5.5-3.3V15z" />
-                </svg>
-              </div>
-              <div className="relative group">
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder=" "
-                  pattern="[0-9]{10}"
-                  value={shippingInfo.phone}
-                  onChange={handleShippingChange}
-                  className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
+                ) : (
+                  <p className="text-gray-600">No existing addresses found.</p>
+                )}
+              </div>        
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="relative group">
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder=" "
+                    value={shippingInfo.firstName}
+                    onChange={handleShippingChange}
+                    className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
                   />
                   <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
-                    Phone Number
+                    First Name
                   </label>
-                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
-                  <path d="M2.003 5.884l2.122-2.122a1 1 0 011.415 0l1.414 1.414a1 1 0 010 1.415l-1.293 1.293a12.042 12.042 0 005.657 5.657l1.293-1.293a1 1 0 011.415 0l1.414 1.414a1 1 0 010 1.415l-2.122 2.122a1 1 0 01-1.415 0C6.403 16.835 3.165 13.597 2.003 9.3a1 1 0 010-1.415z" />
-                </svg>
+                  <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
+                  </svg>
+                </div>
+                <div className="relative group">
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder=" "
+                    value={shippingInfo.lastName}
+                    onChange={handleShippingChange}
+                    className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
+                  />
+                  <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
+                    Last Name
+                  </label>
+                  <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 peer-focus:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a8.001 8.001 0 00-7.938 7h15.876A8.001 8.001 0 0010 12z" />
+                  </svg>
+                </div>
+              </div>  
+              <div className="relative group">
+                <AddressInput
+                  setIsAddressLoaded={setIsAddressLoaded}
+                  supportedCountries={['CA']}
+                  role="shipping"
+                  street={shippingInfo.street}
+                  city={shippingInfo.city}
+                  state={shippingInfo.stateCode}
+                  postalCode={shippingInfo.zip}
+                  country={shippingInfo.countryCode}
+                  setStreet={(value) => setShippingInfo(prev => ({ ...prev, street: value }))}
+                  setCity={(value) => setShippingInfo(prev => ({ ...prev, city: value }))}
+                  setPostalCode={(value) => setShippingInfo(prev => ({ ...prev, zip: value }))}
+                  setState={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
+                  setCountry={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
+                  setStateCode={(value) => setShippingInfo(prev => ({ ...prev, stateCode: value }))}
+                  setCountryCode={(value) => setShippingInfo(prev => ({ ...prev, countryCode: value }))}
+                  inputClassName="w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white"
+                  containerClassName="relative mb-4 group"
+                  iconClassName="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
+                />
               </div>
-            </div>
-          </form>
-        </div>
-  );
-      case 2:
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="relative group">
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder=" "
+                    value={shippingInfo.email}
+                    onChange={handleShippingChange}
+                    className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
+                  />
+                  <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
+                    Email
+                  </label>
+                  <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm2.5 0v.8l5.5 3.3 5.5-3.3V5H4.5zM4 15h12V7.5l-5.5 3.3-5.5-3.3V15z" />
+                  </svg>
+                </div>
+                <div className="relative group">
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder=" "
+                    pattern="[0-9]{10}"
+                    value={shippingInfo.phone}
+                    onChange={handleShippingChange}
+                    className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
+                    />
+                    <label className="absolute left-12 top-4 text-gray-500 transition-all duration-300 peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-blue-500 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:-ml-1">
+                      Phone Number
+                    </label>
+                  <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path d="M2.003 5.884l2.122-2.122a1 1 0 011.415 0l1.414 1.414a1 1 0 010 1.415l-1.293 1.293a12.042 12.042 0 005.657 5.657l1.293-1.293a1 1 0 011.415 0l1.414 1.414a1 1 0 010 1.415l-2.122 2.122a1 1 0 01-1.415 0C6.403 16.835 3.165 13.597 2.003 9.3a1 1 0 010-1.415z" />
+                  </svg>
+                </div>
+              </div>
+            </form>
+          </div> 
+          )}
+          </div>
+        );
+       
+        
+        case 2:
         return (
           <div className="animate-fade-in-down max-w-4xl mx-auto px-4">
             <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Review Your Order</h2>
@@ -454,7 +483,7 @@ const renderStep = () => {
                   <div className="space-y-1 text-sm">
                     <p className="text-gray-700">{shippingInfo.firstName} {shippingInfo.lastName}</p>
                     <p className="text-gray-700">{shippingInfo.street}</p>
-                    <p className="text-gray-700">{shippingInfo.city}, {shippingInfo.state}, {shippingInfo.zip}</p>
+                    <p className="text-gray-700">{shippingInfo.city}, {shippingInfo.stateCode}, {shippingInfo.zip}</p>
                     <p className="text-gray-700">{shippingInfo.email}</p>
                   </div>
                 </div>
@@ -490,14 +519,14 @@ const renderStep = () => {
                     lastName: shippingInfo.lastName,
                     street: shippingInfo.street,
                     city: shippingInfo.city,
-                    state: shippingInfo.state,
+                    state: shippingInfo.stateCode,
                     zip: shippingInfo.zip,
-                    country: shippingInfo.country,
+                    country: shippingInfo.countryCode,
                     email: shippingInfo.email,
                     phone: shippingInfo.phone,
                   }}
                   onTotalShippingCostChange={handleTotalShippingCostChange}
-                  onShippingDetailsChange={handleShippingDetailsChange}
+                  onShippingDetailsChange={handleShippingDetailsChange}           
                 />
               </div>
               <div className="flex justify-between font-bold text-lg border-t pt-4">
@@ -569,7 +598,6 @@ const renderStep = () => {
               </div>
             </div>
           );
-  
         default:
           return null;
       }
