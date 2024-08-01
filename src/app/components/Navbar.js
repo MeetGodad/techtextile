@@ -48,6 +48,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
       }
     };
 
+  
     const handleCartUpdate = () => {
       fetchCart();
     };

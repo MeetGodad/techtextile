@@ -36,6 +36,7 @@ export default function Cart({ children }) {
     }
   };
 
+  
   const updateQuantity = async (cart_item_id, quantity, variantIds) => {
     try {
       console.log('Updating quantity for item:', cart_item_id);
