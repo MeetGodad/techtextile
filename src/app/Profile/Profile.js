@@ -116,7 +116,7 @@ export default function Profile() {
     (user && userDetails) ? (
 
       <div className="min-h-screen bg-gray-100 flex">
-        <aside className={`transition-transform duration-500 ease-in-out ${sidebarVisible ? 'translate-x-0' : '-translate-x-full'} bg-gray-900 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform lg:relative lg:translate-x-0`}>
+        <aside className={`transition-transform duration-500 ease-in-out ${sidebarVisible ? 'translate-x-0' : '-translate-x-full'} bg-gradient-to-r from-black to-gray-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform lg:relative lg:translate-x-0`}>
           <button onClick={() => setSidebarVisible(!sidebarVisible)} className="text-white absolute top-4 right-4 lg:hidden">
             {sidebarVisible ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
@@ -124,13 +124,13 @@ export default function Profile() {
             <h1 className="text-2xl font-semibold mb-6">Profile</h1>
             <ul>
               <li>
-                <button onClick={handleShowProfile} className={`block py-2.5 px-4 rounded transition duration-200 ${showProfile ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                <button onClick={handleShowProfile} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showProfile ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
                   Profile
                 </button>
               </li>
               {userDetails && (
                 <li>
-                  <button onClick={handleViewPurchaseHistory} className={`block py-2.5 px-4 rounded transition duration-200 ${showPurchaseHistory ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                  <button onClick={handleViewPurchaseHistory} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showPurchaseHistory ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
                     View Purchase History
                   </button>
                 </li>
@@ -138,14 +138,14 @@ export default function Profile() {
               {userDetails.user_type === 'seller' && (
                 <>
                   <li>
-                    <button onClick={handleGoToAdmin} className={`block py-2.5 px-4 rounded transition duration-200 ${showAdminDashboard ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                    <button onClick={handleGoToAdmin} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showAdminDashboard ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
                       Admin Dashboard
                     </button>
                   </li>
                 </>
               )}
               <li>
-                <button onClick={handleUpdateUserInfo} className={`block py-2.5 px-4 rounded transition duration-200 ${showUpdateUser ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                <button onClick={handleUpdateUserInfo} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showUpdateUser ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
                   Edit Profile
                 </button>
               </li>

@@ -12,7 +12,6 @@
 //   Tooltip,
 //   Legend,
 // } from 'chart.js';
-// import { useRouter } from 'next/navigation';
 
 // ChartJS.register(
 //   CategoryScale,
@@ -72,7 +71,17 @@
 //   const truncateProductName = (name) => {
 //     return name.length > 12 ? name.slice(0, 12) + '...' : name;
 //   };
-  
+
+//   const parseVariantAttributes = (attributes) => {
+//     const attributesObj = attributes
+//       .split(',')
+//       .reduce((acc, attr) => {
+//         const [key, value] = attr.split(':').map((item) => item.trim());
+//         acc[key] = value;
+//         return acc;
+//       }, {});
+//     return attributesObj['Color'];
+//   };
 
 //   const handleTimeViewChange = (event) => {
 //     setTimeView(event.target.value);
@@ -277,18 +286,22 @@
 //         </div>
 
 //         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
-//         <h2 className="text-2xl font-bold mb-4">Product Stock Levels</h2>
-//           {/* Changed to display 8 products, 4 on the left and 4 on the right */}
+//           <h2 className="text-2xl font-bold mb-4">Product Stock Levels</h2>
 //           <div className="grid grid-cols-2 gap-4">
 //             {stats.productStockLevels.slice(0, showMoreStockLevels ? undefined : 8).map((product, index) => (
 //               <div key={index} className="flex items-center space-x-4">
 //                 <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
 //                 <div>
-//                   <p className="text-lg font-semibold">{product.product_name}</p>
+//                   <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
 //                   <p className="text-gray-600">Price: ${product.price}</p>
-//                   <p className={`text-sm ${product.quantity < 10 ? 'text-red-500' : 'text-green-500'}`}>
-//                     Quantity: {product.quantity}
-//                   </p>
+//                   {product.variants.map((variant, idx) => (
+//                     <div key={idx} className="flex items-center">
+//                       <p className={`text-sm ${variant.quantity < 10 ? 'text-red-500' : 'text-green-500'}`}>
+//                         Variant: {variant.quantity}
+//                       </p>
+//                       <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+//                     </div>
+//                   ))}
 //                 </div>
 //               </div>
 //             ))}
@@ -307,14 +320,20 @@
 //         </div>
 
 //         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
-//         <h2 className="text-2xl font-bold mb-4">Top-Selling Products</h2>
+//           <h2 className="text-2xl font-bold mb-4">Top-Selling Products</h2>
 //           <div className="grid grid-cols-2 gap-4">
 //             {stats.topSellingProducts.slice(0, showMoreTopSelling ? undefined : 5).map((product, index) => (
 //               <div key={index} className="flex items-center space-x-4">
 //                 <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
 //                 <div>
-//                   <p className="text-lg font-semibold">{product.product_name}</p>
+//                   <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
 //                   <p className="text-gray-600">Total Sales: ${product.total_sales}</p>
+//                   {product.variants.map((variant, idx) => (
+//                     <div key={idx} className="flex items-center">
+//                       <p className="text-sm">Variant: {variant.quantity}</p>
+//                       <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+//                     </div>
+//                   ))}
 //                 </div>
 //               </div>
 //             ))}
@@ -333,14 +352,20 @@
 //         </div>
 
 //         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
-//         <h2 className="text-2xl font-bold mb-4">Low Stock Alerts</h2>
+//           <h2 className="text-2xl font-bold mb-4">Low Stock Alerts</h2>
 //           <div className="grid grid-cols-2 gap-4">
 //             {stats.lowStockAlerts.slice(0, showMoreLowStock ? undefined : 10).map((product, index) => (
 //               <div key={index} className="flex items-center space-x-4">
 //                 <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
 //                 <div>
-//                   <p className="text-lg font-semibold">{product.product_name}</p>
+//                   <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
 //                   <p className="text-red-500">Only {product.quantity} left in stock!</p>
+//                   {product.variants.map((variant, idx) => (
+//                     <div key={idx} className="flex items-center">
+//                       <p className="text-sm">Variant: {variant.quantity}</p>
+//                       <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+//                     </div>
+//                   ))}
 //                 </div>
 //               </div>
 //             ))}
@@ -374,8 +399,7 @@
 //               ))}
 //               <button
 //                 onClick={onShowPurchasedItems}
-//                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-//               >
+//                 className="mt-4  bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 py-2 rounded-lg hover:from-gray-800 hover:to-gray-600 transition duration-300">
 //                 Go to Purchased Items
 //               </button>
 //             </>
@@ -396,8 +420,14 @@
 //               <div key={index} className="flex items-center space-x-4">
 //                 <img src={order.image_url.split(',')[0]} alt={order.product_name} className="w-16 h-16 object-cover rounded" />
 //                 <div>
-//                   <p className="text-lg font-semibold">{order.product_name}</p>
+//                   <p className="text-lg font-semibold">{truncateProductName(order.product_name)}</p>
 //                   <p className="text-gray-600">Orders: {order.order_count}</p>
+//                   {order.variants.map((variant, idx) => (
+//                     <div key={idx} className="flex items-center">
+//                       <p className="text-sm">Variant:{variant.quantity}</p>
+//                       <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+//                     </div>
+//                   ))}
 //                 </div>
 //               </div>
 //             ))}
@@ -420,8 +450,6 @@
 // };
 
 // export default BusinessStats;
-
-
 "use client";
 import { useEffect, useState } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
@@ -723,7 +751,7 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
                       <p className={`text-sm ${variant.quantity < 10 ? 'text-red-500' : 'text-green-500'}`}>
                         Variant: {variant.quantity}
                       </p>
-                      <div className="w-6 h-6 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+                      <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
                     </div>
                   ))}
                 </div>
@@ -755,7 +783,7 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
                   {product.variants.map((variant, idx) => (
                     <div key={idx} className="flex items-center">
                       <p className="text-sm">Variant: {variant.quantity}</p>
-                      <div className="w-6 h-6 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+                      <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
                     </div>
                   ))}
                 </div>
@@ -787,7 +815,7 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
                   {product.variants.map((variant, idx) => (
                     <div key={idx} className="flex items-center">
                       <p className="text-sm">Variant: {variant.quantity}</p>
-                      <div className="w-6 h-6 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+                      <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
                     </div>
                   ))}
                 </div>
@@ -823,8 +851,7 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
               ))}
               <button
                 onClick={onShowPurchasedItems}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-              >
+                className="mt-4  bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 py-2 rounded-lg hover:from-gray-800 hover:to-gray-600 transition duration-300">
                 Go to Purchased Items
               </button>
             </>
@@ -849,8 +876,8 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
                   <p className="text-gray-600">Orders: {order.order_count}</p>
                   {order.variants.map((variant, idx) => (
                     <div key={idx} className="flex items-center">
-                      <p className="text-sm">Variant:{variant.quantity}</p>
-                      <div className="w-6 h-6 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+                      <p className="text-sm">Variant: {variant.quantity}</p>
+                      <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
                     </div>
                   ))}
                 </div>

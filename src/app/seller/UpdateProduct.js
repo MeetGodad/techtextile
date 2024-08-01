@@ -1,3 +1,5 @@
+
+
 // "use client";
 // import React, { useEffect, useState } from 'react';
 // import { storage } from '../auth/firebase';
@@ -12,8 +14,8 @@
 //     const [productData, setProductData] = useState({
 //         ...product,
 //         userId: user ? user.uid : '',
-//         yarn_variants: product.yarn_variants || [{ color: '', deniers: [{ denier: '', quantity: 0 }] }],
-//         fabric_variants: product.fabric_variants || [{ color: '', quantity: 0 }],
+//         yarn_variants: product.yarn_variants || [{ variant_id: '', color: '', deniers: [{ denier: '', quantity: 0 }] }],
+//         fabric_variants: product.fabric_variants || [{ variant_id: '', color: '', quantity: 0 }],
 //     });
 //     const [error, setError] = useState(null);
 
@@ -47,13 +49,13 @@
 //                 body: JSON.stringify(updatedProductData),
 //             });
 //             if (!response.ok) {
-//                 alert('An error occurred while updating the product');
-//             } else {
-//                 alert('Product updated successfully');
-//                 onUpdateSuccess();
+//                 throw new Error('An error occurred while updating the product');
 //             }
+//             alert('Product updated successfully');
+//             onUpdateSuccess();
 //         } catch (error) {
 //             console.error('Unexpected server response:', error);
+//             alert('An error occurred while updating the product');
 //         }
 //     };
 
@@ -105,7 +107,7 @@
 //     };
 
 //     const addYarnVariant = () => {
-//         setProductData({ ...productData, yarn_variants: [...productData.yarn_variants, { color: '', deniers: [{ denier: '', quantity: 0 }] }] });
+//         setProductData({ ...productData, yarn_variants: [...productData.yarn_variants, { variant_id: '', color: '', deniers: [{ denier: '', quantity: 0 }] }] });
 //     };
 
 //     const addDenier = (variantIndex) => {
@@ -127,7 +129,7 @@
 //     };
 
 //     const addFabricVariant = () => {
-//         setProductData({ ...productData, fabric_variants: [...productData.fabric_variants, { color: '', quantity: 0 }] });
+//         setProductData({ ...productData, fabric_variants: [...productData.fabric_variants, { variant_id: '', color: '', quantity: 0 }] });
 //     };
 
 //     const removeFabricVariant = (index) => {
@@ -140,7 +142,8 @@
 //         <div className="fixed inset-0 flex items-center justify-center z-50">
 //             <div className="fixed inset-0 bg-black bg-opacity-50"></div>
 //             <div
-//                 className="relative bg-white p-8 rounded-lg shadow-lg w-full max-w-xl transition-transform duration-300 ease-in-out"
+//                 className="relative bg-white p-8 rounded-lg shadow-lg w-full max-w-3xl transition-transform duration-300 ease-in-out overflow-y-auto"
+//                 style={{ maxHeight: '90vh' }}
 //             >
 //                 <h2 className="text-2xl font-bold mb-4 text-center">Update Item</h2>
 //                 {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -189,57 +192,43 @@
 //                     </div>
 //                     <div className="space-y-2">
 //                         <label className="block font-semibold">Product Type</label>
-//                         <select
+//                         <input
+//                             type="text"
 //                             name="product_type"
 //                             value={productData.product_type}
-//                             onChange={handleChange}
-//                             required
-//                             className="w-full p-3 border border-gray-300 rounded-lg"
-//                         >
-//                             <option value="yarn">Yarn</option>
-//                             <option value="fabric">Fabric</option>
-//                         </select>
+//                             readOnly
+//                             className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100"
+//                         />
 //                     </div>
 //                     {productData.product_type === 'yarn' && (
 //                         <div className="space-y-2">
 //                             <div>
 //                                 <label className="block font-semibold">Yarn Material</label>
-//                                 <select 
+//                                 <input 
 //                                     type="text" 
-//                                     required 
 //                                     name="yarn_material" 
-//                                     value={productData.yarn_material}  
-//                                     onChange={handleChange} 
-//                                     className="w-full p-3 border border-gray-300 rounded-lg"
-//                                 >
-//                                     <option value="" disabled>Select Yarn Material</option>
-//                                     <option value="Cotton">Cotton</option>
-//                                     <option value="Polyester">Polyester</option>
-//                                     <option value="Silk">Silk</option>
-//                                     <option value="Wool">Wool</option>
-//                                     <option value="Nylon">Nylon</option>    
-//                                     <option value="Linen">Linen</option>
-//                                 </select>
+//                                     value={productData.yarn_material}
+//                                     readOnly
+//                                     className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100"
+//                                 />
 //                             </div>
 //                             <div>
 //                                 <label className="block font-semibold">Yarn Variants</label>
 //                                 {productData.yarn_variants.map((variant, index) => (
-//                                     <div key={index} className="relative w-80 mr-2">
+//                                     <div key={index} className="relative p-4 bg-gray-100 rounded-lg mb-4">
 //                                         <label className="block font-semibold">Color</label>
 //                                         <input
 //                                             type="color"
-//                                             placeholder="Color"
 //                                             value={variant.color}
 //                                             onChange={(e) => handleYarnVariantChange(index, 'color', e.target.value)}
-//                                             className="w-1/3 h-12 my-2 p-1 border border-black rounded-lg" 
+//                                             className="w-12 h-12 p-1 border border-black rounded-lg" 
 //                                         />
 //                                         {variant.deniers.map((denier, denierIndex) => (
-//                                             <div key={denierIndex} className="flex items-center mb-4">
+//                                             <div key={denierIndex} className="flex items-center mt-4">
 //                                                 <div className="flex-1 mr-2">
 //                                                     <label className="block font-semibold">Denier</label>
 //                                                     <input
 //                                                         type="text"
-//                                                         placeholder="Denier"
 //                                                         value={denier.denier}
 //                                                         onChange={(e) => handleDeniersChange(index, denierIndex, 'denier', e.target.value)}
 //                                                         className="w-full p-3 border border-gray-300 rounded-lg"
@@ -249,7 +238,6 @@
 //                                                     <label className="block font-semibold">Quantity</label>
 //                                                     <input
 //                                                         type="number"
-//                                                         placeholder="Quantity"
 //                                                         value={denier.quantity}
 //                                                         onChange={(e) => handleDeniersChange(index, denierIndex, 'quantity', e.target.value)}
 //                                                         className="w-full p-3 border border-gray-300 rounded-lg"
@@ -262,20 +250,21 @@
 //                                                 )}
 //                                             </div>
 //                                         ))}
-//                                             <button
-//                                                     type="button"
-//                                                     onClick={() => addDenier(index)}
-//                                                     className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">
-//                                                     Add Denier
-//                                                 </button>
-//                                             {productData.yarn_variants.length > 1 && (
-//                                             <button type="button" onClick={() => removeYarnVariant(index)} className="text-red-500">
+//                                         <button
+//                                             type="button"
+//                                             onClick={() => addDenier(index)}
+//                                             className="px-4 py-2 mt-2 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-lg hover:from-gray-800 hover:to-gray-600"
+//                                         >
+//                                             Add Denier
+//                                         </button>
+//                                         {productData.yarn_variants.length > 1 && (
+//                                             <button type="button" onClick={() => removeYarnVariant(index)} className="text-red-500 absolute top-4 right-4">
 //                                                 <MdDeleteForever size={24} />
 //                                             </button>
 //                                         )}
 //                                     </div>
 //                                 ))}
-//                                 <button type="button" onClick={addYarnVariant} className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">Add Yarn Variant</button>
+//                                 <button type="button" onClick={addYarnVariant} className="px-4 py-2 mt-2 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-lg hover:from-gray-800 hover:to-gray-600">Add Yarn Variant</button>
 //                             </div>
 //                         </div>
 //                     )}
@@ -285,70 +274,64 @@
 //                                 <label className="block font-semibold">Fabric Print Tech</label>
 //                                 <input
 //                                     type="text"
-//                                     required
 //                                     name="fabric_print_tech"
 //                                     value={productData.fabric_print_tech}
-//                                     onChange={handleChange}
-//                                     className="w-full p-3 border border-gray-300 rounded-lg"
+//                                     readOnly
+//                                     className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100"
 //                                 />
 //                             </div>
 //                             <div>
 //                                 <label className="block font-semibold">Fabric Material</label>
 //                                 <input
 //                                     type="text"
-//                                     required
 //                                     name="fabric_material"
 //                                     value={productData.fabric_material}
-//                                     onChange={handleChange}
-//                                     className="w-full p-3 border border-gray-300 rounded-lg"
+//                                     readOnly
+//                                     className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100"
 //                                 />
 //                             </div>
 //                             <div>
 //                                 <label className="block font-semibold">Fabric Variants</label>
 //                                 {productData.fabric_variants.map((variant, index) => (
-//                                     <div key={index} className="relative w-80 mr-2">
+//                                     <div key={index} className="relative p-4 bg-gray-100 rounded-lg mb-4">
 //                                         <label className="block font-semibold">Color</label>
 //                                         <input
 //                                             type="color"
-//                                             placeholder="Color"
 //                                             value={variant.color}
 //                                             onChange={(e) => handleFabricVariantChange(index, 'color', e.target.value)}
-//                                             className="w-1/3 h-12 my-2 p-1 border border-black rounded-lg"
+//                                             className="w-12 h-12 p-1 border border-black rounded-lg"
 //                                         />
-//                                         <div className="flex items-center mb-4">
+//                                         <div className="flex items-center mt-4">
 //                                             <div className="flex-1 mr-2">
 //                                                 <label className="block font-semibold">Quantity</label>
 //                                                 <input
 //                                                     type="number"
-//                                                     placeholder="Quantity"
 //                                                     value={variant.quantity}
 //                                                     onChange={(e) => handleFabricVariantChange(index, 'quantity', e.target.value)}
 //                                                     className="w-full p-3 border border-gray-300 rounded-lg"
 //                                                 />
 //                                             </div>
 //                                             {productData.fabric_variants.length > 1 && (
-//                                                 <button type="button" onClick={() => removeFabricVariant(index)} className="text-red-500">
+//                                                 <button type="button" onClick={() => removeFabricVariant(index)} className="text-red-500 absolute top-4 right-4">
 //                                                     <MdDeleteForever size={24} />
 //                                                 </button>
 //                                             )}
 //                                         </div>
 //                                     </div>
 //                                 ))}
-//                                 <button type="button" onClick={addFabricVariant} className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg border border-blue-500 hover:bg-white hover:text-blue-500">Add Fabric Variant</button>
+//                                 <button type="button" onClick={addFabricVariant} className="px-4 py-2 mt-2 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-lg hover:from-gray-800 hover:to-gray-600">Add Fabric Variant</button>
 //                             </div>
 //                         </div>
 //                     )}
 //                     <div className="flex justify-end space-x-4">
-//                         <button onClick={handleClose} type="button" className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Cancel</button>
-//                         <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Update</button>
+//                         <button onClick={handleClose} type="button" className="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-800 text-white rounded-md hover:from-gray-500 hover:to-gray-700">Cancel</button>
+//                         <button type="submit" className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-800 text-white rounded-md hover:from-green-500 hover:to-green-700">Update</button>
 //                     </div>
 //                 </form>
 //             </div>
 //         </div>
 //     );
 // }
-
-// UpdateProduct.js
 
 "use client";
 import React, { useEffect, useState } from 'react';
@@ -357,6 +340,10 @@ import { useUserAuth } from '../auth/auth-context';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { MdDeleteForever } from "react-icons/md";
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 export default function UpdateProduct({ product, onUpdateSuccess, onClose, position }) {
     const { user } = useUserAuth();
@@ -401,11 +388,21 @@ export default function UpdateProduct({ product, onUpdateSuccess, onClose, posit
             if (!response.ok) {
                 throw new Error('An error occurred while updating the product');
             }
-            alert('Product updated successfully');
+            MySwal.fire({
+                title: 'Success',
+                text: 'Product updated successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
             onUpdateSuccess();
         } catch (error) {
             console.error('Unexpected server response:', error);
-            alert('An error occurred while updating the product');
+            MySwal.fire({
+                title: 'Error',
+                text: 'An error occurred while updating the product',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         }
     };
 

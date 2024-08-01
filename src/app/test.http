@@ -93,7 +93,7 @@ GET http://localhost:3000/api/seller/LTdAf0Zzqvd6ZQhfNYBhUAn2m6s2 HTTP/1.1
 GET http://localhost:3000/api/sales/LTdAf0Zzqvd6ZQhfNYBhUAn2m6s2 HTTP/1.1
 ###
 //Test for Purchased Item
-GET http://localhost:3000/api/admin/1 HTTP/1.1
+GET http://localhost:3000/api/admin/LTdAf0Zzqvd6ZQhfNYBhUAn2m6s2 HTTP/1.1
 ###
 GET http://localhost:3000/api/admin/e7vVMBprlRYB7PHuaJgv2u2RAVb2?status=cancled  HTTP/1.1
 ###
