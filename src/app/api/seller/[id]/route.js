@@ -93,7 +93,7 @@ export async function PUT(req) {
             SET product_name = ${product_name}, product_description = ${product_description}, price = ${price}, image_url = ${image_url}
             WHERE product_id = ${productId}`;
 
-        // Set the quantity of the last variant to 0
+        // Set the quantity of the existing variants to 0
         await sql`
             UPDATE productvariant
             SET quantity = 0
@@ -129,6 +129,8 @@ export async function PUT(req) {
 }
 
 
+
+
 // DELETE REQUEST
 
 export async function DELETE(req) {
@@ -160,3 +162,4 @@ export async function DELETE(req) {
         return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
     }
 }
+
