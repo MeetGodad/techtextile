@@ -1,8 +1,8 @@
 
 # TechTextile: Revolutionizing Textile E-Commerce
+![A test image](https://firebasestorage.googleapis.com/v0/b/techtextile-ca673.appspot.com/o/Screenshot%202024-08-01%20185206.png?alt=media&token=b65c9d5f-968e-4687-b38b-46e3c8d925fd)
 
-
-
+![A test image](https://firebasestorage.googleapis.com/v0/b/techtextile-ca673.appspot.com/o/Screenshot%202024-08-01%20190134.png?alt=media&token=ed108a56-1c64-4f85-8df3-fe4c70fa03b6)
 
 ## About The Project
 
@@ -11,12 +11,14 @@ TechTextile is an innovative B2B and B2C e-commerce platform specializing in yar
 ### Key Features
 
 - User-friendly interface for browsing and purchasing textile products
-- Specialized B2B features for bulk ordering and quotation requests
 - Secure user authentication and account management
 - Responsive design for seamless desktop and mobile experiences
 - Efficient product search and filtering capabilities
 - Secure payment processing
 - Seller dashboard for product management
+
+ ### Project Link:
+ https://techtextile.vercel.app/
 
 ## Built With
 
@@ -26,6 +28,16 @@ TechTextile is an innovative B2B and B2C e-commerce platform specializing in yar
 - [Neon](https://neon.tech/) - Serverless Postgres database
 - [Firebase Authentication](https://firebase.google.com/products/auth) - For secure user authentication
 - [Firebase Storage](https://firebase.google.com/products/storage) - For scalable file storage
+
+Project Link: https://techtextile.vercel.app/
+
+## Acknowledgements
+
+- [React Documentation](https://reactjs.org/docs/getting-started.html)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Node.js Documentation](https://nodejs.org/en/docs/)
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [Neon Documentation](https://neon.tech/docs/introduction)
 
 ## Getting Started
 
