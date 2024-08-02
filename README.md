@@ -1,3 +1,44 @@
+
+# TechTextile: Revolutionizing Textile E-Commerce
+
+
+
+
+## About The Project
+
+TechTextile is an innovative B2B and B2C e-commerce platform specializing in yarn and fabric products. Our mission is to bridge the gap between Indian textile manufacturers and North American buyers, leveraging the substantial import market and facilitating global trade.
+
+### Key Features
+
+- User-friendly interface for browsing and purchasing textile products
+- Specialized B2B features for bulk ordering and quotation requests
+- Secure user authentication and account management
+- Responsive design for seamless desktop and mobile experiences
+- Efficient product search and filtering capabilities
+- Secure payment processing
+- Seller dashboard for product management
+
+## Built With
+
+- [React](https://reactjs.org/) - A JavaScript library for building user interfaces
+- [Next.js](https://nextjs.org/) - The React Framework for Production
+- [Node.js](https://nodejs.org/) - JavaScript runtime for server-side development
+- [Neon](https://neon.tech/) - Serverless Postgres database
+- [Firebase Authentication](https://firebase.google.com/products/auth) - For secure user authentication
+- [Firebase Storage](https://firebase.google.com/products/storage) - For scalable file storage
+
+## Getting Started
+
+To get a local copy up and running, follow these simple steps.
+
+### Prerequisites
+
+- Node.js (v14.0 or later)
+- npm
+
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
