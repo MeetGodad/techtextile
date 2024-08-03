@@ -138,18 +138,18 @@ export default function Cart({ children }) {
   };
 
   return (
-    <div className="bg-gray-600 p-8 min-h-screen">
-      <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-[1.01] transition-all duration-300">
-        <h1 className="text-5xl font-extrabold mb-12 text-gray-800 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-900 animate-gradient">
+    <div className="bg-gray-600 mt-20 p-7 min-h-screen">
+      <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl p-5 transform hover:scale-[1.01] transition-all duration-300">
+        <h2 className="text-5xl font-extrabold mb-12 text-gray-800 text-center bg-clip-text bg-gradient-to-r from-gray-700 to-gray-900 animate-gradient">
           Your Shopping Cart
-        </h1>
+        </h2>
         {cart.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {cart.map((item) => (
                 <div
                   key={item.product_id}
-                  className="bg-gray-200 rounded-2xl p-6 shadow-lg transform transition duration-500 hover:shadow-2xl hover:translate-y-[-5px]"
+                  className="bg-gray-200 rounded-2xl p-2 shadow-lg transform transition duration-500 hover:shadow-2xl hover:translate-y-[-5px]"
                 >
                   <div className="relative mb-6 group overflow-hidden rounded-xl"
                     onClick={() => handleProductClick(item.product_id)}
@@ -163,14 +163,14 @@ export default function Cart({ children }) {
                       <span className="text-white text-lg font-semibold transform translate-y-4 group-hover:translate-y-0 transition duration-300">{item.product_name}</span>
                     </div>
                   </div>
-                  <div className="text-3xl font-bold mb-4 text-gray-800">${parseFloat(item.price).toFixed(2)}</div>
+                  <div className="text-3xl font-bold mb-4 px-4 text-gray-800">${parseFloat(item.price).toFixed(2)}</div>
                   {item.selected_variant && (
                     <div className="mb-4">
-                      <label className="block font-semibold text-gray-700 mb-2">Variant:</label>
+                      <label className="block font-semibold text-gray-700 px-4 mb-2">Variant:</label>
                       <div className="text-gray-600 mb-2">
                         {item.selected_variant.color && (
                           <div className="flex items-center">
-                            <span className="font-semibold">Color: </span>
+                            <span className="font-semibold px-4 ">Color: </span>
                             <span 
                               className="inline-block w-5 h-5 rounded-full ml-2 border-2 border-black transform transition duration-300 ease-in-out hover:scale-110 hover:border-white"
                               style={{ backgroundColor: item.selected_variant.color.split(':')[1]?.trim() || item.selected_variant.color }}
@@ -179,7 +179,7 @@ export default function Cart({ children }) {
                         )}
                         {item.selected_variant.denier && (
                           <div>
-                            <span className="font-semibold">Denier: </span>
+                            <span className="font-semibold px-4">Denier: </span>
                             <span>{item.selected_variant.denier.split(':')[1]?.trim() || item.selected_variant.denier}</span>
                           </div>
                         )}
@@ -187,11 +187,11 @@ export default function Cart({ children }) {
                     </div>
                   )}
                   <div className="mb-6">
-                    <label className="block text-gray-700 mb-2">Quantity</label>
-                    <div className="relative">
+                    <label className="block text-gray-700 px-4 mb-2">Quantity</label>
+                    <div className="absolute">
                       <input
                         type="number"
-                        className="w-full bg-white border-2 border-gray-300 rounded-full py-2 px-12 text-gray-800 text-center placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition duration-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-60 bg-white border-2 border-gray-300 rounded-full py-2 px-12 text-gray-800 text-center placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition duration-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         min="1"
                         max={item.selected_variant.quantity}
                         value={item.quantity}
@@ -206,7 +206,7 @@ export default function Cart({ children }) {
                         <span className="text-xl font-semibold">−</span>
                       </button>
                       <button
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
                         onClick={() => updateQuantity(item.cart_item_id, Math.min(item.selected_variant.quantity, item.quantity + 1), item.variant_ids)}
                         disabled={parseInt(item.selected_variant.quantity) === 0 || item.quantity >= item.selected_variant.quantity}
                       >
@@ -218,7 +218,7 @@ export default function Cart({ children }) {
                   {parseInt(item.selected_variant.quantity) === 0 && (
                     <p className="text-red-500 text-sm mb-2 animate-pulse">Product is out of stock</p>
                   )}
-                  <div className="font-semibold text-gray-700 mb-4">Subtotal: ${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
+                  <div className="font-semibold px-4 text-gray-700 mb-4">Subtotal: ${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>
                   <button 
                     onClick={() => removeItem(item.cart_item_id)} 
                     className="text-red-500 font-semibold hover:text-red-700 transition duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 rounded-full px-4 py-2"
