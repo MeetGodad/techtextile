@@ -39,31 +39,4 @@ export async function GET(req, { params }) {
 
 
 
-export async function PUT(req, { params }) {
-  const userId = params.id;
-  const { firstName, lastName, phone, address, companyName, role } = await req.json();
-  const databaseUrl = process.env.DATABASE_URL || "";
-  const sql = neon(databaseUrl);
 
-  try {
-    if (!firstName || !lastName || !phone || !address || !address.street || !address.city || !address.state || !address.postalCode) {
-      throw new Error("Missing parameters");
-    }
-
-    await sql.transaction(async (trx) => {
-      await trx`UPDATE UserAccounts SET first_name = ${firstName}, last_name = ${lastName} WHERE user_id = ${userId};`;
-      await trx`UPDATE Addresses SET street = ${address.street}, city = ${address.city}, state = ${address.state}, postal_code = ${address.postalCode} WHERE user_id = ${userId};`;
-
-      if (role === 'seller') {
-        await trx`UPDATE Sellers SET business_name = ${companyName}, phone_num = ${phone} WHERE user_id = ${userId};`;
-      } else if (role === 'buyer') {
-        await trx`UPDATE Buyers SET phone_num = ${phone} WHERE user_id = ${userId};`;
-      }
-    });
-
-    return new Response(JSON.stringify({ message: "User updated successfully" }), { status: 200 });
-  } catch (error) {
-    console.error('An error occurred:', error);
-    return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
-  }
-}

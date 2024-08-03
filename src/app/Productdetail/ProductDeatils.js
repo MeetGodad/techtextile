@@ -226,18 +226,29 @@ useEffect(() => {
     }
   };
   
-const handleQuantityChange = (event) => {
-  const maxQuantity = getSelectedVariantQuantity();
-  const newQuantity = parseInt(event.target.value);
-
-  if (newQuantity > maxQuantity) {
-    setMessage(`You can only select up to ${maxQuantity} units.`);
-    setQuantity(maxQuantity);
-  } else {
-    setMessage('');
-    setQuantity(newQuantity);
-  }
-};
+  const handleQuantityChange = (newQuantity) => {
+    const maxQuantity = getSelectedVariantQuantity();
+    
+    if (newQuantity > maxQuantity) {
+      setQuantity(maxQuantity);
+    } else if (newQuantity < 1) {
+      setMessage(`Quantity cannot be less than 1.`);
+      setQuantity(1);
+    } else {
+      setMessage('');
+      setQuantity(newQuantity);
+    }
+  };
+  const handleQuantityIncrease = () => {
+    const maxQuantity = getSelectedVariantQuantity();
+    if (quantity < maxQuantity) {
+      setQuantity(quantity + 1);
+      setMessage('');
+    } else {
+      setMessage(`Product quantity cannot exceed ${maxQuantity}.`);
+    }
+  };  
+  
 const handleColorSelection = (color) => {
   setSelectedColor(color);
   setSelectedDenier(null); // Reset selected denier when color changes
@@ -333,19 +344,27 @@ const uniqueColors = product.variants
         <div className="max-w-screen-xl mx-auto">
           <div className="flex flex-col md:flex-row">
             <div className="md:w-1/2 flex flex-col items-start relative">
-              <div className="flex flex-col md:flex-row items-start">
-                <div className="flex flex-row md:flex-col items-center relative mb-4 md:mb-0">
+              <div className="flex flex-col items-start">
+                <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
+                  <img
+                    className="w-[600px] h-[365px] object-cover object-center transition-opacity duration-300"
+                    style={{ borderRadius: '20px' }}
+                    src={currentImage}
+                    alt={`${product.product_name} current`}
+                  />
+                </div>
+                <div className="flex flex-row items-center relative mb-4 md:mb-0">
                   <button
                     onClick={handlePrevImage}
-                    className="flex bg-gray-200 hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mb-2 md:mb-0"
+                    className="flex bg-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mb-2 md:mb-0"
                     style={{ top: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
-                    <span className="transform rotate-90 md:rotate-0">&uarr;</span>
+                    <span className="transform rotate-180 text-white text-2xl group-hover:animate-bounce">➤</span>
                   </button>
-                  <div className="flex flex-row md:flex-col items-center mt-2 p-2 rounded-lg overflow-x-auto md:overflow-y-auto scrollbar-hide">
+                  <div className="flex flex-row items-center mt-2 p-2 rounded-lg overflow-x-auto scrollbar-hide">
                     {imageUrls.map((url, index) => (
                       <img
                         key={index}
-                        className={`w-16 h-16 mb-0 md:mb-2 mr-2 md:mr-0 cursor-pointer transition-transform duration-300 hover:scale-110 ${currentImage === url.trim() ? 'border-2 border-black' : ''}`}
+                        className={`w-16 h-16 mb-0 mr-2 cursor-pointer transition-transform duration-300 hover:scale-110 ${currentImage === url.trim() ? 'border-2 border-black' : ''}`}
                         style={{ borderRadius: '20px' }}
                         src={url.trim()}
                         alt={`${product.product_name} thumbnail ${index + 1}`}
@@ -355,33 +374,11 @@ const uniqueColors = product.variants
                   </div>
                   <button
                     onClick={handleNextImage}
-                    className="flex bg-gray-200 hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mt-2 md:mt-0"
+                    className="flex bg-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mt-2 md:mt-0"
                     style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
-                    <span className="transform rotate-90 md:rotate-0">&darr;</span>
+                    <span className="text-white text-2xl group-hover:animate-bounce">➤</span>
                   </button>
                 </div>
-                <div className="border-2 border-gray-500 ml-0 md:ml-10 w-full max-w-lg h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden">
-                  <img
-                    className="w-screen h-[365px] object-cover object-center transition-opacity duration-300"
-                    style={{ borderRadius: '20px' }}
-                    src={currentImage}
-                    alt={`${product.product_name} current`}
-                  />
-                </div>
-              </div>
-              <div className="mt-4 w-full">
-                <button
-                  className="px-4 py-2 bg-white border-2 border-black text-black rounded-lg mb-2 ml-0 md:ml-28 h-11 w-48 hover:bg-black hover:text-white transition-colors duration-300"
-                  onClick={() => setShowSellerDetails(!showSellerDetails)}>
-                  Seller Details {showSellerDetails ? '▲' : '▼'}
-                </button>
-                {showSellerDetails && (
-                  <div className="p-4 border border-gray-300 rounded-lg ml-0 md:ml-28 animate-fade-in">
-                    <p className="text-lg mb-2"><strong>Seller Company:</strong> {product.seller_business_name}</p>
-                    <p className="text-lg mb-2"><strong>Phone :</strong>{product.seller_phone_num}</p>
-                    <p className="text-lg mb-2"><strong>Address:</strong> {`${product.seller_address.street}, ${product.seller_address.city}, ${product.seller_address.state}, ${product.seller_address.postal_code}`}</p>
-                  </div>
-                )}
               </div>
             </div>
             <div className="md:w-1/2 md:pl-8">
@@ -427,111 +424,119 @@ const uniqueColors = product.variants
                 <span className="text-gray-600">({reviews.length} reviews)</span>
               </div>
               <h2 className="text-3xl font-bold text-gray-800 my-4">${product.price}</h2>
-              <div></div>
-              <div className="flex space-x-6 mb-6">
+              <div className="flex space-x-5">
                 <div className="flex-grow">
-                          <div className="mb-6">
-                            <h3 className="font-semibold mb-2">Color:</h3>
-                            <div className="flex space-x-2">
-                              {uniqueColors.map(color => (
-                                <button
-                                  key={color}
-                                  onClick={() => setSelectedColor(color)}
-                                  className={`w-8 h-8 rounded-full transition-transform duration-300 hover:scale-110 ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
-                                  style={{ backgroundColor: color }}
-                                  title={color}/>
-                              ))}
-                            </div>
+                  <div className="mb-1">
+                    <div className="flex items-center">
+                      <h3 className="font-semibold mb-2">Color:</h3>
+                      <div className="flex space-x-2 ml-4">
+                        {uniqueColors.map(color => (
+                          <button
+                            key={color}
+                            onClick={() => setSelectedColor(color)}
+                            className={`w-6 h-6 rounded-full transition-transform duration-300 hover:scale-110 ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
+                            style={{ backgroundColor: color }}
+                            title={color}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                    {product.product_type === 'yarn' && (
+                    <div className="flex-col">
+                      <h3 className="font-semibold mb-2">Denier:</h3>
+                      <div className="flex space-x-2">
+                        {availableDeniers.slice(0, 5).map(denier => (
+                          <button
+                            key={denier}
+                            onClick={() => handleDenierSelection(denier)}
+                            className={`px-4 py-2 border rounded transition-transform duration-300 ${selectedDenier === denier ? 'bg-black text-white border-white' : 'bg-transparent text-black border-black hover:bg-black hover:text-white'}`}
+                            >
+                            {denier}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    )}
+                    <div>
+                      <div className="flex flex-col space-y-4">
+                        <div className="flex items-center space-x-4">
+                          {/* Quantity Label and Input */}
+                          <label htmlFor="quantity" className="font-semibold mr-1">Quantity:</label>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              id="quantity"
+                              className="bg-white border-2 border-gray-300 rounded-full py-2 px-12 text-gray-800 text-center placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition duration-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none fixed-width"
+                              min="1"
+                              max={getSelectedVariantQuantity()}
+                              value={quantity}
+                              onChange={handleQuantityChange}
+                              disabled={!selectedColor || parseInt(getSelectedVariantQuantity()) === 0}/>
+                            <button
+                              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                              onClick={() => handleQuantityChange(quantity - 1)}
+                              disabled={quantity <= 1}>
+                              <span className="text-xl font-semibold">−</span>
+                            </button>
+                            <button
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                              onClick={() => handleQuantityIncrease()}
+                              disabled={!selectedColor || parseInt(getSelectedVariantQuantity()) === 0}
+                            >
+                              <span className="text-xl font-semibold">+</span>
+                            </button>
                           </div>
-                        {/* div */}
-                            {product.product_type === 'yarn' && (
-                            <div className="mb-4">
-                              <h3 className="font-semibold mb-2">Denier:</h3>
-                              <select
-                                value={selectedDenier || ''}
-                                onChange={(e) => handleDenierSelection(e.target.value)}
-                                disabled={!selectedColor}
-                                className="w-48 p-2 border rounded">
-                                <option value="">Select Denier</option>
-                                {availableDeniers.map(denier => (
-                                  <option key={denier} value={denier}>{denier}</option>
-                                ))}
-                              </select>
-                            </div>
-                            )}
-                            {selectedDenier && product.product_type === 'yarn' && (
-                            <div className="mb-4">
-                              <h3 className="font-semibold mb-2">Available Quantity:</h3>
-                              <p>
-                                {getSelectedVariantQuantity() || 'N/A'}
-                              </p>
-                            </div>
-                            )}
-                            {selectedColor && product.product_type === 'fabric' && (
-                              <div className="mb-4">
-                                <h3 className="font-semibold mb-2">Available Quantity:</h3>
-                                <p>
-                                  {getSelectedVariantQuantity() || 'N/A'}
-                                </p>
-                              </div>
-                            )}
-                            {selectedDenier && product.product_type === 'yarn' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
-                            <div className="mb-4">
-                              <p className="text-red-600">Warning: Low quantity available!</p>
-                            </div>
-                            )}
-                            {selectedColor && product.product_type === 'fabric' && getSelectedVariantQuantity() !== null && getSelectedVariantQuantity() <= 10 && (
-                          <div className="mb-4">
-                            <p className="text-red-600">Warning: Low quantity available!</p>
+                          {Message && <p className="text-red-600">{Message}</p>} 
+                          {/* Add to Cart and Add Review Buttons */}
+                          <div className="flex flex-col space-y-4 ml-60"> {/* Adjust ml-8 to increase or decrease spacing */}
+                            <button
+                              className="px-20 py-2 bg-black rounded-full text-white hover:bg-gray-800 transition-colors duration-300 ml-10"
+                              onClick={() => addToCart(product)}
+                            >
+                              Add to cart
+                            </button>
+                            <button
+                              className="px-20 py-2 rounded-full bg-black text-white hover:bg-gray-800 transition-colors duration-300 ml-10"
+                              onClick={handleReviewAdd}
+                            >
+                              Add Review
+                            </button>
                           </div>
-                                )}
-                    {/*</div>*/}
-                              <div>
-                                                <div className="flex flex-col mt-2 ml-2">
-                                                  <label htmlFor="quantity" className="font-semibold mb-2">Quantity:</label>
-                                                    <input
-                                                      type="number"
-                                                      id="quantity"
-                                                      className="border border-gray-300 rounded w-48 p-2 focus:ring-2 focus:ring-black focus:outline-none transition-all duration-300 mb-3"
-                                                      min="1"
-                                                      max={getSelectedVariantQuantity()}
-                                                      value={quantity}
-                                                      onChange={handleQuantityChange}
-                                                    />
-                                                </div>
-                                                <>{Message && <p className="text-red-600">{Message}</p>}</>
-                                                <div className="flex flex-row space-x-40">
-    
-                                                  <button   
-                                                    className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
-                                                    onClick={() => addToCart(product)}>
-                                                    Add to cart
-                                                  </button>
-                                                  <button 
-                                                    className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
-                                                    onClick={handleReviewAdd}>
-                                                    Add Review
-                                                  </button>
-                                                </div>
-                              </div>
-                        {product.yarn_material && (
-                          <p className="text-lg mb-4"><strong>Yarn Material: </strong> {product.yarn_material}</p>
-                        )}
-                        {product.fabric_print_tech && (
-                          <p className="text-lg mb-4"> <strong>Fabric Print Technology: </strong>  {product.fabric_print_tech}</p>
-                        )}
-                        {product.fabric_material && (
-                          <p className="text-lg mb-4"> <strong>Fabric Material: </strong>  {product.fabric_material}</p>
-                        )}
-                        <p className="text-lg mb-4"><strong>Description:</strong> {product.product_description}</p>
+                        </div>
+                      </div>
+                      
+                    </div>
+                    {product.yarn_material && (
+                      <p className="text-lg mt-1"><strong>Yarn Material: </strong> {product.yarn_material}</p>
+                    )}
+                    {product.fabric_print_tech && (
+                      <p className="text-lg mt-1"> <strong>Fabric Print Technology: </strong>  {product.fabric_print_tech}</p>
+                    )}
+                    {product.fabric_material && (
+                      <p className="text-lg mt-1"> <strong>Fabric Material: </strong>  {product.fabric_material}</p>
+                    )}
                 </div>
               </div>
               </div>
-            </div>
-                        {/* Related Products Section */}
-                        <div className="mt-16">
-                <h2 className="text-3xl text-center italic font-bold mb-8">Related Products</h2>
-                <div className="relative">
+            </div> 
+                  {/* Seller Details and Description Sections */}
+              <div className="flex mt-16">
+                <div className="w-1/2 pr-4">
+                  <h2 className="text-xl font-bold mb-2">Seller Details</h2>
+                  <p className="text-lg mb-2"><strong>Seller Company:</strong> {product.seller_business_name}</p>
+                  <p className="text-lg mb-2"><strong>Phone:</strong> {product.seller_phone_num}</p>
+                  <p className="text-lg mb-2"><strong>Address:</strong> {`${product.seller_address.street}, ${product.seller_address.city}, ${product.seller_address.state}, ${product.seller_address.postal_code}`}</p>
+                </div>
+                <div className="border-l border-black h-auto mx-4"></div> {/* Thin black line */}
+                <div className="w-1/2 pl-4">
+                  <h2 className="text-xl font-bold mb-2">Description</h2>
+                  <p className="text-lg">{product.product_description}</p>
+                </div>
+              </div>
+              {/* Related Products Section */}
+              <h2 className="text-3xl text-center italic font-bold mb-8">Related Products</h2>
+                <div className="mt-16 relative">
                   <div className="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-6 pb-4">
                     {relatedProducts.map((relatedProduct) => (
                       <div key={relatedProduct.product_id} className="flex-none w-64 border p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -551,25 +556,20 @@ const uniqueColors = product.variants
                       </div>
                     ))}
                   </div>
-                      {/* Right Arrow Placeholder */}
-                      <div className="absolute right-0 z-10 bg-gray-200 rounded-full cursor-pointer">
-                        {/* Implement arrow icon and functionality */}
-                      </div>
+                </div>
+                {isRatingsOpen && (
+                  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
+                      <button
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                        onClick={handleCloseRatings}>
+                        &times;
+                      </button>
+                      <Ratings productId={productId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
                     </div>
                   </div>
-                    {isRatingsOpen && (
-                      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                        <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
-                          <button
-                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                            onClick={handleCloseRatings}>
-                            &times;
-                          </button>
-                          <Ratings productId={productId} userId={user.uid} productName={product.product_name} onClose={handleCloseRatings}  />
-                        </div>
-                      </div>
-                    )}
-                      {/* Display reviews */}
+                )}
+                {/* Display reviews */}
                   <div className="mt-16">
                   <h2 className="text-3xl font-bold mb-8">Reviews</h2>
                   {reviews.length > 0 ? (

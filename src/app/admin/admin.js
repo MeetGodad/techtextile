@@ -66,10 +66,9 @@ export default function Adminpage() {
     setShowListedItems(false);
     setShowAddProduct(false);
   };
-
   return (
-    <div className="min-h-screen flex bg-gray-100">
-      <aside className={`transition-transform duration-500 ease-in-out ${sidebarVisible ? 'translate-x-0' : '-translate-x-full'} bg-gray-900 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform lg:relative lg:translate-x-0`}>
+    <div className="min-h-screen flex bg-gray-100 ">
+      <aside className={`transition-transform duration-500 ease-in-out ${sidebarVisible ? 'translate-x-0' : '-translate-x-full'} bg-gradient-to-r from-black to-gray-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform lg:relative lg:translate-x-0`}>
         <button onClick={() => setSidebarVisible(!sidebarVisible)} className="text-white absolute top-4 right-4 lg:hidden">
           {sidebarVisible ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
@@ -77,27 +76,27 @@ export default function Adminpage() {
           <h1 className="text-2xl font-semibold mb-6">Admin Dashboard</h1>
           <ul>
             <li>
-              <button onClick={handleViewBusinessStats} className={`block py-2.5 px-4 rounded transition duration-200 ${showBusinessStats ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+              <button onClick={handleViewBusinessStats} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showBusinessStats ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
                 View Business Stats
               </button>
             </li>
             <li>
-              <button onClick={handleViewListedItems} className={`block py-2.5 px-4 rounded transition duration-200 ${showListedItems ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+              <button onClick={handleViewListedItems} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showListedItems ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
                 View Listed Items
               </button>
             </li>
             <li>
-              <button onClick={handleAddProduct} className={`block py-2.5 px-4 rounded transition duration-200 ${showAddProduct ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+              <button onClick={handleAddProduct} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showAddProduct ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
                 Add Product
               </button>
             </li>
             <li>
-              <button onClick={handleShowPurchasedItems} className={`block py-2.5 px-4 rounded transition duration-200 ${showPurchasedItems ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+              <button onClick={handleShowPurchasedItems} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showPurchasedItems ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
                 Purchased Items
               </button>
             </li>
             <li>
-              <button onClick={handleShowProductReviews} className={`block py-2.5 px-4 rounded transition duration-200 ${showProductReviews ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+              <button onClick={handleShowProductReviews} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showProductReviews ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
                 Product Reviews
               </button>
             </li>

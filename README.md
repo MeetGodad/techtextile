@@ -1,3 +1,56 @@
+
+# TechTextile: Revolutionizing Textile E-Commerce
+![A test image](https://firebasestorage.googleapis.com/v0/b/techtextile-ca673.appspot.com/o/Screenshot%202024-08-01%20185206.png?alt=media&token=b65c9d5f-968e-4687-b38b-46e3c8d925fd)
+
+![A test image](https://firebasestorage.googleapis.com/v0/b/techtextile-ca673.appspot.com/o/Screenshot%202024-08-01%20190134.png?alt=media&token=ed108a56-1c64-4f85-8df3-fe4c70fa03b6)
+
+## About The Project
+
+TechTextile is an innovative B2B and B2C e-commerce platform specializing in yarn and fabric products. Our mission is to bridge the gap between Indian textile manufacturers and North American buyers, leveraging the substantial import market and facilitating global trade.
+
+### Key Features
+
+- User-friendly interface for browsing and purchasing textile products
+- Secure user authentication and account management
+- Responsive design for seamless desktop and mobile experiences
+- Efficient product search and filtering capabilities
+- Secure payment processing
+- Seller dashboard for product management
+
+ ### Project Link:
+ https://techtextile.vercel.app/
+
+## Built With
+
+- [React](https://reactjs.org/) - A JavaScript library for building user interfaces
+- [Next.js](https://nextjs.org/) - The React Framework for Production
+- [Node.js](https://nodejs.org/) - JavaScript runtime for server-side development
+- [Neon](https://neon.tech/) - Serverless Postgres database
+- [Firebase Authentication](https://firebase.google.com/products/auth) - For secure user authentication
+- [Firebase Storage](https://firebase.google.com/products/storage) - For scalable file storage
+
+Project Link: https://techtextile.vercel.app/
+
+## Acknowledgements
+
+- [React Documentation](https://reactjs.org/docs/getting-started.html)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Node.js Documentation](https://nodejs.org/en/docs/)
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [Neon Documentation](https://neon.tech/docs/introduction)
+
+## Getting Started
+
+To get a local copy up and running, follow these simple steps.
+
+### Prerequisites
+
+- Node.js (v14.0 or later)
+- npm
+
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started

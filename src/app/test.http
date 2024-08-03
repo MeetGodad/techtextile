@@ -57,22 +57,50 @@ GET http://localhost:3000//api/products/22
 
 
 
+###
+//Test for update product info
+PUT http://localhost:3000/api/seller/11 HTTP/1.1
+Content-Type: application/json
 
-
-
+{
+    "product_type": "yarn",
+    "product_name": "Updated Product Name 1",
+    "product_description": "Updated Product Description",
+    "price": "15.00",
+    "image_url": "https://firebasestorage.googleapis.com/v0/b/techtextile-ca673.appspot.com/o/images%2F5e751f0a-b3e1-46b3-842c-63ce259477d5%2F71kPl8i9nbL._AC_SX679_.jpg?alt=media&token=f3b47068-f47f-4586-aade-ba4edb425488,https://firebasestorage.googleapis.com/v0/b/techtextile-ca673.appspot.com/o/images%2F5e751f0a-b3e1-46b3-842c-63ce259477d5%2F71MYFAAEaEL._AC_SX679_.jpg?alt=media&token=56f6e6e2-8a52-4366-95b9-e310d0cb4678,https://firebasestorage.googleapis.com/v0/b/techtextile-ca673.appspot.com/o/images%2F5e751f0a-b3e1-46b3-842c-63ce259477d5%2F81dWwSKJCCL._AC_SX679_.jpg?alt=media&token=1b9914e3-9135-408d-93da-3f2dd2bc4e7c",
+    "yarn_variants": [
+        {
+            "variant_id": 22,
+            "color": "#ff5233",
+            "denier": [
+                { "denier": 11, "quantity": 60 }
+            ]
+        },
+        {
+            "variant_id": 23,
+            "color": "#70ff7c",
+            "denier": [
+                { "denier": 12, "quantity": 50 }
+            ]  
+        }
+    ]
+}
+###
+//Test for SellerViewItem
+GET http://localhost:3000/api/seller/LTdAf0Zzqvd6ZQhfNYBhUAn2m6s2 HTTP/1.1
 ### 
 //Test Business Stats API
-GET http://localhost:3000/api/sales/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
+GET http://localhost:3000/api/sales/LTdAf0Zzqvd6ZQhfNYBhUAn2m6s2 HTTP/1.1
 ###
 //Test for Purchased Item
-GET http://localhost:3000/api/admin/1 HTTP/1.1
+GET http://localhost:3000/api/admin/LTdAf0Zzqvd6ZQhfNYBhUAn2m6s2 HTTP/1.1
 ###
 GET http://localhost:3000/api/admin/e7vVMBprlRYB7PHuaJgv2u2RAVb2?status=cancled  HTTP/1.1
 ###
 //For Product review
 GET http://localhost:3000/api/productreviewforseller/e7vVMBprlRYB7PHuaJgv2u2RAVb2 HTTP/1.1
 ###
-=======
+
 
 
 
