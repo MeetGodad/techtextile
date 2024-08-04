@@ -1,3 +1,5 @@
+// // Refrence - https://chatgpt.com/c/5f947589-837e-403b-8027-58a129d2d590
+// //refrence - https://www.npmjs.com/package/react-chartjs-2
 // "use client";
 // import { useEffect, useState } from 'react';
 // import { Bar, Line } from 'react-chartjs-2';
@@ -424,7 +426,7 @@
 //                   <p className="text-gray-600">Orders: {order.order_count}</p>
 //                   {order.variants.map((variant, idx) => (
 //                     <div key={idx} className="flex items-center">
-//                       <p className="text-sm">Variant:{variant.quantity}</p>
+//                       <p className="text-sm">Variant: {variant.quantity}</p>
 //                       <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
 //                     </div>
 //                   ))}
@@ -450,6 +452,7 @@
 // };
 
 // export default BusinessStats;
+
 "use client";
 import { useEffect, useState } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
@@ -739,21 +742,23 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Product Stock Levels</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {stats.productStockLevels.slice(0, showMoreStockLevels ? undefined : 8).map((product, index) => (
               <div key={index} className="flex items-center space-x-4">
                 <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
-                <div>
+                <div className="flex flex-col space-y-2">
                   <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
                   <p className="text-gray-600">Price: ${product.price}</p>
-                  {product.variants.map((variant, idx) => (
-                    <div key={idx} className="flex items-center">
-                      <p className={`text-sm ${variant.quantity < 10 ? 'text-red-500' : 'text-green-500'}`}>
-                        Variant: {variant.quantity}
-                      </p>
-                      <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
-                    </div>
-                  ))}
+                  <div className="grid grid-cols-2 gap-2">
+                    {product.variants.map((variant, idx) => (
+                      <div key={idx} className="flex items-center space-x-1">
+                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+                        <p className={`text-sm ${variant.quantity < 10 ? 'text-red-500' : 'text-green-500'}`}>
+                          {variant.quantity} {variant.quantity === 1 ? 'item' : 'items'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
@@ -773,19 +778,13 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Top-Selling Products</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {stats.topSellingProducts.slice(0, showMoreTopSelling ? undefined : 5).map((product, index) => (
               <div key={index} className="flex items-center space-x-4">
                 <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
-                <div>
+                <div className="flex flex-col space-y-2">
                   <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
                   <p className="text-gray-600">Total Sales: ${product.total_sales}</p>
-                  {product.variants.map((variant, idx) => (
-                    <div key={idx} className="flex items-center">
-                      <p className="text-sm">Variant: {variant.quantity}</p>
-                      <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
-                    </div>
-                  ))}
                 </div>
               </div>
             ))}
@@ -805,19 +804,21 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Low Stock Alerts</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {stats.lowStockAlerts.slice(0, showMoreLowStock ? undefined : 10).map((product, index) => (
               <div key={index} className="flex items-center space-x-4">
                 <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
-                <div>
+                <div className="flex flex-col space-y-2">
                   <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
                   <p className="text-red-500">Only {product.quantity} left in stock!</p>
-                  {product.variants.map((variant, idx) => (
-                    <div key={idx} className="flex items-center">
-                      <p className="text-sm">Variant: {variant.quantity}</p>
-                      <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
-                    </div>
-                  ))}
+                  <div className="grid grid-cols-2 gap-2">
+                    {product.variants.map((variant, idx) => (
+                      <div key={idx} className="flex items-center space-x-1">
+                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+                        <p className="text-sm">Qty: {variant.quantity}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
@@ -851,7 +852,7 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
               ))}
               <button
                 onClick={onShowPurchasedItems}
-                className="mt-4  bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 py-2 rounded-lg hover:from-gray-800 hover:to-gray-600 transition duration-300">
+                className="mt-4 bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 py-2 rounded-lg hover:from-gray-800 hover:to-gray-600 transition duration-300">
                 Go to Purchased Items
               </button>
             </>
@@ -867,19 +868,13 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Repeat Orders</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {stats.repeatOrders.slice(0, showMoreRepeatOrders ? undefined : 10).map((order, index) => (
               <div key={index} className="flex items-center space-x-4">
                 <img src={order.image_url.split(',')[0]} alt={order.product_name} className="w-16 h-16 object-cover rounded" />
-                <div>
+                <div className="flex flex-col space-y-2">
                   <p className="text-lg font-semibold">{truncateProductName(order.product_name)}</p>
                   <p className="text-gray-600">Orders: {order.order_count}</p>
-                  {order.variants.map((variant, idx) => (
-                    <div key={idx} className="flex items-center">
-                      <p className="text-sm">Variant: {variant.quantity}</p>
-                      <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
-                    </div>
-                  ))}
                 </div>
               </div>
             ))}
