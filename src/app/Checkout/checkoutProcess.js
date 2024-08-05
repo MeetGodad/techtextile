@@ -46,7 +46,8 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddressLoaded, setIsAddressLoaded] = useState(true);
   const [isFormLoaded, setIsFormLoaded] = useState(false);
-  
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+
   useEffect(() => {
     if (isAddressLoaded) {
       setIsFormLoaded(true);
@@ -124,9 +125,9 @@ const Checkout = () => {
         lastName: signupAddress.address_last_name || '',
         street: signupAddress.street || '',
         city: signupAddress.city || '',
-        state: signupAddress.stateCode || '',
+        stateCode: signupAddress.state || '',
         zip: signupAddress.postal_code || '',
-        country: signupAddress.countryCode || '',
+        countryCode: signupAddress.country || '',
         email: signupAddress.address_email || '',
         phone: signupAddress.phone_num || '',
       });
@@ -298,6 +299,10 @@ const handleSuccess = async () => {
 
 
 const handleAddressChange = (address) => {
+  if (address) {
+    setSelectedAddressId(address.address_id);  // Update the selected address id
+    setUseSignupAddress(false);  // Optionally uncheck the checkbox if an address is selected
+  }
     setShippingInfo({
       firstName: address.address_first_name || '',
       lastName: address.address_last_name || '',
@@ -332,6 +337,7 @@ const renderStep = () => {
                   name="useSignupAddress"
                   checked={useSignupAddress}
                   onChange={handleCheckboxChange}
+                  disabled={selectedAddressId !== null}
                   className="form-checkbox h-5 w-5 text-blue-500 transition duration-300 ease-in-out transform hover:scale-110"
                 />
                 <label htmlFor="useSignupAddress" className="ml-2 text-black">
@@ -340,16 +346,17 @@ const renderStep = () => {
               </div>
               <div className="w-full max-w-md mx-auto">
                 <h2 className="text-lg font-semibold mb-4">Existing Shipping Addresses</h2>
-                {existingAddresses.length > 0 ? (
+                {filteredExistingAddresses.length > 0 ? (
                   <div className="relative mb-10">
                     <select
                       onChange={(e) => {
-                        const selectedAddress = existingAddresses.find(
+                        const selectedAddress = filteredExistingAddresses.find(
                           (address) => address.address_id === parseInt(e.target.value)
                         );
                         handleAddressChange(selectedAddress);
                       }}
                       className="block w-full p-4 pr-8 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none bg-white text-gray-700 hover:bg-gray-50"
+                      disabled={useSignupAddress}
                     >
                       <option value="" disabled selected className="text-gray-500">
                         Select an existing shipping address
