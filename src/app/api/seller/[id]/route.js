@@ -195,48 +195,6 @@ export async function PUT(req) {
     }
 }
 
-
-
-// export async function DELETE(req) {
-//     try {
-//         const databaseUrl = process.env.DATABASE_URL || "";
-//         const sql = neon(databaseUrl);
-//         const url = new URL(req.url);
-//         const pathSegments = url.pathname.split('/');
-//         const productId = pathSegments[pathSegments.length - 1];
-//         const variantId = url.searchParams.get('variantId'); // Get the variantId from the query params
-
-//         console.log("Product ID to delete:", productId);
-//         console.log("Variant ID to delete:", variantId);
-
-//         if (!productId) {
-//             console.error("Product ID is missing");
-//             return new Response(JSON.stringify({ message: "productId is required" }), { status: 400 });
-//         }
-
-//         if (variantId) {
-//             // Delete only the specified variant by setting its quantity to 0
-//             await sql`
-//                 UPDATE productvariant
-//                 SET quantity = 0
-//                 WHERE product_id = ${productId} AND variant_id = ${variantId};`;
-//             return new Response(JSON.stringify({ message: "Variant deleted successfully" }), { status: 200 });
-//         } else {
-//             // Delete the entire product by setting the quantity to 0 for all variants
-//             await sql`
-//                 UPDATE productvariant
-//                 SET quantity = 0
-//                 WHERE product_id = ${productId};`;
-//             return new Response(JSON.stringify({ message: "Product soft deleted successfully" }), { status: 200 });
-//         }
-
-//     } catch (error) {
-//         console.error('An error occurred: Internal server error', error);
-//         console.error('Error details:', error);
-//         return new Response(JSON.stringify({ message: "Internal server error", error: error.message }), { status: 500 });
-//     }
-// }
-
 export async function DELETE(req) {
     try {
       const databaseUrl = process.env.DATABASE_URL || "";
