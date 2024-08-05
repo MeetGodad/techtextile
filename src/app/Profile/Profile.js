@@ -12,7 +12,6 @@ import SellerViewItem from '../seller/SellerViewItem';
 import ListProduct from '../seller/ListProduct';
 import Loder from '../components/Loder';
 
-
 export default function Profile() {
   const { user, firebaseSignOut } = useUserAuth();
   const router = useRouter();
@@ -57,14 +56,13 @@ export default function Profile() {
             setSellerInfo({
               business_name: data.user.business_name,
               business_address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`,
-              phone_num: data.user.seller_phone_num  // Updated to use seller_phone_num
+              phone_num: data.user.seller_phone_num
             });
           } else if (data.user.user_type === 'buyer') {
             setBuyerInfo({
-              phone_num: data.user.buyer_phone_num,  // Updated to use buyer_phone_num
+              phone_num: data.user.buyer_phone_num,
               address: `${data.user.street}, ${data.user.city}, ${data.user.state} ${data.user.postal_code}`
             });
-
           }
         })
         .catch(error => {
@@ -110,8 +108,6 @@ export default function Profile() {
   }
 
   return (
-
-
     (user && userDetails) ? (
 
       <div className="min-h-screen bg-gray-100 flex pt-20">
@@ -121,15 +117,15 @@ export default function Profile() {
           </button>
           <nav>
             <h1 className="text-2xl font-semibold mb-6">Profile</h1>
-            <ul>
+            <ul className="space-y-2">
               <li>
-                <button onClick={handleShowProfile} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showProfile ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                <button onClick={handleShowProfile} className={`block w-full text-left py-2.5 px-4 rounded transition duration-200 ${showProfile ? 'bg-gradient-to-r from-gray-700 to-black' : 'hover:bg-gray-600'}`}>
                   Profile
                 </button>
               </li>
               {userDetails && (
                 <li>
-                  <button onClick={handleViewPurchaseHistory} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showPurchaseHistory ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                  <button onClick={handleViewPurchaseHistory} className={`block w-full text-left py-2.5 px-4 rounded transition duration-200 ${showPurchaseHistory ? 'bg-gradient-to-r from-gray-700 to-black' : 'hover:bg-gray-600'}`}>
                     View Purchase History
                   </button>
                 </li>
@@ -137,19 +133,19 @@ export default function Profile() {
               {userDetails.user_type === 'seller' && (
                 <>
                   <li>
-                    <button onClick={handleGoToAdmin} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showAdminDashboard ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                    <button onClick={handleGoToAdmin} className={`block w-full text-left py-2.5 px-4 rounded transition duration-200 ${showAdminDashboard ? 'bg-gradient-to-r from-gray-700 to-black' : 'hover:bg-gray-600'}`}>
                       Admin Dashboard
                     </button>
                   </li>
                 </>
               )}
               <li>
-                <button onClick={handleUpdateUserInfo} className={`block py-2.5 px-4 rounded transition duration-200 mb-2 ${showUpdateUser ? 'bg-gradient-to-r from-pink-500 to-yellow-500' : 'hover:bg-gray-700'}`}>
+                <button onClick={handleUpdateUserInfo} className={`block w-full text-left py-2.5 px-4 rounded transition duration-200 ${showUpdateUser ? 'bg-gradient-to-r from-gray-700 to-black' : 'hover:bg-gray-600'}`}>
                   Edit Profile
                 </button>
               </li>
               <li>
-                <button onClick={handelSignOut} className="block py-2.5 px-4 rounded hover:bg-gray-700 transition duration-200">
+                <button onClick={handelSignOut} className="block w-full text-left py-2.5 px-4 rounded hover:bg-gray-600 transition duration-200">
                   Sign Out
                 </button>
               </li>
@@ -160,7 +156,7 @@ export default function Profile() {
         <div className="flex-1 p-10">
           <div className={`transition-opacity duration-500 ${showProfile ? 'opacity-100' : 'opacity-0 hidden'}`}>
             {showProfile && (
-              <main className="bg-white text-black shadow p-4 rounded-lg mb-6">
+              <main className="bg-white text-black shadow p-6 rounded-lg mb-6 relative">
                 <h1 className="text-4xl font-bold mb-4">Hello, {userDetails.first_name} 🙏
                   <button onClick={handleUpdateUserInfo} className="absolute right-4 top-4">
                     <AiOutlineEdit size={24} />
@@ -182,11 +178,13 @@ export default function Profile() {
                   </>
                 )}
                 <div className="mt-8">
-
                   {userDetails.user_type === 'seller' && (
                     <>
-                      <h3 className="text-2xl font-semibold">Business Stats</h3>
-                      <BusinessStats userId={user.uid} />
+                      <h3 className="text-2xl font-semibold mb-4">Business Stats</h3>
+                      <div className="bg-gray-200 p-4 rounded-lg mb-4">
+                        <BusinessStats userId={user.uid} />
+                      </div>
+                      <h3 className="text-2xl font-semibold mb-4">Product Reviews</h3>
                       <div className="bg-gray-200 p-4 rounded-lg mb-4">
                         <ProductReviews userId={user.uid} />
                       </div>
@@ -197,52 +195,43 @@ export default function Profile() {
             )}
           </div>
 
-              <div className={`transition-opacity duration-500 ${showListedItems ? 'opacity-100' : 'opacity-0 hidden'}`}>
-                {showListedItems && userDetails.user_type === 'seller' && (
-                  <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                    <SellerViewItem userId={user.uid} />
-                  </aside>
-                )}
-              </div>
+          <div className={`transition-opacity duration-500 ${showListedItems ? 'opacity-100' : 'opacity-0 hidden'}`}>
+            {showListedItems && userDetails.user_type === 'seller' && (
+              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                <SellerViewItem userId={user.uid} />
+              </aside>
+            )}
+          </div>
 
+          <div className={`transition-opacity duration-500 ${showUpdateUser ? 'opacity-100' : 'opacity-0 hidden'}`}>
+            {showUpdateUser && (
+              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                <UpdateUserInfo userDetails={userDetails} setShowUpdateUser={setShowUpdateUser} />
+              </aside>
+            )}
+          </div>
 
-          
-           
+          <div className={`transition-opacity duration-500 ${showPurchaseHistory ? 'opacity-100' : 'opacity-0 hidden'}`}>
+            {showPurchaseHistory && userDetails && (
+              <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
+                <PurchaseHistory userId={user.uid} onClose={() => setShowPurchaseHistory(false)} />
+              </aside>
+            )}
+          </div>
 
-            <div className={`transition-opacity duration-500 ${showUpdateUser ? 'opacity-100' : 'opacity-0 hidden'}`}>
-              {showUpdateUser && (
-                <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                  <UpdateUserInfo userDetails={userDetails} setShowUpdateUser={setShowUpdateUser} />
-                </aside>
-              )}
-            </div>
-
-            <div className={`transition-opacity duration-500 ${showPurchaseHistory ? 'opacity-100' : 'opacity-0 hidden'}`}>
-              {showPurchaseHistory && userDetails && (
-                <aside className="bg-white text-black shadow p-4 rounded-lg ml-4" style={{ flexGrow: 1 }}>
-                  <PurchaseHistory userId={user.uid} onClose={() => setShowPurchaseHistory(false)} />
-                </aside>
-              )}
-            </div>
-
-        <div className={`transition-opacity duration-500 ${showAddProduct ? 'opacity-100' : 'opacity-0 hidden'}`}>
-          {userDetails.user_type === 'seller' && showAddProduct && (
-            <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showAddProduct ? 'scale-100' : 'scale-0'}`} style={{ marginLeft: 'calc(30% + 20px)', flexGrow: 1 }}>
-              <ListProduct userId={user.uid} />
-            </aside>
-          )}
+          <div className={`transition-opacity duration-500 ${showAddProduct ? 'opacity-100' : 'opacity-0 hidden'}`}>
+            {userDetails.user_type === 'seller' && showAddProduct && (
+              <aside className={`bg-white text-black shadow p-4 rounded-lg ml-4 transition-all duration-1000 ease-in-out transform ${showAddProduct ? 'scale-100' : 'scale-0'}`} style={{ flexGrow: 1 }}>
+                <ListProduct userId={user.uid} />
+              </aside>
+            )}
+          </div>
         </div>
-      
       </div>
-
-     </div>
-    ) 
-    :
-    (
+    ) : (
       <div className="min-h-screen flex items-center justify-center">
         <Loder />
       </div>
     )
-
   );
 }
