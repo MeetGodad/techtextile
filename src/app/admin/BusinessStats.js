@@ -43,8 +43,9 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
   const [showMoreTopSelling, setShowMoreTopSelling] = useState(false);
   const [showMoreLowStock, setShowMoreLowStock] = useState(false);
   const [timeView, setTimeView] = useState('date');
-  const [selectedMonth, setSelectedMonth] = useState('2024-07');
-  const [selectedYear, setSelectedYear] = useState('2024');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
 
   useEffect(() => {
     fetch(`/api/sales/${userId}`)
@@ -87,6 +88,10 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
     setTimeView(event.target.value);
   };
 
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
+  };
+
   const handleMonthChange = (event) => {
     setSelectedMonth(event.target.value);
   };
@@ -98,15 +103,15 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
   const filteredMonthlySales = stats.monthlySales.filter(item => {
     if (!item.date) return false;
     if (timeView === 'date') {
-      return item.date.startsWith(selectedMonth);
+      return item.date.startsWith(selectedDate);
     }
     if (timeView === 'month') {
-      return item.date.startsWith(`${selectedMonth}-`);
+      return item.date.startsWith(selectedMonth);
     }
     if (timeView === 'year') {
       return item.date.startsWith(selectedYear);
     }
-    return true; // For 'year' view, include all data
+    return true;
   });
 
   const productData = {
@@ -147,18 +152,20 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
       {
         label: 'Yarn Sales ($)',
         data: filteredMonthlySales.map(item => item.yarn_sales),
+        backgroundColor: timeView === 'date' ? 'rgba(255, 99, 132, 0.6)' : 'rgba(255, 99, 132, 0.2)',
         borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        fill: true,
+        fill: timeView !== 'date',
         tension: 0.4,
+        barThickness: timeView === 'date' ? 60 : undefined,
       },
       {
         label: 'Fabric Sales ($)',
         data: filteredMonthlySales.map(item => item.fabric_sales),
+        backgroundColor: timeView === 'date' ? 'rgba(54, 162, 235, 0.6)' : 'rgba(54, 162, 235, 0.2)',
         borderColor: 'rgba(54, 162, 235, 1)',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        fill: true,
+        fill: timeView !== 'date',
         tension: 0.4,
+        barThickness: timeView === 'date' ? 60 : undefined,
       },
     ],
   };
@@ -176,6 +183,8 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
           display: true,
           text: 'Product',
         },
+        barPercentage: timeView === 'date' ? 0.5 : undefined,
+        categoryPercentage: timeView === 'date' ? 0.5 : undefined,
       },
       y: {
         beginAtZero: true,
@@ -245,8 +254,8 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
             {timeView === 'date' && (
               <input
                 type="date"
-                value={selectedMonth}
-                onChange={handleMonthChange}
+                value={selectedDate}
+                onChange={handleDateChange}
                 className="px-4 py-2 border rounded"
               />
             )}
@@ -269,7 +278,11 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
           </div>
           <div className="relative h-96">
             {filteredMonthlySales.length > 0 ? (
-              <Line data={monthlySalesData} options={lineOptions} />
+              timeView === 'date' ? (
+                <Bar data={monthlySalesData} options={barOptions} />
+              ) : (
+                <Line data={monthlySalesData} options={lineOptions} />
+              )
             ) : (
               <p className="text-center text-gray-500">No sales data available.</p>
             )}
