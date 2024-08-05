@@ -453,22 +453,22 @@ const uniqueColors = product.variants
                         </div>
                       </div>
                     </div>
-                              {product.product_type === 'yarn' && (
-                              <div className="flex-col">
-                                <h3 className="font-semibold mb-2">Denier:</h3>
-                                <div className="flex space-x-2">
-                                  {availableDeniers.slice(0, 5).map(denier => (
-                                    <button
-                                      key={denier}
-                                      onClick={() => handleDenierSelection(denier)}
-                                      className={`px-4 py-2 border rounded transition-transform duration-300 ${selectedDenier === denier ? 'bg-black text-white border-white' : 'bg-transparent text-black border-black hover:bg-black hover:text-white'}`}
-                                      >
-                                      {denier}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                              )}
+                      {product.product_type === 'yarn' && (
+                      <div className="flex-col">
+                        <h3 className="font-semibold mb-2">Denier:</h3>
+                        <div className="flex space-x-2">
+                          {availableDeniers.slice(0, 5).map(denier => (
+                            <button
+                              key={denier}
+                              onClick={() => handleDenierSelection(denier)}
+                              className={`px-4 py-2 border rounded transition-transform duration-300 ${selectedDenier === denier ? 'bg-black text-white border-white' : 'bg-transparent text-black border-black hover:bg-black hover:text-white'}`}
+                              >
+                              {denier}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      )}
                     <div>
                       <div className="flex flex-col space-y-4">
                         <div className="flex items-center space-x-4">

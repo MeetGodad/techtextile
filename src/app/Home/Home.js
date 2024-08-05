@@ -98,7 +98,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
   const sortedAndFilteredProducts = sortProducts(filteredProducts);
 
   return (
-    <div className="relative flex flex-col w-full min-h-0 bg-white overflow-x-auto z-20 overflow-hidden">
+    <div className="flex flex-col w-full min-h-0 bg-white overflow-x-auto z-20 overflow-hidden">
       <Header isHomePage={true} />
       {/* Background Image Section */}
       <div className="relative h-screen w-full bg-cover bg-center" style={{ backgroundImage: `url('../Images/cotton fabric.gif')` /*, backgroundSize: 'contain', backgroundRepeat: 'no-repeat'*/ }}>
@@ -143,7 +143,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
               <div className="flex justify-center mt-8">
                 <button
                   onClick={showMoreProducts}
-                  className="bg-black text-white border-black border-2 px-4 py-2 rounded hover:bg-white hover:text-black">
+                  className="bg-black text-white border-black border-2 px-4 py-2 mb-4 rounded hover:bg-white hover:text-black">
                   Load More
                 </button>
               </div>
