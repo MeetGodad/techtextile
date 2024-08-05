@@ -15,9 +15,9 @@ export default function ProductSection({
   const imageUrls = image.split(',');
   const firstImageUrl = imageUrls[0];
   return (
-    <div className="max-w-sm">
+    <div className="max-w-full">
     <Link href={{ pathname: '/Productdetail', query: { productId: product.product_id } }} as={`/Productdetail?productId=${product.product_id}`}>
-      <div className="border p-4 rounded-lg relative" style={{ height: '300px', width: '100%' }}>
+      <div className="border rounded-lg relative" style={{ height: '300px', width: '100%' }}>
         <div className="relative w-full h-48 mb-2 rounded-lg overflow-hidden">
           <Image
             className="object-cover"

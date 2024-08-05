@@ -105,7 +105,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
 
 
   return (
-    <header className={`w-full flex items-center gap-80 px-3 box-border z-40 fixed top-0 leading-normal tracking-normal text-xl font-sans  ${backgroundColor} ${isSticky ? 'bg-white shadow-md' : 'bg-transparent'}`}>
+    <header className={`w-full flex items-center mt-0 gap-80 px-3 box-border z-40 fixed top-0 leading-normal tracking-normal text-xl font-sans  ${backgroundColor} ${isSticky ? 'bg-white shadow-md' : 'bg-transparent'}`}>
       <div className="flex flex-auto items-center">
         <div className="flex items-center justify-center w-20 h-20"></div>
         <h3 className={`text-4xl text-center font-bold ${textColor}`} style={{ whiteSpace: 'nowrap', fontSize: 'calc(1.5vw + 1rem)' }}>
