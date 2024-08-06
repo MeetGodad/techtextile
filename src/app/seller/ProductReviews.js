@@ -1,4 +1,4 @@
-// Refrence - https://chatgpt.com/c/b17460af-4df2-4623-91ff-d830dca4d51c
+// Refrence - https://chatgpt.com/c/5f947589-837e-403b-8027-58a129d2d590
 "use client";
 import { useEffect, useState } from 'react';
 
@@ -19,12 +19,18 @@ const ProductReviews = ({ userId }) => {
         <svg
           key={i}
           xmlns="http://www.w3.org/2000/svg"
-          fill={i < rating ? "currentColor" : "none"}
           viewBox="0 0 24 24"
-          stroke="currentColor"
-          className={`w-4 h-4 ${i < rating ? 'text-yellow-500' : 'text-gray-300'}`}
+          className={`w-6 h-6 ${i < rating ? 'text-yellow-500' : 'text-gray-300'} transition-colors duration-300`}
         >
+          <defs>
+            <linearGradient id="gradient-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: '#FFAA00', stopOpacity: 1 }} />
+            </linearGradient>
+          </defs>
           <path
+            fill={i < rating ? 'url(#gradient-gold)' : 'none'}
+            stroke={i < rating ? 'url(#gradient-gold)' : 'currentColor'}
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
@@ -43,8 +49,11 @@ const ProductReviews = ({ userId }) => {
         reviews.map((review, index) => (
           <div key={index} className="bg-white shadow-md rounded-lg p-3 mb-3">
             <div className="flex space-x-4">
-              <img src={review.product_image.split(',')[0]} alt={review.product_name} className="w-48 h-48 object-cover rounded-lg" />
-              <div className="flex-1">
+            <img 
+                    src={review.product_image.split(',')[0]} 
+                    alt={review.product_name} 
+                    className="w-full md:w-48 h-auto object-contain rounded-lg mb-4 md:mb-0"
+                  />              <div className="flex-1">
                 <div className="mb-2">
                   <h2 className="text-xl font-bold">{review.product_name}</h2>
                   <p className="text-gray-600">Price: ${review.product_price}</p>

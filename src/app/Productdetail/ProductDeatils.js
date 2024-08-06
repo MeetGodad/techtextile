@@ -6,6 +6,8 @@ import Ratings from '../components/Ratings';
 import { FiCopy } from 'react-icons/fi';
 import { TbWorldShare } from "react-icons/tb";
 import { useRouter } from 'next/navigation';
+import { GrPrevious, GrNext } from 'react-icons/gr';
+
 
 import {
   FacebookShareButton,
@@ -46,6 +48,10 @@ export default function ProductDetail({ productId }) {
   const [availableQuantities, setAvailableQuantities] = useState([]);
   const [Message, setMessage] = useState('');
   const router = useRouter();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  
+
 
   useEffect(() => {
     // Function to hide share icons when clicking outside
@@ -365,6 +371,13 @@ useEffect(() => {
     }
   };
   
+
+
+  const shortDescription = product.product_description.slice(0, 100);
+
+  const toggleDescription = () => {
+    setIsExpanded(!isExpanded);
+  };
   
 const uniqueColors = product.variants
   ? [...new Set(product.variants.map(v => v.color.split(': ')[1]))]
@@ -376,20 +389,35 @@ const uniqueColors = product.variants
           <div className="flex flex-col md:flex-row">
             <div className="md:w-1/2 flex flex-col items-start relative">
               <div className="flex flex-col items-start">
-                <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
+                {/* <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
                   <img
                     className="w-[600px] h-[365px] object-cover object-center transition-opacity duration-300"
                     style={{ borderRadius: '20px' }}
                     src={currentImage}
                     alt={`${product.product_name} current`}
                   />
+                </div> */}
+                <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
+                  <img
+                    className="w-[600px] h-[365px] object-contain object-center transition-opacity duration-300"
+                    style={{ borderRadius: '20px' }}
+                    src={currentImage}
+                    alt={`${product.product_name} current`}
+                  />
                 </div>
+
                 <div className="flex flex-row items-center relative mb-4 md:mb-0">
-                  <button
+                  {/* <button
                     onClick={handlePrevImage}
                     className="flex bg-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mb-2 md:mb-0"
                     style={{ top: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
                     <span className="transform rotate-180 text-white text-2xl group-hover:animate-bounce">➤</span>
+                  </button> */}
+                  <button
+                    onClick={handlePrevImage}
+                    className="flex bg-white border-2 border-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mb-2 md:mb-0 shadow-md"
+                    style={{ top: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
+                    <GrPrevious className="text-black text-2xl" />
                   </button>
                   <div className="flex flex-row items-center mt-2 p-2 rounded-lg overflow-x-auto scrollbar-hide">
                     {imageUrls.map((url, index) => (
@@ -403,12 +431,19 @@ const uniqueColors = product.variants
                       />
                     ))}
                   </div>
-                  <button
+                  {/* <button
                     onClick={handleNextImage}
                     className="flex bg-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mt-2 md:mt-0"
                     style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
                     <span className="text-white text-2xl group-hover:animate-bounce">➤</span>
-                  </button>
+                  </button> */}
+                  <button
+  onClick={handleNextImage}
+  className="flex bg-white border-2 border-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mt-2 md:mt-0 shadow-md"
+  style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
+  <GrNext className="text-black text-2xl" />
+</button>
+
                 </div>
               </div>
             </div>
@@ -457,42 +492,43 @@ const uniqueColors = product.variants
               <h2 className="text-3xl font-bold text-gray-800 my-4">${product.price}</h2>
               <div className="flex space-x-5">
                 <div className="flex-grow">
-                  <div className="mb-1">
-                    <div className="flex items-center">
-                      <h3 className="font-semibold mb-2">Color:</h3>
-                      <div className="flex space-x-2 ml-4">
-                        {uniqueColors.map(color => (
-                          <button
-                            key={color}
-                            onClick={() => setSelectedColor(color)}
-                            className={`w-6 h-6 rounded-full transition-transform duration-300 hover:scale-110 ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
-                            style={{ backgroundColor: color }}
-                            title={color}
-                          />
-                        ))}
+                    <div className="mb-1">
+                      <div className="flex items-center">
+                        <h3 className="font-semibold mb-2">Color:</h3>
+                        <div className="flex space-x-2 ml-4">
+                          {uniqueColors.map(color => (
+                            <button
+                              key={color}
+                              onClick={() => setSelectedColor(color)}
+                              className={`w-6 h-6 rounded-full transition-transform duration-300 hover:scale-110 ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black' : ''}`}
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                    {product.product_type === 'yarn' && (
-                    <div className="flex-col">
-                      <h3 className="font-semibold mb-2">Denier:</h3>
-                      <div className="flex space-x-2">
-                        {availableDeniers.slice(0, 5).map(denier => (
-                          <button
-                            key={denier}
-                            onClick={() => handleDenierSelection(denier)}
-                            className={`px-4 py-2 border rounded transition-transform duration-300 ${selectedDenier === denier ? 'bg-black text-white border-white' : 'bg-transparent text-black border-black hover:bg-black hover:text-white'}`}
-                            >
-                            {denier}
-                          </button>
-                        ))}
+                      {product.product_type === 'yarn' && (
+                      <div className="flex-col">
+                        <h3 className="font-semibold mb-2">Denier:</h3>
+                        <div className="flex space-x-2">
+                          {availableDeniers.slice(0, 5).map(denier => (
+                            <button
+                              key={denier}
+                              onClick={() => handleDenierSelection(denier)}
+                              className={`px-4 py-2 border rounded transition-transform duration-300 ${selectedDenier === denier ? 'bg-black text-white border-white' : 'bg-transparent text-black border-black hover:bg-black hover:text-white'}`}
+                              >
+                              {denier}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    )}
+                      )}
                     <div>
                       <div className="flex flex-col space-y-4">
                         <div className="flex items-center space-x-4">
                           {/* Quantity Label and Input */}
+                          <div></div>
                           <label htmlFor="quantity" className="font-semibold mr-1">Quantity:</label>
                           <div className="relative">
                             <input
@@ -540,21 +576,15 @@ const uniqueColors = product.variants
                       </div>
                       
                     </div>
-                    {product.yarn_material && (
-                      <p className="text-lg mt-1"><strong>Yarn Material: </strong> {product.yarn_material}</p>
-                    )}
-                    {product.fabric_print_tech && (
-                      <p className="text-lg mt-1"> <strong>Fabric Print Technology: </strong>  {product.fabric_print_tech}</p>
-                    )}
-                    {product.fabric_material && (
-                      <p className="text-lg mt-1"> <strong>Fabric Material: </strong>  {product.fabric_material}</p>
-                    )}
+                    <div className='mt-10'>
+                    
+                    </div>
                 </div>
               </div>
               </div>
             </div> 
                   {/* Seller Details and Description Sections */}
-              <div className="flex mt-16">
+              <div className="flex mt-2">
                 <div className="w-1/2 pr-4">
                   <h2 className="text-xl font-bold mb-2">Seller Details</h2>
                   <p className="text-lg mb-2"><strong>Seller Company:</strong> {product.seller_business_name}</p>
@@ -564,7 +594,26 @@ const uniqueColors = product.variants
                 <div className="border-l border-black h-auto mx-4"></div> {/* Thin black line */}
                 <div className="w-1/2 pl-4">
                   <h2 className="text-xl font-bold mb-2">Description</h2>
-                  <p className="text-lg">{product.product_description}</p>
+                  {product.yarn_material && (
+                      <p className="text-lg mt-1"><strong>Yarn Material: </strong> {product.yarn_material}</p>
+                    )}
+                    {product.fabric_print_tech && (
+                      <p className="text-lg mt-1"> <strong>Fabric Print Technology: </strong>  {product.fabric_print_tech}</p>
+                    )}
+                    {product.fabric_material && (
+                      <p className="text-lg mt-1"> <strong>Fabric Material: </strong>  {product.fabric_material}</p>
+                    )}
+                 <div>
+                  <p className="text-lg">
+                    {isExpanded ? product.product_description : shortDescription + '...'}
+                  </p>
+                  <button 
+                    onClick={toggleDescription} 
+                    className="text-blue-500 underline"
+                  >
+                    {isExpanded ? 'Read less' : 'Read more'}
+                  </button>
+                </div>
                 </div>
               </div>
               {/* Related Products Section */}
