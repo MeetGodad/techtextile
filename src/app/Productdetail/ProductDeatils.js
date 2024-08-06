@@ -6,6 +6,8 @@ import Ratings from '../components/Ratings';
 import { FiCopy } from 'react-icons/fi';
 import { TbWorldShare } from "react-icons/tb";
 import { useRouter } from 'next/navigation';
+import { GrPrevious, GrNext } from 'react-icons/gr';
+
 
 import {
   FacebookShareButton,
@@ -356,20 +358,35 @@ const uniqueColors = product.variants
           <div className="flex flex-col md:flex-row">
             <div className="md:w-1/2 flex flex-col items-start relative">
               <div className="flex flex-col items-start">
-                <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
+                {/* <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
                   <img
                     className="w-[600px] h-[365px] object-cover object-center transition-opacity duration-300"
                     style={{ borderRadius: '20px' }}
                     src={currentImage}
                     alt={`${product.product_name} current`}
                   />
+                </div> */}
+                <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
+                  <img
+                    className="w-[600px] h-[365px] object-contain object-center transition-opacity duration-300"
+                    style={{ borderRadius: '20px' }}
+                    src={currentImage}
+                    alt={`${product.product_name} current`}
+                  />
                 </div>
+
                 <div className="flex flex-row items-center relative mb-4 md:mb-0">
-                  <button
+                  {/* <button
                     onClick={handlePrevImage}
                     className="flex bg-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mb-2 md:mb-0"
                     style={{ top: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
                     <span className="transform rotate-180 text-white text-2xl group-hover:animate-bounce">➤</span>
+                  </button> */}
+                  <button
+                    onClick={handlePrevImage}
+                    className="flex bg-white border-2 border-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mb-2 md:mb-0 shadow-md"
+                    style={{ top: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
+                    <GrPrevious className="text-black text-2xl" />
                   </button>
                   <div className="flex flex-row items-center mt-2 p-2 rounded-lg overflow-x-auto scrollbar-hide">
                     {imageUrls.map((url, index) => (
@@ -383,12 +400,19 @@ const uniqueColors = product.variants
                       />
                     ))}
                   </div>
-                  <button
+                  {/* <button
                     onClick={handleNextImage}
                     className="flex bg-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mt-2 md:mt-0"
                     style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
                     <span className="text-white text-2xl group-hover:animate-bounce">➤</span>
-                  </button>
+                  </button> */}
+                  <button
+  onClick={handleNextImage}
+  className="flex bg-white border-2 border-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mt-2 md:mt-0 shadow-md"
+  style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
+  <GrNext className="text-black text-2xl" />
+</button>
+
                 </div>
               </div>
             </div>
