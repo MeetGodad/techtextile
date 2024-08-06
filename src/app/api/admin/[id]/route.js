@@ -53,15 +53,15 @@ export async function GET(req, { params }) {
         a.state,
         a.postal_code,
         pv.variant_attributes,
-        pv.variant_id
+        pv.variant_id,
+        oi.item_status
       FROM Orders o
       JOIN OrderItems oi ON o.order_id = oi.order_id
       JOIN Products p ON oi.product_id = p.product_id
       LEFT JOIN YarnProducts y ON p.product_id = y.product_id
       LEFT JOIN FabricProducts f ON p.product_id = f.product_id
-      JOIN Buyers b ON o.user_id = b.user_id
-      JOIN UserAccounts ua ON b.user_id = ua.user_id
-      JOIN Addresses a ON b.user_address = a.address_id
+      JOIN UserAccounts ua ON o.user_id = ua.user_id
+      JOIN Addresses a ON o.shipping_address_id = a.address_id
       JOIN ProductVariant pv ON oi.variant_id = pv.variant_id
       WHERE p.seller_id = ${sellerId}
     `;
@@ -81,7 +81,7 @@ export async function GET(req, { params }) {
         baseQuery += ` ORDER BY oi.item_price DESC`;
       }
     } else {
-      baseQuery += ` ORDER BY o.created_at DESC`;
+      baseQuery += ` ORDER BY o.order_id ASC`;
     }
 
     const purchasedItems = await sql(baseQuery);
