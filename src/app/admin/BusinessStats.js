@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -38,14 +38,16 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
     lowStockAlerts: [],
   });
 
-  const [showMoreStockLevels, setShowMoreStockLevels] = useState(false);
   const [showMoreRepeatOrders, setShowMoreRepeatOrders] = useState(false);
   const [showMoreTopSelling, setShowMoreTopSelling] = useState(false);
-  const [showMoreLowStock, setShowMoreLowStock] = useState(false);
   const [timeView, setTimeView] = useState('date');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+
+  const productScrollRef = useRef(null);
+  const stockScrollRef = useRef(null);
+  const lowStockScrollRef = useRef(null);
 
   useEffect(() => {
     fetch(`/api/sales/${userId}`)
@@ -70,7 +72,7 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
   }, [userId]);
 
   const truncateProductName = (name) => {
-    return name.length > 12 ? name.slice(0, 12) + '...' : name;
+    return name.length > 15 ? name.slice(0, 15) + '...' : name;
   };
 
   const parseVariantAttributes = (attributes) => {
@@ -115,7 +117,7 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
   });
 
   const productData = {
-    labels: stats.salesByProduct.map(item => item.product_name),
+    labels: stats.salesByProduct.map(item => truncateProductName(item.product_name)),
     datasets: [
       {
         label: 'Total Sales ($)',
@@ -178,6 +180,8 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
         type: 'category',
         ticks: {
           autoSkip: false,
+          maxRotation: 0,
+          minRotation: 0,
         },
         title: {
           display: true,
@@ -239,7 +243,7 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
   };
 
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
+    <div className="p-4 bg-gray-100 min-h-screen" style={{ zoom: '100%' }}>
       <h1 className="text-4xl font-bold mb-8">Business Stats</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -290,14 +294,19 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
         </div>
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Sales by Product</h2>
-          <div className="relative h-[90%]">
-            {stats.salesByProduct.length > 0 ? (
-              <Bar data={productData} options={barOptions} />
-            ) : (
-              <p className="text-center text-gray-500">No sales data available.</p>
-            )}
+          <div className="relative h-96">
+            <div className="overflow-x-auto h-full" ref={productScrollRef}>
+              {stats.salesByProduct.length > 0 ? (
+                <div className="h-full min-w-[300px]">
+                  <Bar data={productData} options={barOptions} />
+                </div>
+              ) : (
+                <p className="text-center text-gray-500">No sales data available.</p>
+              )}
+            </div>
           </div>
         </div>
+        
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Sales by Category</h2>
           <div className="relative h-96">
@@ -311,95 +320,61 @@ const BusinessStats = ({ userId, onShowPurchasedItems }) => {
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Product Stock Levels</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {stats.productStockLevels.slice(0, showMoreStockLevels ? undefined : 8).map((product, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-contain rounded" />
-                <div className="flex flex-col space-y-2">
-                  <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
-                  <p className="text-gray-600">Price: ${product.price}</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {product.variants.map((variant, idx) => (
-                      <div key={idx} className="flex items-center space-x-1">
-                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
-                        <p className={`text-sm ${variant.quantity < 10 ? 'text-red-500' : 'text-green-500'}`}>
-                          {variant.quantity} {variant.quantity === 1 ? 'item' : 'items'}
-                        </p>
-                      </div>
-                    ))}
+          <div className="overflow-y-auto h-96" ref={stockScrollRef}>
+            <div className="">
+              {stats.productStockLevels.map((product, index) => (
+                <div key={index} className="flex items-center space-x-4 p-4 border-b border-gray-300 w-full">
+                  <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-20 h-20 object-contain rounded" />
+                  <div className="flex flex-col space-y-2 w-full">
+                    <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
+                    <p className="text-gray-600">Price: ${product.price}</p>
+                    <div className="grid grid-cols-2 gap-2 w-full">
+                      {product.variants.map((variant, idx) => (
+                        <div key={idx} className="flex items-center space-x-1">
+                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+                          <p className={`text-sm ${variant.quantity < 10 ? 'text-red-500' : 'text-green-500'}`}>
+                            {variant.quantity} {variant.quantity === 1 ? 'item' : 'items'}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-          {stats.productStockLevels.length > 8 && (
-            <button
-              onClick={() => setShowMoreStockLevels(!showMoreStockLevels)}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-            >
-              {showMoreStockLevels ? 'Show Less' : 'Show More'}
-            </button>
-          )}
           {stats.productStockLevels.length === 0 && (
             <p className="text-center text-gray-500">No product stock levels available.</p>
           )}
         </div>
 
-        <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
-          <h2 className="text-2xl font-bold mb-4">Top-Selling Products</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {stats.topSellingProducts.slice(0, showMoreTopSelling ? undefined : 5).map((product, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-contain rounded" />
-                <div className="flex flex-col space-y-2">
-                  <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
-                  <p className="text-gray-600">Total Sales: ${product.total_sales}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          {stats.topSellingProducts.length > 5 && (
-            <button
-              onClick={() => setShowMoreTopSelling(!showMoreTopSelling)}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-            >
-              {showMoreTopSelling ? 'Show Less' : 'Show More'}
-            </button>
-          )}
-          {stats.topSellingProducts.length === 0 && (
-            <p className="text-center text-gray-500">No top-selling products yet.</p>
-          )}
-        </div>
+
+
+
 
         <div className="p-4 bg-white text-black shadow-md rounded-lg border border-gray-300">
           <h2 className="text-2xl font-bold mb-4">Low Stock Alerts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {stats.lowStockAlerts.slice(0, showMoreLowStock ? undefined : 10).map((product, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-contain rounded" />
-                <div className="flex flex-col space-y-2">
-                  <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
-                  <p className="text-red-500">Only {product.quantity} left in stock!</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {product.variants.map((variant, idx) => (
-                      <div key={idx} className="flex items-center space-x-1">
-                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
-                        <p className="text-sm">Qty: {variant.quantity}</p>
-                      </div>
-                    ))}
+          <div className="overflow-y-auto h-96" ref={lowStockScrollRef}>
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4 h-full">
+              {stats.lowStockAlerts.map((product, index) => (
+                <div key={index} className="flex items-center space-x-4 p-4 border-b border-gray-300">
+                  <img src={product.image_url.split(',')[0]} alt={product.product_name} className="w-16 h-16 object-contain rounded" />
+                  <div className="flex flex-col space-y-2">
+                    <p className="text-lg font-semibold">{truncateProductName(product.product_name)}</p>
+                    <p className="text-red-500">Only {product.quantity} left in stock!</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {product.variants.map((variant, idx) => (
+                        <div key={idx} className="flex items-center space-x-1">
+                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: parseVariantAttributes(variant.variant_attributes) }}></div>
+                          <p className="text-sm">Qty: {variant.quantity}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-          {stats.lowStockAlerts.length > 10 && (
-            <button
-              onClick={() => setShowMoreLowStock(!showMoreLowStock)}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-            >
-              {showMoreLowStock ? 'Show Less' : 'Show More'}
-            </button>
-          )}
           {stats.lowStockAlerts.length === 0 && (
             <p className="text-center text-gray-500">Your inventory is up to date!</p>
           )}
