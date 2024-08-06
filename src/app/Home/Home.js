@@ -99,7 +99,6 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
 
   return (
     <div className="flex flex-col w-full min-h-0 bg-white overflow-x-auto z-20 overflow-hidden">
-      <Header isHomePage={true} />
       {/* Background Image Section */}
       <div className="relative h-screen w-full bg-cover bg-center" style={{ backgroundImage: `url('../Images/cotton fabric.gif')` /*, backgroundSize: 'contain', backgroundRepeat: 'no-repeat'*/ }}>
         <div className="flex flex-col items-baseline justify-center h-full bg-black bg-opacity-60 text-white">
