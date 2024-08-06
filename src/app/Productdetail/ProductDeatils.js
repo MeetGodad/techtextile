@@ -170,7 +170,12 @@ useEffect(() => {
 
   const addToCart = async () => {
     if (!user) {
-      alert('Please sign up or log in first.');
+      Swal.fire({
+        title: 'Please Signup/Login First',
+        text: 'You need to be logged in to add products to cart',
+        icon: 'error',
+        confirmButtonText: 'OK'
+    });
       return;
     }
     let variantId = null;
@@ -181,7 +186,12 @@ useEffect(() => {
           // Assuming selectedColor and selectedDenier have variant_id properties
           variantId = selectedDenier.variant_id;
         } else {
-          alert('Please select both color and denier for yarn products.');
+          Swal.fire({
+            title: 'Please add yarn color and denier first',
+            text: 'You need to select yarn color and denier to add to cart',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
           return;
         }
         break;
@@ -190,12 +200,22 @@ useEffect(() => {
           // Assuming selectedColor has variant_id property
           variantId = selectedColor.variant_id;
         } else {
-          alert('Please select a color for fabric products.');
+          Swal.fire({
+            title: 'Please add yarn color first',
+            text: 'You need to select fabric color to add to cart',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
           return;
         }
         break;
       default:
-        alert('Product type not supported.');
+        Swal.fire({
+          title: 'Product type not supported',
+          text: 'Only yarn and fabric products are supported',
+          icon: 'error',
+          confirmButtonText: 'OK'
+      });
         return;
     }
     try {
@@ -226,19 +246,25 @@ useEffect(() => {
     }
   };
   
-  const handleQuantityChange = (newQuantity) => {
+  const handleQuantityChange = (e) => {
+    let newQuantity = parseInt(e.target.value, 10);
     const maxQuantity = getSelectedVariantQuantity();
-    
-    if (newQuantity > maxQuantity) {
+  
+    if (isNaN(newQuantity)) {
+      setQuantity(1); // default to 1 if the input is invalid
+      setMessage('Quantity cannot be less than 1.');
+    } else if (newQuantity > maxQuantity) {
       setQuantity(maxQuantity);
+      setMessage(`Product quantity cannot exceed ${maxQuantity}.`);
     } else if (newQuantity < 1) {
-      setMessage(`Quantity cannot be less than 1.`);
       setQuantity(1);
+      setMessage('Quantity cannot be less than 1.');
     } else {
-      setMessage('');
       setQuantity(newQuantity);
+      setMessage('');
     }
   };
+  
   const handleQuantityIncrease = () => {
     const maxQuantity = getSelectedVariantQuantity();
     if (quantity < maxQuantity) {
@@ -247,7 +273,7 @@ useEffect(() => {
     } else {
       setMessage(`Product quantity cannot exceed ${maxQuantity}.`);
     }
-  };  
+  };
   
 const handleColorSelection = (color) => {
   setSelectedColor(color);
@@ -292,7 +318,12 @@ useEffect(() => {
   };
   const handleReviewAdd = () => {
     if (!user || !user.uid) {
-      alert('Please sign in to add a review.');
+      Swal.fire({
+        title: 'Please Signup/Login First',
+        text: 'You need to be logged in to add review for products',
+        icon: 'error',
+        confirmButtonText: 'OK'
+    });
       return;
     }
     setIsRatingsOpen(true);
@@ -472,16 +503,18 @@ const uniqueColors = product.variants
                               max={getSelectedVariantQuantity()}
                               value={quantity}
                               onChange={handleQuantityChange}
-                              disabled={!selectedColor || parseInt(getSelectedVariantQuantity()) === 0}/>
+                              disabled={!selectedColor || parseInt(getSelectedVariantQuantity()) === 0}
+                            />
                             <button
                               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
-                              onClick={() => handleQuantityChange(quantity - 1)}
-                              disabled={quantity <= 1}>
+                              onClick={() => handleQuantityChange({ target: { value: quantity - 1 } })}
+                              disabled={quantity <= 1}
+                            >
                               <span className="text-xl font-semibold">−</span>
                             </button>
                             <button
                               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
-                              onClick={() => handleQuantityIncrease()}
+                              onClick={handleQuantityIncrease}
                               disabled={!selectedColor || parseInt(getSelectedVariantQuantity()) === 0}
                             >
                               <span className="text-xl font-semibold">+</span>
