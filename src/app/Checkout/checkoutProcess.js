@@ -40,6 +40,7 @@ const Checkout = () => {
     phone: '',
   });
   const [isStepValid, setIsStepValid] = useState(false);
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
   const [totalShippingCost, setTotalShippingCost] = useState(0);
   const [shippingDetails, setShippingDetails] = useState([]);
   const [existingAddresses, setExistingAddresses] = useState([]);
@@ -148,19 +149,39 @@ const Checkout = () => {
     }
     validateStep1(); // Validate step after updating shipping info
   };
-
-  // Handler for shipping info change
-  const handleShippingChange = (e) => {
-    const { name, value } = e.target;
-    setShippingInfo((prev) => ({ ...prev, [name]: value }));
-    validateStep1();
-  };
+    // Handler for shipping info change
+    const handleShippingChange = (e) => {
+      const { name, value } = e.target;
+      setShippingInfo((prev) => ({ ...prev, [name]: value }));
+      
+      // Validate phone number length
+      if (name === 'phone') {
+        setIsPhoneValid(value.length === 10);
+      }
+  
+      validateStep1();
+    };
 
   // Function to validate step 1 (shipping details)
   const validateStep1 = () => {
-    const { firstName, lastName, street, city, stateCode, zip, email, countryCode } = shippingInfo;
-    setIsStepValid(firstName && lastName && street && city && stateCode && zip && email && countryCode);
+    const { firstName, lastName, street, city, state, zip, email, country, phone } = shippingInfo;
+    console.log('Phone Valid:', isPhoneValid); // Debugging line
+    console.log('Form Valid:', ); // Debugging line
+  
+    setIsStepValid(
+      firstName &&
+      lastName &&
+      street &&
+      city &&
+      state &&
+      zip &&
+      email &&
+      country &&
+      phone.length === 10 // Ensure phone number is exactly 10 digits
+    );
   };
+  
+
 
   // Handler to move to previous step
   const handlePreviousStep = () => {
@@ -169,7 +190,7 @@ const Checkout = () => {
 
   // Handler to move to next step if current step is valid
   const handleNextStep = () => {
-    if (isStepValid) {
+    if (isPhoneValid) {
       setStep(step + 1);
     }
   };
@@ -183,7 +204,7 @@ const Checkout = () => {
 
         // Show loading state
         Swal.fire({
-            title: 'Placing your order...',
+            title: 'Validating your order...',
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
@@ -217,12 +238,7 @@ const Checkout = () => {
 
         if (response.ok) {
             setOrderId(data.orderId);
-            Swal.fire({
-                title: 'Order has been Placed Successfully! 🎉 Please Complete The Payment',
-                text: `Your order ID is: ${data.orderId}`,
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
+            Swal.close();
             return data.orderId;
         } else {
             throw new Error(data.message || 'Failed to submit order');
@@ -459,7 +475,8 @@ const renderStep = () => {
                     type="tel"
                     name="phone"
                     placeholder=" "
-                    pattern="[0-9]{10}"
+                    pattern="[0-9]{10}"   // Ensures only digits are entered
+                    maxLength="10" 
                     value={shippingInfo.phone}
                     onChange={handleShippingChange}
                     className="peer w-full p-4 pl-12 border text-black border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 group-hover:bg-white placeholder-transparent"
@@ -650,9 +667,9 @@ const renderStep = () => {
                 {step < 2 && (
                   <button
                     onClick={handleNextStep}
-                    disabled={!isStepValid}
+                    disabled={!isPhoneValid}
                     className={`${
-                      isStepValid
+                      isPhoneValid
                         ? 'bg-blue-500 hover:bg-blue-600 text-white'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     } transition-colors duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 rounded-lg px-4 py-2`}
@@ -663,9 +680,9 @@ const renderStep = () => {
                 {step === 2 && (
                   <button
                     onClick={handlePayAndSubmit}
-                    disabled={!isStepValid}
+                    disabled={!isPhoneValid}
                     className={`${
-                      isStepValid
+                      isPhoneValid
                         ? 'bg-blue-500 hover:bg-blue-600 text-white'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     } transition-colors duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 rounded-lg px-4 py-2`}

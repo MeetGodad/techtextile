@@ -229,7 +229,7 @@ export default function Profile() {
         </div>
       </div>
     ) : (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className={`min-h-screen 'bg-white'`}>
         <Loder />
       </div>
     )
