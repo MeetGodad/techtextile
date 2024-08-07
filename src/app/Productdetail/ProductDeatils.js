@@ -7,6 +7,7 @@ import { FiCopy } from 'react-icons/fi';
 import { TbWorldShare } from "react-icons/tb";
 import { useRouter } from 'next/navigation';
 import { GrPrevious, GrNext } from 'react-icons/gr';
+import Swal from 'sweetalert2';
 
 
 import {
