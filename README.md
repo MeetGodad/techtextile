@@ -68,7 +68,7 @@ The application is deployed on Vercel. You can view it [here](https://techtextil
 3. **Start the development server**:
     ```bash
     npm install
-    npm start
+    npm run dev
     ```
 
 ---
