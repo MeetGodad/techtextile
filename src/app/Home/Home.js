@@ -116,7 +116,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
         
         {products.length > 0 ? (
           <>
-            <div className="flex justify-end mb-4">
+            <div className="flex text-black justify-end mb-4">
               <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
                 <option value="none">Sort by</option>
                 <option value="lowToHigh">Price: Low to High</option>
