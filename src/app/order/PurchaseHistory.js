@@ -312,7 +312,7 @@ const PurchaseHistory = ({ userId }) => {
                   )}
                   <button 
                     onClick={() => handleBuyAgain(item.product_id)}
-                    className="mt-auto bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 text-sm"
+                    className="mt-auto bg-black text-white px-4 py-2 rounded border-black border-2 hover:bg-white hover:border-black hover:text-black transition duration-300 text-sm"
                   >
                     Buy Again
                   </button>
