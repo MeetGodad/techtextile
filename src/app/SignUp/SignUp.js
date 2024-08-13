@@ -43,7 +43,7 @@ export default function SignUp( {onSwitch}) {
             return;
         }
     
-try {
+    try {
       const userId = await emailSignUp(formData.email, formData.password);
 
       const checkUserAvailable = async () => {

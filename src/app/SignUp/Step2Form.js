@@ -1,8 +1,19 @@
 // components/Step2Form.js
 "use client";
+import { useState, useEffect } from 'react';
 import AddressInput from '../components/AddressInput';
 
 export function Step2Form({ formData, handleChange, role }) {
+
+    const [isAddressLoaded, setIsAddressLoaded] = useState(true);
+    const [isFormLoaded, setIsFormLoaded] = useState(false);
+  
+    useEffect(() => {
+      if (isAddressLoaded) {
+        setIsFormLoaded(true);
+      }
+    }, [isAddressLoaded]);
+
     return (
       <div className="p-4 w-full">
         <h2 className="block text-base leading-tight font-medium text-black mb-2">Personal Information</h2>
@@ -70,6 +81,7 @@ export function Step2Form({ formData, handleChange, role }) {
                 {role === "seller" ? "Company Address" : "Address"}
               </label>
               <AddressInput
+                setIsAddressLoaded={setIsAddressLoaded}
                 supportedCountries={role === "seller" ? ['CA', 'IN'] : ['CA']}
                 role={role}
                 street={formData.street}
