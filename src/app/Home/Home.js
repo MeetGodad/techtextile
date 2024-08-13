@@ -99,7 +99,6 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
 
   return (
     <div className="flex flex-col w-full min-h-0 bg-white overflow-x-auto z-20 overflow-hidden">
-      <Header isHomePage={true} />
       {/* Background Image Section */}
       <div className="relative h-screen w-full bg-cover bg-center" style={{ backgroundImage: `url('../Images/cotton fabric.gif')` /*, backgroundSize: 'contain', backgroundRepeat: 'no-repeat'*/ }}>
         <div className="flex flex-col items-baseline justify-center h-full bg-black bg-opacity-60 text-white">
@@ -117,7 +116,7 @@ export default function Home({ category, subCategory, subSubCategory, searchResu
         
         {products.length > 0 ? (
           <>
-            <div className="flex justify-end mb-4">
+            <div className="flex text-black justify-end mb-4">
               <select value={sortOrder} onChange={handleSortChange} className="border p-2 rounded">
                 <option value="none">Sort by</option>
                 <option value="lowToHigh">Price: Low to High</option>

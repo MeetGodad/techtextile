@@ -36,7 +36,7 @@ export default function Profile() {
     console.log("User Id : ", userId);
 
     if (userId !== null) {
-      fetch(`api/profile/${userId}`, {
+      fetch(`api/Profile/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -229,7 +229,7 @@ export default function Profile() {
         </div>
       </div>
     ) : (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className={`min-h-screen 'bg-white'`}>
         <Loder />
       </div>
     )

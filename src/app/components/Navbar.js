@@ -117,7 +117,7 @@ const Header = ({ category, subCategory, subSubCategory, onCategoryChange, onSub
           <input
             type="text"
             placeholder="What are you looking for?"
-            className="text-left bg-transparent outline-none text-sm"
+            className="text-left text-black bg-transparent outline-none text-sm"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

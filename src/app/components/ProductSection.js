@@ -20,13 +20,16 @@ export default function ProductSection({
       <div className="border rounded-lg relative" style={{ height: '300px', width: '100%' }}>
         <div className="relative w-full h-48 mb-2 rounded-lg overflow-hidden">
           <Image
-            className="object-cover"
+            className="object-cover w-full md:w-48 h-auto object-contain rounded-lg mb-4 md:mb-0"
             alt={name}
             src={firstImageUrl}
             layout="fill"
             objectFit="cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
+         
+        
+
         </div>
         <div className="overflow-hidden">
           <h2 className="text-2xl ml-2 font-bold truncate text-black">{name}</h2>

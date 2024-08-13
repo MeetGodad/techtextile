@@ -225,12 +225,12 @@ const PurchaseHistory = ({ userId }) => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-100 p-8">
-      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Purchase History</h2>
-      {isLoading ? (
-      <div className="flex justfy-center align-self ">
-        <Loder />
-      </div>
+    <div className={`min-h-screen mt-10 ${isLoading ? 'bg-white' : 'bg-gray-100'}`}>
+  <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Purchase History</h2>
+  {isLoading ? (
+    <div className="flex items-center justify-center w-full h-full">
+      <Loder />
+    </div>
     ) : orders.length === 0 ? (
       <div className="text-center text-gray-500">No purchase history found</div>
     ) : (

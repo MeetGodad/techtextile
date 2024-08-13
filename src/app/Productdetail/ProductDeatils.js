@@ -6,6 +6,9 @@ import Ratings from '../components/Ratings';
 import { FiCopy } from 'react-icons/fi';
 import { TbWorldShare } from "react-icons/tb";
 import { useRouter } from 'next/navigation';
+import { GrPrevious, GrNext } from 'react-icons/gr';
+import Swal from 'sweetalert2';
+
 
 import {
   FacebookShareButton,
@@ -174,7 +177,12 @@ useEffect(() => {
 
   const addToCart = async () => {
     if (!user) {
-      alert('Please sign up or log in first.');
+      Swal.fire({
+        title: 'Please Signup/Login First',
+        text: 'You need to be logged in to add products to cart',
+        icon: 'error',
+        confirmButtonText: 'OK'
+    });
       return;
     }
     let variantId = null;
@@ -185,7 +193,12 @@ useEffect(() => {
           // Assuming selectedColor and selectedDenier have variant_id properties
           variantId = selectedDenier.variant_id;
         } else {
-          alert('Please select both color and denier for yarn products.');
+          Swal.fire({
+            title: 'Please add yarn color and denier first',
+            text: 'You need to select yarn color and denier to add to cart',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
           return;
         }
         break;
@@ -194,12 +207,22 @@ useEffect(() => {
           // Assuming selectedColor has variant_id property
           variantId = selectedColor.variant_id;
         } else {
-          alert('Please select a color for fabric products.');
+          Swal.fire({
+            title: 'Please add yarn color first',
+            text: 'You need to select fabric color to add to cart',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
           return;
         }
         break;
       default:
-        alert('Product type not supported.');
+        Swal.fire({
+          title: 'Product type not supported',
+          text: 'Only yarn and fabric products are supported',
+          icon: 'error',
+          confirmButtonText: 'OK'
+      });
         return;
     }
     try {
@@ -230,19 +253,25 @@ useEffect(() => {
     }
   };
   
-  const handleQuantityChange = (newQuantity) => {
+  const handleQuantityChange = (e) => {
+    let newQuantity = parseInt(e.target.value, 10);
     const maxQuantity = getSelectedVariantQuantity();
-    
-    if (newQuantity > maxQuantity) {
+  
+    if (isNaN(newQuantity)) {
+      setQuantity(1); // default to 1 if the input is invalid
+      setMessage('Quantity cannot be less than 1.');
+    } else if (newQuantity > maxQuantity) {
       setQuantity(maxQuantity);
+      setMessage(`Product quantity cannot exceed ${maxQuantity}.`);
     } else if (newQuantity < 1) {
-      setMessage(`Quantity cannot be less than 1.`);
       setQuantity(1);
+      setMessage('Quantity cannot be less than 1.');
     } else {
-      setMessage('');
       setQuantity(newQuantity);
+      setMessage('');
     }
   };
+  
   const handleQuantityIncrease = () => {
     const maxQuantity = getSelectedVariantQuantity();
     if (quantity < maxQuantity) {
@@ -251,7 +280,7 @@ useEffect(() => {
     } else {
       setMessage(`Product quantity cannot exceed ${maxQuantity}.`);
     }
-  };  
+  };
   
 const handleColorSelection = (color) => {
   setSelectedColor(color);
@@ -296,7 +325,12 @@ useEffect(() => {
   };
   const handleReviewAdd = () => {
     if (!user || !user.uid) {
-      alert('Please sign in to add a review.');
+      Swal.fire({
+        title: 'Please Signup/Login First',
+        text: 'You need to be logged in to add review for products',
+        icon: 'error',
+        confirmButtonText: 'OK'
+    });
       return;
     }
     setIsRatingsOpen(true);
@@ -356,20 +390,35 @@ const uniqueColors = product.variants
           <div className="flex flex-col md:flex-row">
             <div className="md:w-1/2 flex flex-col items-start relative">
               <div className="flex flex-col items-start">
-                <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
+                {/* <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
                   <img
                     className="w-[600px] h-[365px] object-cover object-center transition-opacity duration-300"
                     style={{ borderRadius: '20px' }}
                     src={currentImage}
                     alt={`${product.product_name} current`}
                   />
+                </div> */}
+                <div className="border-2 border-gray-500 w-[650px] h-96 flex items-center justify-center p-2 rounded-lg overflow-hidden mb-4">
+                  <img
+                    className="w-[600px] h-[365px] object-contain object-center transition-opacity duration-300"
+                    style={{ borderRadius: '20px' }}
+                    src={currentImage}
+                    alt={`${product.product_name} current`}
+                  />
                 </div>
+
                 <div className="flex flex-row items-center relative mb-4 md:mb-0">
-                  <button
+                  {/* <button
                     onClick={handlePrevImage}
                     className="flex bg-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mb-2 md:mb-0"
                     style={{ top: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
                     <span className="transform rotate-180 text-white text-2xl group-hover:animate-bounce">➤</span>
+                  </button> */}
+                  <button
+                    onClick={handlePrevImage}
+                    className="flex bg-white border-2 border-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mb-2 md:mb-0 shadow-md"
+                    style={{ top: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
+                    <GrPrevious className="text-black text-2xl" />
                   </button>
                   <div className="flex flex-row items-center mt-2 p-2 rounded-lg overflow-x-auto scrollbar-hide">
                     {imageUrls.map((url, index) => (
@@ -383,12 +432,19 @@ const uniqueColors = product.variants
                       />
                     ))}
                   </div>
-                  <button
+                  {/* <button
                     onClick={handleNextImage}
                     className="flex bg-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mt-2 md:mt-0"
                     style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
                     <span className="text-white text-2xl group-hover:animate-bounce">➤</span>
-                  </button>
+                  </button> */}
+                  <button
+  onClick={handleNextImage}
+  className="flex bg-white border-2 border-black hover:bg-gray-300 p-2 rounded-full transition-colors duration-300 mt-2 md:mt-0 shadow-md"
+  style={{ bottom: `${Math.max(0, (imageUrls.length * 20) / 2 - 20)}px` }}>
+  <GrNext className="text-black text-2xl" />
+</button>
+
                 </div>
               </div>
             </div>
@@ -484,16 +540,18 @@ const uniqueColors = product.variants
                               max={getSelectedVariantQuantity()}
                               value={quantity}
                               onChange={handleQuantityChange}
-                              disabled={!selectedColor || parseInt(getSelectedVariantQuantity()) === 0}/>
+                              disabled={!selectedColor || parseInt(getSelectedVariantQuantity()) === 0}
+                            />
                             <button
                               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
-                              onClick={() => handleQuantityChange(quantity - 1)}
-                              disabled={quantity <= 1}>
+                              onClick={() => handleQuantityChange({ target: { value: quantity - 1 } })}
+                              disabled={quantity <= 1}
+                            >
                               <span className="text-xl font-semibold">−</span>
                             </button>
                             <button
                               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
-                              onClick={() => handleQuantityIncrease()}
+                              onClick={handleQuantityIncrease}
                               disabled={!selectedColor || parseInt(getSelectedVariantQuantity()) === 0}
                             >
                               <span className="text-xl font-semibold">+</span>
